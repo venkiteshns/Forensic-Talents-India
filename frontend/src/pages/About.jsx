@@ -49,7 +49,7 @@ export default function About() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-7">
-              <h2 className="text-3xl font-heading font-bold text-primary mb-6">About the Organization</h2>
+              <h2 className="text-3xl font-heading font-bold text-primary mb-6">Welcome to Forensic Talents India</h2>
               <div className="space-y-4 text-slate-600 leading-relaxed">
                 <p>
                   Forensic Talents India stands as a distinguished and forward-thinking organization in the domain of forensic science and investigation, dedicated to delivering scientifically precise, ethically grounded, and legally admissible forensic solutions. The organization was established with a clear and purposeful vision—to bridge the longstanding gap between scientific analysis and legal interpretation, thereby strengthening the justice delivery system.
@@ -73,7 +73,7 @@ export default function About() {
 
             <div className="lg:col-span-5 space-y-8">
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-                <h3 className="text-2xl font-bold text-primary mb-4">Welcome to Forensic Talents India</h3>
+                <h3 className="text-2xl font-bold text-primary mb-4">About Us</h3>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6 italic border-l-2 border-slate-200 pl-4">
                   Forensic science is fundamentally defined as “the application of scientific principles and techniques for the purpose of law.” It plays an indispensable role in modern justice systems by enabling the objective discovery of truth through evidence-based analysis.
                 </p>
@@ -115,7 +115,7 @@ export default function About() {
                 ))}
               </ul>
             </div>
-            
+
             {/* Why Choose Us */}
             <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
               <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
