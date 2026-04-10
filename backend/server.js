@@ -63,6 +63,27 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// Keep-alive route
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('Server is alive.');
+});
+
+const https = require('https');
+const pingInterval = 14 * 60 * 1000; // 14 minutes
+const backendUrl = "https://forensic-talents-india.onrender.com/api/ping";
+
+setInterval(() => {
+  https.get(backendUrl, (response) => {
+    if (response.statusCode === 200) {
+      console.log('Keep-alive ping successful:', new Date().toISOString());
+    } else {
+      console.log('Keep-alive ping failed with status code:', response.statusCode);
+    }
+  }).on('error', (error) => {
+    console.error('Keep-alive ping error:', error.message);
+  });
+}, pingInterval);
+
 app.listen(port, () => {
   console.log(`Backend server is running correctly on http://localhost:${port}`);
 });

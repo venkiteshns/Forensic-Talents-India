@@ -42,7 +42,7 @@ export default function Education() {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/contact", {
+      const response = await fetch("https://forensic-talents-india.onrender.com/api/contact", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
