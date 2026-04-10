@@ -34,11 +34,15 @@ export default function SuccessStories() {
   return (
     <div className="bg-white min-h-[calc(100vh-88px)]">
       {/* Header */}
-      <section className="bg-primary text-white py-16 text-center border-b-[8px] border-accent">
-        <Container>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">Our Success & Impact</h1>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-            A proven track record of delivering truth, solidifying evidence, and shaping justice through forensic science globally.
+      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}>
+        <div className="absolute inset-0 z-0">
+          <img src="/images/banners/success_stories_banner.png" alt="Success Stories" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
+        </div>
+        <Container className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Our Success & Impact</h1>
+          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            A proven track record of delivering absolute truth, solidifying undeniable evidence, and shaping justice globally. We pride ourselves on the high-profile results our scientific expertise has provided to courtrooms worldwide.
           </p>
         </Container>
       </section>

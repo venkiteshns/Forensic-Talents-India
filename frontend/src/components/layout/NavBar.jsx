@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Container } from '../ui/Container';
@@ -9,6 +9,18 @@ export function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navRef = useRef(null);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +46,7 @@ export function NavBar() {
 
   return (
     <header 
+      ref={navRef}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled ? "bg-white/95 backdrop-blur-md shadow-md py-3" : "bg-white py-5"
@@ -82,6 +95,7 @@ export function NavBar() {
             <Link 
               key={link.name} 
               to={link.path}
+              onClick={() => setMobileMenuOpen(false)}
               className={cn(
                 "block py-2 text-lg font-medium",
                 location.pathname === link.path ? "text-primary font-bold" : "text-slate-600"
@@ -90,7 +104,7 @@ export function NavBar() {
               {link.name}
             </Link>
           ))}
-          <Link to="/contact" className="w-full mt-4 block">
+          <Link to="/contact" className="w-full mt-4 block" onClick={() => setMobileMenuOpen(false)}>
             <Button variant="primary" className="w-full">
               Book Consultation
             </Button>

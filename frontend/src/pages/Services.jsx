@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, UserSearch } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export default function Services() {
@@ -41,24 +41,25 @@ export default function Services() {
       desc: 'Critical evaluation and questioning of opposing forensic evidence and expert reports for courtroom accuracy.', 
       icon: <Scale size={32} /> 
     },
-    { 
-      id: 'detective', 
-      title: 'Detective Services', 
-      desc: 'Discreet, professional investigative services for both businesses and individuals to uncover the truth.', 
-      icon: <UserSearch size={32} /> 
-    },
   ];
 
   return (
-    <div className="bg-secondary-light min-h-[calc(100vh-88px)] py-20">
-      <Container>
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-primary mb-6">Our Forensic Services</h1>
-          <p className="text-slate-600 text-lg">
-            We provide specialized scientific assistance across various domains. Click on a service to see a detailed breakdown of our process and offerings.
-          </p>
+    <div className="bg-secondary-light min-h-[calc(100vh-88px)] pb-20">
+      {/* Header */}
+      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+        <div className="absolute inset-0 z-0">
+          <img src="/images/banners/services_banner.png" alt="Forensic Services" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
+        <Container className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Our Forensic Services</h1>
+          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            We provide specialized, legally sound scientific assistance across fundamentally critical domains. Explore our comprehensive portfolio below to view detailed breakdowns of our methodologies and forensic analysis processes.
+          </p>
+        </Container>
+      </section>
 
+      <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {servicesList.map((srv) => (
             <div key={srv.id} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300">

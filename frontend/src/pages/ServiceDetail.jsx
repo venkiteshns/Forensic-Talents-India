@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowLeft, ArrowRight, CheckCircle2, Globe, FileText, Fingerprint, Shield, Link as LinkIcon, BadgeCheck, Search, Database, MessageSquare, Mail, MapPin, Mic, HardDrive, Scale, History, Camera, GitCompare, ShieldAlert, Beaker, ClipboardList, Eye, Landmark, UserCheck, Scan, PenTool, FileSearch, FileEdit, FileQuestion, Droplet, Award, UserSearch, Heart, Activity, ShieldCheck, DollarSign, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Globe, FileText, Fingerprint, Shield, Link as LinkIcon, BadgeCheck, Search, Database, MessageSquare, Mail, MapPin, Mic, HardDrive, Scale, History, Camera, GitCompare, ShieldAlert, Beaker, ClipboardList, Eye, Landmark, UserCheck, Scan, PenTool, FileSearch, FileEdit, FileQuestion, Droplet, Award } from 'lucide-react';
 import extractedData from '../data/extracted_docs.json';
 
 // Utility to parse extracted Word text safely
@@ -74,11 +74,6 @@ export default function ServiceDetail() {
       title: 'Forensic Cross Examination', 
       file: 'Forensic Cross Examination.docx',
       catchyIntro: "Strategic evaluation and questioning of forensic evidence to ensure scientific validity and legally reliable courtroom outcomes."
-    },
-    'detective': {
-      title: 'Detective Services',
-      file: 'Detective Services.docx',
-      catchyIntro: "Experienced Private Investigators meticulously picked for discreet, professional investigations solving complex personal and corporate puzzles."
     },
   };
 
@@ -581,152 +576,6 @@ export default function ServiceDetail() {
             </div>
           </div>
         </Container>
-      )}
-
-      {/* Detective Services Specific Custom Section */}
-      {id === 'detective' && (
-        <div className="bg-white">
-          <Container className="py-16 border-t border-slate-100">
-            <div className="max-w-5xl mx-auto text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-6">We Exceed your Expectations, not your Budget.</h2>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                Our Private Investigators are meticulously picked to be part of The FOR-T team. We boldly stand on having the best Private Investigators in India. We have experts from various sides of the industry; our team includes Surveillance Investigators with years of relevant experience. We treat each file with professional pride that guarantees the best possible outcome for your investigation. We work efficiently and discretely and always strive for continued success on files!
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24">
-              <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="text-2xl font-bold text-primary mb-6 border-b border-slate-200 pb-4">Personal Detective Services</h3>
-                <ul className="space-y-6">
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Investigative Expertise for Your Needs</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">We offer professional investigative services for both businesses and individuals. Our team of experienced investigators is dedicated to providing you with discreet and thorough investigations.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Confidentiality is Paramount</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">We understand the importance of privacy. You can be assured that all your information and case details will be kept strictly confidential.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Tailored Investigations</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">Every case is unique. We utilize the necessary manpower, technology, and resources to ensure a comprehensive investigation, regardless of complexity.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Transparent Costs</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">Our fees are based on the specific requirements of your case, including factors like location, potential risks, and time commitment. We'll provide a clear cost breakdown before we begin.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">What We Need From You</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">Please provide as much detail as possible about your case (photos, vehicle intel, numbers, addresses). Your full cooperation and honesty are essential for success.</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 shadow-sm">
-                <h3 className="text-2xl font-bold text-primary mb-6 border-b border-slate-200 pb-4">Corporate Detective Services</h3>
-                <ul className="space-y-6">
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Pre Employment Verification</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">Check candidate credentials to avoid hiring employees with past fraulent history that may harm your company's growth. Pre-employment checks are extremely important.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Post Employment Verification</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">Investigate theft by employees, misappropriation of information, industrial theft, internal fraud, or employees involved in parallel business or meeting competitors.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Asset Verification</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">FOR-T tracing services are designed to locate and identify company or individually held assets such as real estate property, vehicles, and income sources.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Trademark & Copyright Verification</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">FOR-T will aggressively protect your company from counterfeit merchandise and gray market trading.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={24} />
-                    <div>
-                      <span className="block font-bold text-slate-800 mb-1">Business Interference</span>
-                      <span className="text-slate-600 leading-relaxed text-sm">FOR-T will help you out when other business associates give a bad impact on your organization and help you with solid proof and documentation.</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mb-20">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-heading font-bold text-primary mb-4">Discreet Investigations for Peace of Mind</h3>
-                <p className="text-slate-600 max-w-2xl mx-auto">Our experienced private detectives offer a comprehensive range of services to meet your unique needs.</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                  <Heart className="text-accent mb-4" size={36} />
-                  <h4 className="text-xl font-bold text-slate-800 mb-2">Pre-Marital Verification</h4>
-                  <p className="text-slate-600 text-sm">Gain clarity and confidence before marriage with thorough background checks on potential partners.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                  <Activity className="text-accent mb-4" size={36} />
-                  <h4 className="text-xl font-bold text-slate-800 mb-2">Post-Marital Investigations</h4>
-                  <p className="text-slate-600 text-sm">Uncover the truth in situations of infidelity or suspicious behavior.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                  <UserSearch className="text-accent mb-4" size={36} />
-                  <h4 className="text-xl font-bold text-slate-800 mb-2">In-depth Background Checks</h4>
-                  <p className="text-slate-600 text-sm">Get a clear picture of an individual's history for employment purposes, tenant screening, or personal peace of mind.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-lg hover:-translate-y-1 transition-all duration-300 lg:col-start-1 lg:ml-auto lg:w-[120%] lg:max-w-none">
-                  <Eye className="text-accent mb-4" size={36} />
-                  <h4 className="text-xl font-bold text-slate-800 mb-2">Discreet Surveillance</h4>
-                  <p className="text-slate-600 text-sm">Gather evidence through lawful observation techniques and discreet shadowing.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-lg hover:-translate-y-1 transition-all duration-300 lg:w-[120%] lg:max-w-none">
-                  <ShieldCheck className="text-accent mb-4" size={36} />
-                  <h4 className="text-xl font-bold text-slate-800 mb-2">Security Consulting</h4>
-                  <p className="text-slate-600 text-sm">Our experts provide security assessments and strategies to safeguard your assets and loved ones.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-primary/5 border border-primary/20 p-8 rounded-xl mb-8">
-              <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                <AlertCircle className="text-primary" /> Terms and Conditions
-              </h3>
-              <ul className="space-y-4 text-slate-700 list-disc ml-6">
-                <li><strong className="text-slate-900">Upfront Fee:</strong> A 80% upfront fee is required to begin the investigation process.</li>
-                <li><strong className="text-slate-900">Disclosure:</strong> Please disclose any previous investigation attempts by other agencies.</li>
-                <li><strong className="text-slate-900">Confidentiality:</strong> Maintain confidentiality - do not discuss the case details with anyone during the investigation.</li>
-                <li><strong className="text-slate-900">Refunds:</strong> Investigation process fees are non-refundable.</li>
-              </ul>
-            </div>
-            
-          </Container>
-        </div>
       )}
     </div>
   );

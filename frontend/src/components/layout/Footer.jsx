@@ -49,6 +49,7 @@ export function Footer() {
           <div>
             <h4 className="text-white font-heading font-semibold mb-6">Our Services</h4>
             <ul className="space-y-3 text-sm">
+              <li><Link to="/services/pcc" className="hover:text-white transition-colors">Police Clearance Certificate</Link></li>
               <li><Link to="/services/fingerprint" className="hover:text-white transition-colors">Fingerprint Examination</Link></li>
               <li><Link to="/services/cyber" className="hover:text-white transition-colors">Cyber Forensics</Link></li>
               <li><Link to="/services/questioned-documents" className="hover:text-white transition-colors">Questioned Documents</Link></li>

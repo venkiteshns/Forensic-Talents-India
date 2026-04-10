@@ -182,11 +182,15 @@ export default function Education() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20">
       {/* Header */}
-      <section className="bg-primary text-white py-16 text-center">
-        <Container>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">Education & Training Programs</h1>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-            Industry-oriented forensic science training designed to provide both theoretical knowledge and practical exposure by top-tier experts.
+      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}>
+        <div className="absolute inset-0 z-0">
+          <img src="/images/banners/education_banner.png" alt="Forensic Education" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
+        </div>
+        <Container className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Education & Training Programs</h1>
+          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            Industry-oriented forensic science training designed to provide deep theoretical knowledge fused with hands-on practical exposure. Delivered directly by top-tier field experts, preparing you for real-world forensic challenges.
           </p>
         </Container>
       </section>
