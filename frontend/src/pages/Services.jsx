@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, UserSearch } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export default function Services() {
@@ -40,6 +40,12 @@ export default function Services() {
       title: 'Forensic Cross Examination', 
       desc: 'Critical evaluation and questioning of opposing forensic evidence and expert reports for courtroom accuracy.', 
       icon: <Scale size={32} /> 
+    },
+    { 
+      id: 'detective', 
+      title: 'Detective Services', 
+      desc: 'Discreet, professional investigative services for both businesses and individuals to uncover the truth.', 
+      icon: <UserSearch size={32} /> 
     },
   ];
 

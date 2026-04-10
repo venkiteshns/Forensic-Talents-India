@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, Presentation, Users, Award } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, Presentation, Users, Award, UserSearch } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 
@@ -11,6 +11,7 @@ export default function Home() {
     { id: 'cyber', title: 'Cyber Forensics', desc: 'Digital evidence recovery and data analysis.', icon: <Monitor size={24} /> },
     { id: 'crime-scene', title: 'Crime Scene Investigation', desc: 'Systematic analysis and evidence collection.', icon: <Search size={24} /> },
     { id: 'cross-examination', title: 'Cross Examination', desc: 'Critical evaluation of forensic evidence in courts.', icon: <Scale size={24} /> },
+    { id: 'detective', title: 'Detective Services', desc: 'Discreet and professional private investigations for individuals and businesses.', icon: <UserSearch size={24} /> },
   ];
 
   const stats = [
@@ -100,13 +101,13 @@ export default function Home() {
                 <div className="absolute top-1/2 left-6 -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full"></div>
               </div>
             </div>
-            
+
             <Link to="/education" className="hidden md:flex items-center text-accent font-semibold hover:text-accent-light transition-colors group">
               Show more <ArrowRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             <Link to="/education" className="bg-slate-50 hover:bg-white p-4 sm:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <Presentation className="w-10 h-10 sm:w-12 sm:h-12 text-accent mb-3 sm:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-base md:text-lg font-bold text-slate-700">Training</h3>
@@ -115,10 +116,7 @@ export default function Home() {
               <GraduationCap className="w-10 h-10 sm:w-12 sm:h-12 text-accent mb-3 sm:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-base md:text-lg font-bold text-slate-700">Internship</h3>
             </Link>
-            <Link to="/education" className="bg-slate-50 hover:bg-white p-4 sm:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
-              <Users className="w-10 h-10 sm:w-12 sm:h-12 text-accent mb-3 sm:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
-              <h3 className="text-base md:text-lg font-bold text-slate-700">Personal Classes</h3>
-            </Link>
+
             <Link to="/education" className="bg-slate-50 hover:bg-white p-4 sm:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <Award className="w-10 h-10 sm:w-12 sm:h-12 text-accent mb-3 sm:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-base md:text-lg font-bold text-slate-700">Certificate Courses</h3>

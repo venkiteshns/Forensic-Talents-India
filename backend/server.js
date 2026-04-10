@@ -22,28 +22,34 @@ const transporter = nodemailer.createTransport({
 // Configure endpoint for contact form submissions
 app.post('/api/contact', async (req, res) => {
   try {
-    const { name, company, phone, email, service, enquiryType, message } = req.body;
+    const { name, company, phone, email, service, enquiryType, message, age, professionStatus, courseDetails } = req.body;
 
     // Validate required fields
-    if (!name || !email || !phone || !message) {
+    if (!name || !email || !phone) {
       return res.status(400).json({ error: 'Missing required configuration fields' });
     }
 
     const mailOptions = {
       from: `"${name}" <${email}>`,
       to: process.env.EMAIL_USER, // Sends the email TO yourself
-      subject: `New Enquiry from ${name} (Forensic Talents India)`,
+      subject: courseDetails ? `New Course Enrollment: ${name}` : `New Enquiry from ${name} (Forensic Talents India)`,
       html: `
-        <h2>New Enquiry</h2>
+        <h2>${courseDetails ? 'Course Enrollment Request' : 'New Enquiry'}</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Company:</strong> ${company || 'N/A'}</p>
-        <p><strong>Service Interest:</strong> ${service || 'None specified'}</p>
-        <p><strong>Course Enquiry:</strong> ${enquiryType || 'None specified'}</p>
+        ${company ? `<p><strong>Company:</strong> ${company}</p>` : ''}
+        ${service ? `<p><strong>Service Interest:</strong> ${service}</p>` : ''}
+        ${enquiryType ? `<p><strong>Enquiry Type:</strong> ${enquiryType}</p>` : ''}
+        
+        ${courseDetails ? `<h3>Enrollment Details</h3>` : ''}
+        ${courseDetails ? `<p><strong>Course:</strong> ${courseDetails}</p>` : ''}
+        ${age ? `<p><strong>Age:</strong> ${age}</p>` : ''}
+        ${professionStatus ? `<p><strong>Current Status:</strong> ${professionStatus}</p>` : ''}
+
         <hr/>
         <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br/>')}</p>
+        <p>${message ? message.replace(/\n/g, '<br/>') : 'No additional message provided.'}</p>
       `
     };
 
