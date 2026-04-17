@@ -527,84 +527,84 @@ export const serviceDetails = {
     "catchyIntro": "Accurately assess truthfulness with advanced physiological monitoring and expert polygraph analysis for critical investigations.",
     "faqs": [
       {
-        "question": "1. What is a polygraph examination?\nPolygraph examination is a technique used to assess truthfulness by measuring physiological responses during questioning.",
-        "answer": ""
+        "question": "1. What is a polygraph examination?",
+        "answer": "Polygraph examination is a technique used to assess truthfulness by measuring physiological responses during questioning."
       },
       {
-        "question": "2. How does a polygraph work?\nIt records changes in heart rate, blood pressure, respiration, and skin conductivity while a person answers questions.",
-        "answer": ""
+        "question": "2. How does a polygraph work?",
+        "answer": "It records changes in heart rate, blood pressure, respiration, and skin conductivity while a person answers questions."
       },
       {
-        "question": "3. Does a polygraph detect lies directly?\nNo, it detects physiological changes that may indicate stress associated with deception.",
-        "answer": ""
+        "question": "3. Does a polygraph detect lies directly?",
+        "answer": "No, it detects physiological changes that may indicate stress associated with deception."
       },
       {
-        "question": "4. What are the main stages of a polygraph test?\nPre-test interview, question formulation, chart recording, analysis, and post-test interview.",
-        "answer": ""
+        "question": "4. What are the main stages of a polygraph test?",
+        "answer": "Pre-test interview, question formulation, chart recording, analysis, and post-test interview."
       },
       {
-        "question": "5. What types of questions are used?\nRelevant questions, control questions, and neutral questions.",
-        "answer": ""
+        "question": "5. What types of questions are used?",
+        "answer": "Relevant questions, control questions, and neutral questions."
       },
       {
-        "question": "6. What is the Control Question Test (CQT)?\nIt is a commonly used technique that compares responses to relevant and control questions to detect deception.",
-        "answer": ""
+        "question": "6. What is the Control Question Test (CQT)?",
+        "answer": "It is a commonly used technique that compares responses to relevant and control questions to detect deception."
       },
       {
-        "question": "7. What is the Guilty Knowledge Test (GKT)?\nIt assesses whether the subject has knowledge of specific details related to a crime that only the guilty person would know.",
-        "answer": ""
+        "question": "7. What is the Guilty Knowledge Test (GKT)?",
+        "answer": "It assesses whether the subject has knowledge of specific details related to a crime that only the guilty person would know."
       },
       {
-        "question": "8. Is polygraph testing accurate?\nIt is considered a useful investigative tool, but accuracy depends on examiner skill, test conditions, and subject cooperation.",
-        "answer": ""
+        "question": "8. Is polygraph testing accurate?",
+        "answer": "It is considered a useful investigative tool, but accuracy depends on examiner skill, test conditions, and subject cooperation."
       },
       {
-        "question": "9. Is polygraph evidence admissible in court?\nIn many jurisdictions, it is not admissible as direct evidence but may support investigations.",
-        "answer": ""
+        "question": "9. Is polygraph evidence admissible in court?",
+        "answer": "In many jurisdictions, it is not admissible as direct evidence but may support investigations."
       },
       {
-        "question": "10. Is the test safe?\nYes, polygraph examination is non-invasive and safe.",
-        "answer": ""
+        "question": "10. Is the test safe?",
+        "answer": "Yes, polygraph examination is non-invasive and safe."
       },
       {
-        "question": "11. Can anyone take a polygraph test?\nMost individuals can, but certain medical or psychological conditions may affect suitability.",
-        "answer": ""
+        "question": "11. Can anyone take a polygraph test?",
+        "answer": "Most individuals can, but certain medical or psychological conditions may affect suitability."
       },
       {
-        "question": "12. Can a person manipulate the results?\nAttempts can be made, but trained examiners and modern instruments can often detect such efforts.",
-        "answer": ""
+        "question": "12. Can a person manipulate the results?",
+        "answer": "Attempts can be made, but trained examiners and modern instruments can often detect such efforts."
       },
       {
-        "question": "13. How long does a polygraph test take?\nTypically between 1.5 to 3 hours, including all phases.",
-        "answer": ""
+        "question": "13. How long does a polygraph test take?",
+        "answer": "Typically between 1.5 to 3 hours, including all phases."
       },
       {
-        "question": "14. What is recorded during the test?\nPhysiological responses such as heart rate, breathing patterns, and skin conductivity.",
-        "answer": ""
+        "question": "14. What is recorded during the test?",
+        "answer": "Physiological responses such as heart rate, breathing patterns, and skin conductivity."
       },
       {
-        "question": "15. Is consent required for a polygraph test?\nYes, the test is conducted only with the subject’s voluntary consent.",
-        "answer": ""
+        "question": "15. Is consent required for a polygraph test?",
+        "answer": "Yes, the test is conducted only with the subject’s voluntary consent."
       },
       {
-        "question": "16. Where is polygraph examination used?\nCriminal investigations, employee screening, internal inquiries, and verification processes.",
-        "answer": ""
+        "question": "16. Where is polygraph examination used?",
+        "answer": "Criminal investigations, employee screening, internal inquiries, and verification processes."
       },
       {
-        "question": "17. Can polygraph tests confirm innocence?\nThey can support claims of truthfulness but are not absolute proof.",
-        "answer": ""
+        "question": "17. Can polygraph tests confirm innocence?",
+        "answer": "They can support claims of truthfulness but are not absolute proof."
       },
       {
-        "question": "18. What is the role of technology in polygraph testing?\nComputerized systems improve accuracy, recording, and analysis of physiological data.",
-        "answer": ""
+        "question": "18. What is the role of technology in polygraph testing?",
+        "answer": "Computerized systems improve accuracy, recording, and analysis of physiological data."
       },
       {
-        "question": "19. Who conducts polygraph examinations?\nTrained and certified forensic polygraph examiners.",
-        "answer": ""
+        "question": "19. Who conducts polygraph examinations?",
+        "answer": "Trained and certified forensic polygraph examiners."
       },
       {
-        "question": "20. Why is polygraph examination important?\nIt helps investigators verify information, detect deception, and support decision-making in complex cases.",
-        "answer": ""
+        "question": "20. Why is polygraph examination important?",
+        "answer": "It helps investigators verify information, detect deception, and support decision-making in complex cases."
       }
     ]
   }
