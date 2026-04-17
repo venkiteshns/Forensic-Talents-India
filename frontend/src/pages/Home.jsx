@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, Presentation, Users, Award } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, Presentation, Users, Award, Activity } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 
@@ -11,6 +11,7 @@ export default function Home() {
     { id: 'cyber', title: 'Cyber Forensics', desc: 'Digital evidence recovery and data analysis.', icon: <Monitor size={24} /> },
     { id: 'crime-scene', title: 'Crime Scene Investigation', desc: 'Systematic analysis and evidence collection.', icon: <Search size={24} /> },
     { id: 'cross-examination', title: 'Cross Examination', desc: 'Critical evaluation of forensic evidence in courts.', icon: <Scale size={24} /> },
+    { id: 'polygraph', title: 'Polygraph Examination', desc: 'Accurately assess truthfulness with advanced physiological monitoring.', icon: <Activity size={24} /> },
   ];
 
   const stats = [

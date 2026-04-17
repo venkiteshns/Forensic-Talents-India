@@ -1,16 +1,19 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowLeft, ArrowRight, CheckCircle2, Globe, FileText, Fingerprint, Shield, Link as LinkIcon, BadgeCheck, Search, Database, MessageSquare, Mail, MapPin, Mic, HardDrive, Scale, History, Camera, GitCompare, ShieldAlert, Beaker, ClipboardList, Eye, Landmark, UserCheck, Scan, PenTool, FileSearch, FileEdit, FileQuestion, Droplet, Award } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Globe, FileText, Fingerprint, Shield, Link as LinkIcon, BadgeCheck, Search, Database, MessageSquare, Mail, MapPin, Mic, HardDrive, Scale, History, Camera, GitCompare, ShieldAlert, Beaker, ClipboardList, Eye, Landmark, UserCheck, Scan, PenTool, FileSearch, FileEdit, FileQuestion, Droplet, Award, Activity, Users, Monitor } from 'lucide-react';
 import extractedData from '../data/extracted_docs.json';
+
+import { serviceDetails } from '../data/serviceDetails';
+import FAQAccordion from '../components/ui/FAQAccordion';
 
 // Utility to parse extracted Word text safely
 function parseContent(text) {
   if (!text) return { intro: '', features: [], process: [] };
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  
+
   // Basic heuristic parsing since it's raw text
   const intro = lines.slice(1, 4).join(' '); // Skip title
-  
+
   const features = [];
   const process = [];
   let currentSection = '';
@@ -33,7 +36,7 @@ function parseContent(text) {
           features[features.length - 1].details.push(line);
         }
       } else if (line.length > 0) {
-        features.push({ title: line, details: []});
+        features.push({ title: line, details: [] });
       }
     }
   }
@@ -44,41 +47,8 @@ function parseContent(text) {
 export default function ServiceDetail() {
   const { id } = useParams();
 
-  const serviceMap = {
-    'pcc': { 
-      title: 'Police Clearance Certificate', 
-      file: 'Police Clearance Certificate.docx',
-      catchyIntro: "Seamlessly navigate background checks with our globally accepted, error-free Police Clearance and Fingerprinting services."
-    },
-    'questioned-documents': { 
-      title: 'Questioned Documents Examination', 
-      file: 'Questioned Document Examination.docx',
-      catchyIntro: "Uncover the truth behind disputed documents through rigorous scientific examination of handwriting, forgery, and authenticity."
-    },
-    'fingerprint': { 
-      title: 'Fingerprint Investigation', 
-      file: 'Fingerprint examination.docx',
-      catchyIntro: "Precision fingerprint analysis utilizing world-class methods for flawless identity verification and criminal investigation."
-    },
-    'cyber': { 
-      title: 'Cyber Forensics & Digital Investigation', 
-      file: 'Cyber Forensics.docx',
-      catchyIntro: "Advanced digital investigation recovering critical evidence from devices and networks to combat modern cyber threats."
-    },
-    'crime-scene': { 
-      title: 'Crime Scene Investigation', 
-      file: 'Crime Scene Investigation.docx',
-      catchyIntro: "Expert evidence collection, preservation, and precise scene reconstruction to capture the full story behind the crime."
-    },
-    'cross-examination': { 
-      title: 'Forensic Cross Examination', 
-      file: 'Forensic Cross Examination.docx',
-      catchyIntro: "Strategic evaluation and questioning of forensic evidence to ensure scientific validity and legally reliable courtroom outcomes."
-    },
-  };
+  const serviceInfo = serviceDetails[id];
 
-  const serviceInfo = serviceMap[id];
-  
   if (!serviceInfo) {
     return <Navigate to="/services" replace />;
   }
@@ -88,7 +58,7 @@ export default function ServiceDetail() {
 
   return (
     <div className="bg-white min-h-[calc(100vh-88px)]">
-      <div 
+      <div
         className="text-white py-12 md:py-24 relative bg-primary bg-cover bg-center border-b border-primary/20"
         style={{ backgroundImage: `url('/images/services/${id}.png')` }}
       >
@@ -137,7 +107,7 @@ export default function ServiceDetail() {
               ))}
             </div>
           ) : (
-             <p className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</p>   
+            <p className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</p>
           )}
         </div>
       </Container>
@@ -149,9 +119,9 @@ export default function ServiceDetail() {
 
             {/* Benefits of Our Services Section */}
             <div className="mb-20">
-              <h3 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Benefits of Our Services</h3>
+              <h3 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Why Choose Us?</h3>
               <div className="space-y-4">
-                
+
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-100 flex items-start gap-4">
                   <CheckCircle2 size={24} className="text-accent flex-shrink-0 mt-1" />
                   <div>
@@ -293,7 +263,7 @@ export default function ServiceDetail() {
                 </a>
               </div>
             </div>
-            
+
           </div>
         </Container>
       )}
@@ -308,7 +278,7 @@ export default function ServiceDetail() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              
+
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                 <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
                   <Search size={28} />
@@ -577,6 +547,83 @@ export default function ServiceDetail() {
           </div>
         </Container>
       )}
+
+      {/* Polygraph Specific Custom Section */}
+      {id === 'polygraph' && (
+        <Container className="py-16 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Polygraph Examination Services</h2>
+            <p className="text-slate-600 mb-12 text-lg text-center max-w-3xl mx-auto">
+              Our polygraph testing services evaluate truthfulness using advanced physiological monitoring, providing reliable insights for criminal investigations, corporate inquiries, and dispute resolution.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Activity size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Lie Detection Testing</h3>
+                <p className="text-slate-600 leading-relaxed">Evaluate truthfulness using physiological responses like heart rate, respiration, and skin conductivity during structured questioning.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <FileQuestion size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Pre-Test Interviews</h3>
+                <p className="text-slate-600 leading-relaxed">Formulate careful, unbiased questions across relevant, control, and neutral categories to ensure highly accurate results.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Monitor size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Advanced Data Analysis</h3>
+                <p className="text-slate-600 leading-relaxed">Experts score and interpret complex charts with computer-assisted methods to eliminate bias and establish clear conclusions.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Search size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Criminal Investigations</h3>
+                <p className="text-slate-600 leading-relaxed">Narrow down suspects and verify witness statements effectively to support major law enforcement and private investigations.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Users size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Employee Screening</h3>
+                <p className="text-slate-600 leading-relaxed">Maintain organizational integrity by screening personnel for internal investigations involving misconduct, theft, or fraud.</p>
+              </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Scale size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Expert Reporting</h3>
+                <p className="text-slate-600 leading-relaxed">Receive structured, meticulous reports detailing the methodology and conclusions, designed to assist legal and executive authorities.</p>
+              </div>
+
+            </div>
+          </div>
+        </Container>
+      )}
+
+      {/* Frequently Asked Questions */}
+      {serviceInfo.faqs && serviceInfo.faqs.length > 0 && (
+        <Container className="py-16 border-t border-slate-100">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-heading font-bold text-slate-800 mb-8 flex items-center gap-3">
+              <MessageSquare className="text-accent" size={32} /> Frequently Asked Questions
+            </h2>
+            <FAQAccordion faqs={serviceInfo.faqs} />
+          </div>
+        </Container>
+      )}
+
     </div>
   );
 }

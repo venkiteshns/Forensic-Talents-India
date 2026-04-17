@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export default function Services() {
@@ -41,6 +41,12 @@ export default function Services() {
       desc: 'Critical evaluation and questioning of opposing forensic evidence and expert reports for courtroom accuracy.', 
       icon: <Scale size={32} /> 
     },
+    { 
+      id: 'polygraph', 
+      title: 'Polygraph Examination', 
+      desc: 'Accurately assess truthfulness with advanced physiological monitoring and expert analysis for critical investigations.', 
+      icon: <Activity size={32} /> 
+    },
   ];
 
   return (
@@ -62,7 +68,7 @@ export default function Services() {
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {servicesList.map((srv) => (
-            <div key={srv.id} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300">
+            <div key={srv.id} className="bg-white rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-primary overflow-hidden flex flex-col hover:-translate-y-2 hover:shadow-xl transition-transform duration-300 ease-out group">
               <div className="p-8 flex-grow">
                 <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-6 shadow-md">
                   {srv.icon}

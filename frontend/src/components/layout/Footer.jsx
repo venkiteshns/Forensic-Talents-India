@@ -55,6 +55,7 @@ export function Footer() {
               <li><Link to="/services/questioned-documents" className="hover:text-white transition-colors">Questioned Documents</Link></li>
               <li><Link to="/services/crime-scene" className="hover:text-white transition-colors">Crime Scene Investigation</Link></li>
               <li><Link to="/services/cross-examination" className="hover:text-white transition-colors">Cross Examination</Link></li>
+              <li><Link to="/services/polygraph" className="hover:text-white transition-colors">Polygraph Examination</Link></li>
             </ul>
           </div>
 
