@@ -48,11 +48,11 @@ export default function Contact() {
 
     setStatus('loading');
 
-    let subjectLine = 'General Enquiry - Contact Us Form';
+    let subjectLine = 'Contact Us Form';
     if (formData.enquiryType) {
-      subjectLine = `Course/Internship Enquiry: ${formData.enquiryType.replace(/-/g, ' ').toUpperCase()}`;
+      subjectLine = formData.enquiryType.includes('internship') ? 'Internship Enquiry' : 'Course Enquiry';
     } else if (formData.service) {
-      subjectLine = `Service Enquiry: ${formData.service.toUpperCase()}`;
+      subjectLine = 'Service Enquiry';
     }
 
     const payload = { ...formData, subject: subjectLine };

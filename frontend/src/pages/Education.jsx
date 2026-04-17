@@ -29,13 +29,11 @@ export default function Education() {
     if (!formData.name || !formData.email || !formData.phone) return;
     setStatus('loading');
 
-    let subjectLine = `New Registration: ${enrollModal.course.category}`;
+    let subjectLine = 'Course Enrollment';
     if (enrollModal.course.category.toLowerCase().includes('quiz')) {
-      subjectLine = `New Quiz Registration: Monthly Forensic Quiz`;
+      subjectLine = 'Quiz Enrollment';
     } else if (enrollModal.course.category.toLowerCase().includes('internship')) {
-      subjectLine = `New Internship Application: ${enrollModal.course.category}`;
-    } else {
-      subjectLine = `New Course Registration: ${enrollModal.course.category} - ${enrollModal.course.prog.duration}`;
+      subjectLine = 'Internship Enrollment';
     }
 
     const payload = {
@@ -313,7 +311,6 @@ export default function Education() {
 
         <Container className="relative z-10">
           <div className="text-center mb-16">
-            <span className="bg-accent/20 text-accent-light px-4 py-1.5 rounded-full text-sm font-bold tracking-wider uppercase mb-4 inline-block backdrop-blur-md border border-accent/30">Summer Lab Based</span>
             <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Internship Program</h2>
             <p className="text-slate-300 max-w-2xl mx-auto text-lg md:text-xl">
               Jumpstart your career and acquire practical, real-world experience.
