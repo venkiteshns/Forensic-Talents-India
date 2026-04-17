@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { BookOpen, Award, Briefcase, GraduationCap, Clock, IndianRupee, ChevronDown, ChevronUp, X, Send, CheckCircle2, Globe, MapPin, ExternalLink, Fingerprint, Monitor, Search, PenTool, PlayCircle, FileText, CheckCircle, Shield, BrainCircuit, ArrowRight } from 'lucide-react';
@@ -6,6 +7,21 @@ import { BookOpen, Award, Briefcase, GraduationCap, Clock, IndianRupee, ChevronD
 export default function Education() {
   const [expandedProgram, setExpandedProgram] = useState(null);
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.getElementById(location.hash.substring(1));
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location]);
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', age: '', professionStatus: '', additionalInfo: ''
@@ -208,7 +224,7 @@ export default function Education() {
       </section>
 
       {/* 2. CERTIFICATE COURSES SECTION */}
-      <section className="py-24 relative z-10 -mt-10">
+      <section id="certificates" className="scroll-mt-24 py-24 relative z-10 -mt-10">
         <Container>
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Certificate Courses</h2>
@@ -295,7 +311,7 @@ export default function Education() {
       </section>
 
       {/* 3. INTERNSHIPS SECTION (FROM POSTER) */}
-      <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+      <section id="internships" className="scroll-mt-24 py-24 bg-slate-900 text-white relative overflow-hidden">
         {/* Background Forensics Texture */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -429,7 +445,7 @@ export default function Education() {
       </section>
 
       {/* 4. QUIZ SECTION */}
-      <section className="py-24 bg-white border-b border-slate-100">
+      <section id="quiz" className="scroll-mt-24 py-24 bg-white border-b border-slate-100">
         <Container>
           <div className="bg-slate-50 rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
 
@@ -483,7 +499,7 @@ export default function Education() {
       </section>
 
       {/* 5. BLOG SECTION */}
-      <section className="py-24 bg-slate-50">
+      <section id="blogs" className="scroll-mt-24 py-24 bg-slate-50">
         <Container>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>

@@ -162,7 +162,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Course / Internship Enquiry</label>
-                    <select name="enquiryType" value={formData.enquiryType} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
+                    <select name="Course/Internship Enquiry" value={formData.enquiryType} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
                       <option value="">Select an Option for Course Related Enquiry</option>
                       <option value="fingerprint-course">Fingerprint Course</option>
                       <option value="handwriting-course">Handwriting Course</option>
