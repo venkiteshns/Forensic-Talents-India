@@ -32,7 +32,7 @@ app.post('/api/contact', async (req, res) => {
     const mailOptions = {
       from: `"${name}" <${email}>`,
       to: process.env.EMAIL_USER, // Sends the email TO yourself
-      subject: courseDetails ? `New Course Enrollment: ${name}` : `New Enquiry from ${name} (Forensic Talents India)`,
+      subject: req.body.subject || (courseDetails ? `New Course Enrollment: ${name}` : `New Enquiry from ${name} (Forensic Talents India)`),
       html: `
         <h2>${courseDetails ? 'Course Enrollment Request' : 'New Enquiry'}</h2>
         <p><strong>Name:</strong> ${name}</p>

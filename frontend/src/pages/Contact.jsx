@@ -48,6 +48,15 @@ export default function Contact() {
 
     setStatus('loading');
 
+    let subjectLine = 'General Enquiry - Contact Us Form';
+    if (formData.enquiryType) {
+      subjectLine = `Course/Internship Enquiry: ${formData.enquiryType.replace(/-/g, ' ').toUpperCase()}`;
+    } else if (formData.service) {
+      subjectLine = `Service Enquiry: ${formData.service.toUpperCase()}`;
+    }
+
+    const payload = { ...formData, subject: subjectLine };
+
     try {
       const response = await fetch("https://forensic-talents-india.onrender.com/api/contact", {
         method: "POST",
@@ -55,7 +64,7 @@ export default function Contact() {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {

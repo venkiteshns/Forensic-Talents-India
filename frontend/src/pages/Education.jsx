@@ -29,6 +29,15 @@ export default function Education() {
     if (!formData.name || !formData.email || !formData.phone) return;
     setStatus('loading');
 
+    let subjectLine = `New Registration: ${enrollModal.course.category}`;
+    if (enrollModal.course.category.toLowerCase().includes('quiz')) {
+      subjectLine = `New Quiz Registration: Monthly Forensic Quiz`;
+    } else if (enrollModal.course.category.toLowerCase().includes('internship')) {
+      subjectLine = `New Internship Application: ${enrollModal.course.category}`;
+    } else {
+      subjectLine = `New Course Registration: ${enrollModal.course.category} - ${enrollModal.course.prog.duration}`;
+    }
+
     const payload = {
       name: formData.name,
       email: formData.email,
@@ -37,7 +46,8 @@ export default function Education() {
       professionStatus: formData.professionStatus,
       courseDetails: `${enrollModal.course.category} - ${enrollModal.course.prog.duration}`,
       enquiryType: 'Course Enrollment',
-      message: formData.additionalInfo || 'No additional notes.'
+      message: formData.additionalInfo || 'No additional notes.',
+      subject: subjectLine
     };
 
     try {
