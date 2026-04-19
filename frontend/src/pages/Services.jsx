@@ -1,51 +1,63 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export default function Services() {
   const servicesList = [
-    { 
-      id: 'pcc', 
-      title: 'Police Clearance Certificate', 
-      desc: 'Expert assistance in securing a Police Clearance Certificate securely, ensuring error-free fingerprints and accurate applications.', 
-      icon: <Shield size={32} /> 
+    {
+      id: 'pcc',
+      title: 'Police Clearance Certificate',
+      desc: 'Expert assistance in securing a Police Clearance Certificate securely, ensuring error-free fingerprints and accurate applications.',
+      icon: <Shield size={32} />
     },
-    { 
-      id: 'questioned-documents', 
-      title: 'Questioned Documents Examination', 
-      desc: 'Determine authenticity, trace authorship, and detect alterations or forgeries using advanced scientific tools.', 
-      icon: <FileText size={32} /> 
+    {
+      id: 'questioned-documents',
+      title: 'Questioned Documents Examination',
+      desc: 'Determine authenticity, trace authorship, and detect alterations or forgeries using advanced scientific tools.',
+      icon: <FileText size={32} />
     },
-    { 
-      id: 'fingerprint', 
-      title: 'Fingerprint Investigation', 
-      desc: 'Reliable forensic identification based on unique ridge patterns, including latent fingerprint development and enhancement.', 
-      icon: <Fingerprint size={32} /> 
+    {
+      id: 'fingerprint',
+      title: 'Fingerprint Investigation',
+      desc: 'Reliable forensic identification based on unique ridge patterns, including latent fingerprint development and enhancement.',
+      icon: <Fingerprint size={32} />
     },
-    { 
-      id: 'cyber', 
-      title: 'Cyber Forensics', 
-      desc: 'Recovery, preservation, and analysis of digital evidence. Tackle data breaches, cyber fraud, and trace digital activities.', 
-      icon: <Monitor size={32} /> 
+    {
+      id: 'cyber',
+      title: 'Cyber Forensics',
+      desc: 'Recovery, preservation, and analysis of digital evidence. Tackle data breaches, cyber fraud, and trace digital activities.',
+      icon: <Monitor size={32} />
     },
-    { 
-      id: 'crime-scene', 
-      title: 'Crime Scene Investigation', 
-      desc: 'Systematic examination, documentation, and scientific analysis of crime scenes to collect critical physical evidence.', 
-      icon: <Search size={32} /> 
+    {
+      id: 'crime-scene',
+      title: 'Crime Scene Investigation',
+      desc: 'Systematic examination, documentation, and scientific analysis of crime scenes to collect critical physical evidence.',
+      icon: <Search size={32} />
     },
-    { 
-      id: 'cross-examination', 
-      title: 'Forensic Cross Examination', 
-      desc: 'Critical evaluation and questioning of opposing forensic evidence and expert reports for courtroom accuracy.', 
-      icon: <Scale size={32} /> 
+    {
+      id: 'cross-examination',
+      title: 'Forensic Cross Examination',
+      desc: 'Critical evaluation and questioning of opposing forensic evidence and expert reports for courtroom accuracy.',
+      icon: <Scale size={32} />
     },
-    { 
-      id: 'polygraph', 
-      title: 'Polygraph Examination', 
-      desc: 'Accurately assess truthfulness with advanced physiological monitoring and expert analysis for critical investigations.', 
-      icon: <Activity size={32} /> 
+    {
+      id: 'polygraph',
+      title: 'Polygraph Examination',
+      desc: 'Accurately assess truthfulness with advanced physiological monitoring and expert analysis for critical investigations.',
+      icon: <Activity size={32} />
+    },
+    {
+      id: 'workplace-assessments',
+      title: 'Workplace Assessments',
+      desc: 'Scientific evaluation of workforce behavior, psychological risks, and performance using forensic methodologies for organizational decision-making.',
+      icon: <Users size={32} />
+    },
+    {
+      id: 'forensic-training',
+      title: 'Professional Forensic Training & Capacity Building',
+      desc: 'Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.',
+      icon: <GraduationCap size={32} />
     },
   ];
 

@@ -607,5 +607,17 @@ export const serviceDetails = {
         "answer": "It helps investigators verify information, detect deception, and support decision-making in complex cases."
       }
     ]
+  },
+  "workplace-assessments": {
+    "title": "Workplace Assessments",
+    "file": "",
+    "catchyIntro": "Scientific evaluation of workforce behavior, psychological risks, and performance using forensic methodologies for organizational decision-making.",
+    "faqs": []
+  },
+  "forensic-training": {
+    "title": "Professional Forensic Training",
+    "file": "",
+    "catchyIntro": "Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.",
+    "faqs": []
   }
 };

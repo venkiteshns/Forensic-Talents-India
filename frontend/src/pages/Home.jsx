@@ -12,6 +12,8 @@ export default function Home() {
     { id: 'crime-scene', title: 'Crime Scene Investigation', desc: 'Systematic analysis and evidence collection.', icon: <Search size={24} /> },
     { id: 'cross-examination', title: 'Cross Examination', desc: 'Critical evaluation of forensic evidence in courts.', icon: <Scale size={24} /> },
     { id: 'polygraph', title: 'Polygraph Examination', desc: 'Accurately assess truthfulness with advanced physiological monitoring.', icon: <Activity size={24} /> },
+    { id: 'workplace-assessments', title: 'Workplace Assessments', desc: 'Scientific evaluation of workforce behavior, psychological risks, and performance using forensic methodologies.', icon: <Users size={24} /> },
+    { id: 'forensic-training', title: 'Professional Forensic Training', desc: 'Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.', icon: <GraduationCap size={24} /> },
   ];
 
   const stats = [
