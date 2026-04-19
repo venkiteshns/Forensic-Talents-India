@@ -275,11 +275,31 @@ export default function ServiceDetail() {
       {/* Cyber Forensics Specific Custom Section */}
       {id === 'cyber' && (
         <Container className="py-16 border-t border-slate-100">
+          {/* Legal Validity & Digital Evidence Compliance Section */}
+          <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-xl p-6 md:p-8 mb-12 shadow-sm flex flex-col md:flex-row items-start gap-6 transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md animate-fade-in-up">
+            <div className="bg-blue-100 text-blue-700 p-3 rounded-full flex-shrink-0 mt-1">
+              <Scale size={28} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-3">Legal Validity & Digital Evidence Compliance</h3>
+              <p className="text-slate-800 font-semibold text-lg mb-4 leading-snug">
+                The reports and analysis are conducted under Cyber Forensics & Digital Investigation standards, with a strong focus on Section 63(4)(c) of the Bharatiya Sakshya Adhiniyam (BSA), formerly Section 65B of the Indian Evidence Act.
+              </p>
+              <p className="text-slate-600 mb-4 leading-relaxed">
+                This legal provision governs the admissibility of electronic evidence in courts. It ensures that digital records such as emails, documents, audio, video, and system data are considered valid evidence only when properly certified and handled according to prescribed procedures.
+              </p>
+              <p className="text-slate-700 font-medium border-t border-blue-200/60 pt-4">
+                This ensures that all forensic findings are legally valid, reliable, and admissible in judicial proceedings.
+              </p>
+            </div>
+          </div>
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Our Cyber Forensics Services</h2>
             <p className="text-slate-600 mb-12 text-lg text-center max-w-3xl mx-auto">
               We leverage cutting-edge technology and established methodologies to resolve complex digital puzzles and deliver actionable evidence.
             </p>
+
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -618,413 +638,391 @@ export default function ServiceDetail() {
 
       {/* Workplace Assessments Specific Custom Section */}
       {id === 'workplace-assessments' && (
-        <>
-          <div className="bg-white py-16 border-t border-slate-100">
-            <Container>
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Overview</h2>
-                <p className="text-slate-600 text-lg text-center max-w-3xl mx-auto">
-                  The most complex variable in any organization is human behavior. Our Forensic Psychological Workplace Assessments provide organizations with a scientific, independent evaluation of the psychological and behavioral health of their workforce. <br /><br /> By utilizing validated psychometric tools and forensic psychology principles, we help management look beneath the surface to identify behavioral risks, optimize cognitive performance, and ensure a secure, resilient, and ethically sound workplace.
-                </p>
+        <Container className="py-16 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Overview</h2>
+            <p className="text-slate-600 mb-12 text-lg text-center max-w-3xl mx-auto">
+              The most complex variable in any organization is human behavior. Our Forensic Psychological Workplace Assessments provide organizations with a scientific, independent evaluation of the psychological and behavioral health of their workforce. By utilizing validated psychometric tools and forensic psychology principles, we help management look beneath the surface to identify behavioral risks, optimize cognitive performance, and ensure a secure, resilient, and ethically sound workplace.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <BrainCircuit size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Forensic Psychometric Profiling <br /> (Personality & Behavior)</h3>
+                <p className="text-slate-600 leading-relaxed">Moving beyond standard personality quizzes, we utilize validated forensic tools to assess deep-seated behavioral traits, including emotional intelligence, risk tolerance, and susceptibility to unethical behavior. This is crucial for high-stakes hiring, leadership development, and identifying potential culture-clashes.</p>
               </div>
-            </Container>
-          </div>
-
-          <div className="bg-slate-50 py-16 border-t border-slate-100">
-            <Container>
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-10 text-center">Core Psychological Assessment Modules</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <BrainCircuit size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Forensic Psychometric Profiling <br /> (Personality & Behavior)</h3>
-                    <p className="text-slate-600 leading-relaxed">Moving beyond standard personality quizzes, we utilize validated forensic tools to assess deep-seated behavioral traits, including emotional intelligence, risk tolerance, and susceptibility to unethical behavior. This is crucial for high-stakes hiring, leadership development, and identifying potential culture-clashes.</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <Lightbulb size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Cognitive & Behavioral Performance Analysis</h3>
-                    <p className="text-slate-600 leading-relaxed">We evaluate the psychological drivers behind employee performance. By assessing cognitive flexibility, decision-making capabilities under pressure, and problem-solving styles, we help organizations align the right psychological profiles with specific operational roles.</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <Activity size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Stress & Workload Assessment </h3>
-                    <p className="text-slate-600 leading-relaxed">Burnout is a profound organizational risk. We measure cognitive load and psychological resilience to ensure optimal resource allocation. This assessment helps prevent severe fatigue, reducing the risk of critical errors and safeguarding employee mental well-being.</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <ShieldAlert size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Integrity & Counter-Productive Work Behavior (CWB) Audits</h3>
-                    <p className="text-slate-600 leading-relaxed">A specialized psychological evaluation designed to detect propensities for rule-breaking, insubordination, internal fraud, or hostility. This proactive screening protects your organization's assets and reputation from internal threats.</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <Users size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Leadership Competency & Succession Dynamics</h3>
-                    <p className="text-slate-600 leading-relaxed">An evidence-based psychological evaluation of future leaders, focusing on their capacity for empathy, strategic cognition, and crisis management, ensuring your organization’s future is in psychologically capable hands.</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
-                      <Scale size={28} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-3">Workplace Conflict & Risk Escalation Assessment</h3>
-                    <p className="text-slate-600 leading-relaxed">When internal disputes arise, we provide an objective, psychological analysis of the individuals involved to determine the root cause of the conflict, the risk of escalation, and the most effective psychological interventions.</p>
-                  </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Lightbulb size={28} />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                  <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                    <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                      <Target className="text-accent" /> Strategic Value
-                    </h3>
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Predict behavioral risks early</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Legally defensible HR decisions</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Improve operational resilience</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                    <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                      <Briefcase className="text-accent" /> Who Needs This
-                    </h3>
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Corporate leadership</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Legal professionals</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">HR & compliance teams</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
-                        <span className="text-slate-700">Banking & high-security sectors</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-primary text-white p-8 md:p-12 rounded-2xl text-center relative overflow-hidden">
-                  <div className="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
-                    <Shield size={200} />
-                  </div>
-                  <h3 className="text-3xl font-heading font-bold mb-6 relative z-10 text-white">Why Choose Us</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
-                    <div>
-                      <h4 className="text-xl font-bold text-accent mb-2">Scientifically Validated</h4>
-                      <p className="text-slate-200">Using proven, standardized psychological tools.</p>
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold text-accent mb-2">High Confidentiality</h4>
-                      <p className="text-slate-200">Strict ethical standards and data protection.</p>
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold text-accent mb-2">Actionable Insights</h4>
-                      <p className="text-slate-200">Clear reports for informed business decisions.</p>
-                    </div>
-                  </div>
-                </div>
-
-
-
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Cognitive & Behavioral Performance Analysis</h3>
+                <p className="text-slate-600 leading-relaxed">We evaluate the psychological drivers behind employee performance. By assessing cognitive flexibility, decision-making capabilities under pressure, and problem-solving styles, we help organizations align the right psychological profiles with specific operational roles.</p>
               </div>
-            </Container>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Activity size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Stress & Workload Assessment </h3>
+                <p className="text-slate-600 leading-relaxed">Burnout is a profound organizational risk. We measure cognitive load and psychological resilience to ensure optimal resource allocation. This assessment helps prevent severe fatigue, reducing the risk of critical errors and safeguarding employee mental well-being.</p>
+              </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <ShieldAlert size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Integrity & Counter-Productive Work Behavior (CWB) Audits</h3>
+                <p className="text-slate-600 leading-relaxed">A specialized psychological evaluation designed to detect propensities for rule-breaking, insubordination, internal fraud, or hostility. This proactive screening protects your organization's assets and reputation from internal threats.</p>
+              </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Users size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Leadership Competency & Succession Dynamics</h3>
+                <p className="text-slate-600 leading-relaxed">An evidence-based psychological evaluation of future leaders, focusing on their capacity for empathy, strategic cognition, and crisis management, ensuring your organization’s future is in psychologically capable hands.</p>
+              </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
+                  <Scale size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">Workplace Conflict & Risk Escalation Assessment</h3>
+                <p className="text-slate-600 leading-relaxed">When internal disputes arise, we provide an objective, psychological analysis of the individuals involved to determine the root cause of the conflict, the risk of escalation, and the most effective psychological interventions.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+              <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
+                <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <Target className="text-accent" /> Strategic Value
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Predict behavioral risks early</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Legally defensible HR decisions</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Improve operational resilience</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
+                <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <Briefcase className="text-accent" /> Who Needs This
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Corporate leadership</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Legal professionals</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">HR & compliance teams</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle2 className="text-accent mt-1 flex-shrink-0" size={20} />
+                    <span className="text-slate-700">Banking & high-security sectors</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-primary text-white p-8 md:p-12 rounded-2xl text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
+                <Shield size={200} />
+              </div>
+              <h3 className="text-3xl font-heading font-bold mb-6 relative z-10 text-white">Why Choose Us</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
+                <div>
+                  <h4 className="text-xl font-bold text-accent mb-2">Scientifically Validated</h4>
+                  <p className="text-slate-200">Using proven, standardized psychological tools.</p>
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-accent mb-2">High Confidentiality</h4>
+                  <p className="text-slate-200">Strict ethical standards and data protection.</p>
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-accent mb-2">Actionable Insights</h4>
+                  <p className="text-slate-200">Clear reports for informed business decisions.</p>
+                </div>
+              </div>
+            </div>
+
+
+
           </div>
-        </>
+        </Container>
       )}
 
       {/* Forensic Training Specific Custom Section */}
       {id === 'forensic-training' && (
-        <>
-          <div className="bg-white py-16 border-t border-slate-100">
-            <Container>
-              <div className="max-w-6xl mx-auto">
-                {/* PART 1: INTRO PARAGRAPH */}
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-6 text-center animate-in fade-in duration-700">Overview</h2>
-                <p className="text-slate-600 text-lg text-center max-w-4xl mx-auto leading-relaxed animate-in fade-in duration-700 delay-100">
-                  In an era where technology-driven crime outpaces traditional security measures, specialized knowledge is the only viable defense. Forensic Talents INDIA LLP provides elite, research-backed training programs designed to empower professionals across the legal, financial, and corporate spectrum. <br /> <br /> Our programs bridge the gap between academic theory and field application, ensuring that stakeholders can identify, preserve, and utilize evidence with scientific precision and legal defensibility.
+        <Container className="py-16 border-t border-slate-100">
+          <div className="max-w-6xl mx-auto">
+            {/* PART 1: INTRO PARAGRAPH */}
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-6 text-center animate-in fade-in duration-700">Overview</h2>
+            <p className="text-slate-600 mb-16 text-lg text-center max-w-4xl mx-auto leading-relaxed animate-in fade-in duration-700 delay-100">
+              In an era where technology-driven crime outpaces traditional security measures, specialized knowledge is the only viable defense. Forensic Talents INDIA LLP provides elite, research-backed training programs designed to empower professionals across the legal, financial, and corporate spectrum. <br /> <br /> Our programs bridge the gap between academic theory and field application, ensuring that stakeholders can identify, preserve, and utilize evidence with scientific precision and legal defensibility.
+            </p>
+
+            {/* PART 2: TRAINING TRACKS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+              {/* Card 1 */}
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
+                <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
+                  <img
+                    src="/images/services/infographic-law.png"
+                    alt="Law Enforcement Forensic Infographic"
+                    className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
+                    <Scale size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-800">Law Enforcement & Judiciary</h3>
+                </div>
+                <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                  Focus on evidence handling, cyber law, and forensic investigation accuracy.
                 </p>
+                <div className="pt-4 border-t border-slate-100">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Focus:</span> Advanced crime scene management, biological evidence, digital forensics</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Key Skills:</span> Evidence Integrity & The New Legal Framework (BSA)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Outcome:</span> Ability to handle high-sensitivity cases with zero-error protocols</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </Container>
-          </div>
 
-          <div className="bg-slate-50 py-16 border-t border-slate-100">
-            <Container>
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-10 text-center">Targeted Training Tracks</h2>
-                {/* PART 2: TRAINING TRACKS */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-                  {/* Card 1 */}
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
-                    <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
-                      <img
-                        src="/images/services/infographic-law.png"
-                        alt="Law Enforcement Forensic Infographic"
-                        className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                        <Scale size={24} />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800">Law Enforcement & Judiciary</h3>
-                    </div>
-                    <p className="text-slate-600 mb-6 text-sm leading-relaxed">
-                      Focus on evidence handling, cyber law, and forensic investigation accuracy.
-                    </p>
-                    <div className="pt-4 border-t border-slate-100">
-                      <ul className="space-y-3">
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Focus:</span> Advanced crime scene management, biological evidence, digital forensics</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Key Skills:</span> Evidence Integrity & The New Legal Framework (BSA)</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Outcome:</span> Ability to handle high-sensitivity cases with zero-error protocols</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Card 2 */}
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
-                    <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
-                      <img
-                        src="/images/services/infographic-banking.png"
-                        alt="Banking Forensic Infographic"
-                        className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                        <Landmark size={24} />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800">Banking & Financial Institutions</h3>
-                    </div>
-                    <p className="text-slate-600 mb-6 text-sm leading-relaxed">
-                      Focus on fraud detection, compliance, and financial forensic intelligence.
-                    </p>
-                    <div className="pt-4 border-t border-slate-100">
-                      <ul className="space-y-3">
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Focus:</span> Signature verification, fraud detection, KYC identity analysis</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Key Skills:</span> Document Security & Fraud Detection</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Outcome:</span> Reduced financial risk and improved audit capability</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Card 3 */}
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
-                    <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
-                      <img
-                        src="/images/services/infographic-corporate.png"
-                        alt="Corporate Forensic Infographic"
-                        className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                        <Shield size={24} />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800">Corporate & Security Agencies</h3>
-                    </div>
-                    <p className="text-slate-600 mb-6 text-sm leading-relaxed">
-                      Focus on internal risk, behavioral integrity, and forensic evaluation of workplace threats.
-                    </p>
-                    <div className="pt-4 border-t border-slate-100">
-                      <ul className="space-y-3">
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Focus:</span> Forensic interviewing, employee vetting, digital footprint analysis</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Key Skills:</span> Internal Investigation & Workplace Integrity</span>
-                        </li>
-                        <li className="flex items-start gap-2 text-sm text-slate-600">
-                          <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                          <span><span className="font-semibold text-slate-800">Outcome:</span> Strong internal security and misconduct prevention</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Card 4 */}
-                  <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group lg:col-span-1 overflow-hidden">
-                    {/* Image Section */}
-                    <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
-                      <img
-                        src="/images/services/academic-infographic.png"
-                        alt="Academic Research Forensic Certification Outcome"
-                        className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
-                        <GraduationCap size={24} />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-800">Academics, Researchers & Interns</h3>
-                    </div>
-
-                    <p className="text-slate-600 mb-6 text-sm leading-relaxed">
-                      This program is designed to bridge the gap between academic theory and real-world forensic application, equipping researchers, educators, and interns with advanced analytical, methodological, and professional skills.
-                    </p>
-
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-primary mb-3 text-sm">Core Areas:</h4>
-                      <ul className="space-y-2">
-                        <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Advanced Analytical Techniques</li>
-                        <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Research Methodology</li>
-                        <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Teaching & Pedagogy</li>
-                        <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Practical Exposure</li>
-                        <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Professional Mentorship</li>
-                      </ul>
-                    </div>
-
-                    <button
-                      onClick={() => setShowAcademicOutcome(!showAcademicOutcome)}
-                      className="w-full text-center py-2 mt-2 text-sm font-semibold text-accent hover:text-primary transition-colors flex items-center justify-center gap-2 bg-slate-50 rounded-lg"
-                    >
-                      {showAcademicOutcome ? "Show Less" : "Show More"}
-                    </button>
-
-                    {showAcademicOutcome && (
-                      <div className="pt-4 mt-4 border-t border-slate-100 animate-in slide-in-from-top-2 duration-300">
-                        <h4 className="font-semibold text-primary mb-3 text-sm">Outcome:</h4>
-                        <p className="text-sm text-slate-600 mb-4">Participants graduate from this program not just as proficient lab technicians, but as <span className="font-semibold"> Holistic Forensic Leaders.</span> </p>
-                        <ul className="space-y-2">
-                          <li className="flex items-start gap-2 text-sm text-slate-600">
-                            <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                            <span><span className="font-semibold text-slate-800">Academics</span> &rarr; Improved teaching and curriculum design</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm text-slate-600">
-                            <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                            <span><span className="font-semibold text-slate-800">Researchers</span> &rarr; Strong analytical and publishing capability</span>
-                          </li>
-                          <li className="flex items-start gap-2 text-sm text-slate-600">
-                            <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
-                            <span><span className="font-semibold text-slate-800">Interns</span> &rarr; Industry-ready forensic skills</span>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+              {/* Card 2 */}
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
+                <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
+                  <img
+                    src="/images/services/infographic-banking.png"
+                    alt="Banking Forensic Infographic"
+                    className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
+                  />
                 </div>
-
-                {/* PART 3: PEDAGOGICAL APPROACH SECTION */}
-                <div className="bg-slate-50 p-10 md:p-12 rounded-2xl border border-slate-200 mb-20 animate-in fade-in duration-700">
-                  <div className="max-w-3xl mx-auto text-center mb-10">
-                    <h3 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-4 flex items-center justify-center gap-3">
-                      <Lightbulb className="text-accent" size={32} /> Our Pedagogical Approach: The Forensic Edge
-                    </h3>
-                    <p className="text-slate-600 text-lg">We reject dry, lecture-heavy formats. Our training is built on:</p>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
+                    <Landmark size={24} />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <FileText size={24} />
-                      </div>
-                      <span className="font-semibold text-slate-800">Case-Based Learning<br /><span className="text-sm font-normal text-slate-500">(real-world Indian cases)</span></span>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Monitor size={24} />
-                      </div>
-                      <span className="font-semibold text-slate-800">Interactive Simulations<br /><span className="text-sm font-normal text-slate-500">(crime-room scenarios)</span></span>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Beaker size={24} />
-                      </div>
-                      <span className="font-semibold text-slate-800">Hands-on Lab Access</span>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <BadgeCheck size={24} />
-                      </div>
-                      <span className="font-semibold text-slate-800">Industry-recognized Certification</span>
-                    </div>
-                  </div>
+                  <h3 className="text-xl font-bold text-slate-800">Banking & Financial Institutions</h3>
                 </div>
-
-                {/* PART 4: WHY PARTNER SECTION */}
-                <div className="bg-primary text-white p-10 md:p-14 rounded-2xl relative overflow-hidden shadow-xl animate-in fade-in duration-700">
-                  <div className="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
-                    <Target size={300} />
-                  </div>
-                  <h3 className="text-3xl md:text-4xl font-heading font-bold mb-12 relative z-10 text-center text-white">Why Partner with Forensic Talents INDIA LLP?</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                    <div className="text-center sm:text-left">
-                      <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
-                        <BookOpen className="text-white" size={24} />
-                      </div>
-                      <h4 className="text-xl font-bold text-accent mb-3">Research-Driven</h4>
-                      <p className="text-slate-300 leading-relaxed text-sm">Curriculum based on the latest forensic advancements.</p>
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
-                        <Users className="text-white" size={24} />
-                      </div>
-                      <h4 className="text-xl font-bold text-accent mb-3">Customized</h4>
-                      <p className="text-slate-300 leading-relaxed text-sm">Training tailored to specific industry needs.</p>
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
-                        <Briefcase className="text-white" size={24} />
-                      </div>
-                      <h4 className="text-xl font-bold text-accent mb-3">Real-World</h4>
-                      <p className="text-slate-300 leading-relaxed text-sm">Exposure to actual case methodologies.</p>
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
-                        <ShieldAlert className="text-white" size={24} />
-                      </div>
-                      <h4 className="text-xl font-bold text-accent mb-3">Expertise</h4>
-                      <p className="text-slate-300 leading-relaxed text-sm">National-level forensic professionals guiding the sessions.</p>
-                    </div>
-                  </div>
+                <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                  Focus on fraud detection, compliance, and financial forensic intelligence.
+                </p>
+                <div className="pt-4 border-t border-slate-100">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Focus:</span> Signature verification, fraud detection, KYC identity analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Key Skills:</span> Document Security & Fraud Detection</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Outcome:</span> Reduced financial risk and improved audit capability</span>
+                    </li>
+                  </ul>
                 </div>
-
-
-
               </div>
-            </Container>
+
+              {/* Card 3 */}
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
+                <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
+                  <img
+                    src="/images/services/infographic-corporate.png"
+                    alt="Corporate Forensic Infographic"
+                    className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
+                    <Shield size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-800">Corporate & Security Agencies</h3>
+                </div>
+                <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                  Focus on internal risk, behavioral integrity, and forensic evaluation of workplace threats.
+                </p>
+                <div className="pt-4 border-t border-slate-100">
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Target className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Focus:</span> Forensic interviewing, employee vetting, digital footprint analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Briefcase className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Key Skills:</span> Internal Investigation & Workplace Integrity</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-slate-600">
+                      <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                      <span><span className="font-semibold text-slate-800">Outcome:</span> Strong internal security and misconduct prevention</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Card 4 */}
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group lg:col-span-1 overflow-hidden">
+                {/* Image Section */}
+                <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
+                  <img
+                    src="/images/services/academic-infographic.png"
+                    alt="Academic Research Forensic Certification Outcome"
+                    className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors">
+                    <GraduationCap size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-800">Academics, Researchers & Interns</h3>
+                </div>
+
+                <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                  This program is designed to bridge the gap between academic theory and real-world forensic application, equipping researchers, educators, and interns with advanced analytical, methodological, and professional skills.
+                </p>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-primary mb-3 text-sm">Core Areas:</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Advanced Analytical Techniques</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Research Methodology</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Teaching & Pedagogy</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Practical Exposure</li>
+                    <li className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 className="text-accent" size={16} /> Professional Mentorship</li>
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => setShowAcademicOutcome(!showAcademicOutcome)}
+                  className="w-full text-center py-2 mt-2 text-sm font-semibold text-accent hover:text-primary transition-colors flex items-center justify-center gap-2 bg-slate-50 rounded-lg"
+                >
+                  {showAcademicOutcome ? "Show Less" : "Show More"}
+                </button>
+
+                {showAcademicOutcome && (
+                  <div className="pt-4 mt-4 border-t border-slate-100 animate-in slide-in-from-top-2 duration-300">
+                    <h4 className="font-semibold text-primary mb-3 text-sm">Outcome:</h4>
+                    <p className="text-sm text-slate-600 mb-4">Participants graduate from this program not just as proficient lab technicians, but as <span className="font-semibold"> Holistic Forensic Leaders.</span> </p>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-2 text-sm text-slate-600">
+                        <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                        <span><span className="font-semibold text-slate-800">Academics</span> &rarr; Improved teaching and curriculum design</span>
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-slate-600">
+                        <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                        <span><span className="font-semibold text-slate-800">Researchers</span> &rarr; Strong analytical and publishing capability</span>
+                      </li>
+                      <li className="flex items-start gap-2 text-sm text-slate-600">
+                        <Award className="text-accent mt-0.5 flex-shrink-0" size={16} />
+                        <span><span className="font-semibold text-slate-800">Interns</span> &rarr; Industry-ready forensic skills</span>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* PART 3: PEDAGOGICAL APPROACH SECTION */}
+            <div className="bg-slate-50 p-10 md:p-12 rounded-2xl border border-slate-200 mb-20 animate-in fade-in duration-700">
+              <div className="max-w-3xl mx-auto text-center mb-10">
+                <h3 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-4 flex items-center justify-center gap-3">
+                  <Lightbulb className="text-accent" size={32} /> Our Pedagogical Approach: The Forensic Edge
+                </h3>
+                <p className="text-slate-600 text-lg">We reject dry, lecture-heavy formats. Our training is built on:</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                  <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <FileText size={24} />
+                  </div>
+                  <span className="font-semibold text-slate-800">Case-Based Learning<br /><span className="text-sm font-normal text-slate-500">(real-world Indian cases)</span></span>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                  <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <Monitor size={24} />
+                  </div>
+                  <span className="font-semibold text-slate-800">Interactive Simulations<br /><span className="text-sm font-normal text-slate-500">(crime-room scenarios)</span></span>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                  <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <Beaker size={24} />
+                  </div>
+                  <span className="font-semibold text-slate-800">Hands-on Lab Access</span>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                  <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <BadgeCheck size={24} />
+                  </div>
+                  <span className="font-semibold text-slate-800">Industry-recognized Certification</span>
+                </div>
+              </div>
+            </div>
+
+            {/* PART 4: WHY PARTNER SECTION */}
+            <div className="bg-primary text-white p-10 md:p-14 rounded-2xl relative overflow-hidden shadow-xl animate-in fade-in duration-700">
+              <div className="absolute top-0 right-0 opacity-10 translate-x-1/4 -translate-y-1/4">
+                <Target size={300} />
+              </div>
+              <h3 className="text-3xl md:text-4xl font-heading font-bold mb-12 relative z-10 text-center text-white">Why Partner with Forensic Talents INDIA LLP?</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                <div className="text-center sm:text-left">
+                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
+                    <BookOpen className="text-white" size={24} />
+                  </div>
+                  <h4 className="text-xl font-bold text-accent mb-3">Research-Driven</h4>
+                  <p className="text-slate-300 leading-relaxed text-sm">Curriculum based on the latest forensic advancements.</p>
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
+                    <Users className="text-white" size={24} />
+                  </div>
+                  <h4 className="text-xl font-bold text-accent mb-3">Customized</h4>
+                  <p className="text-slate-300 leading-relaxed text-sm">Training tailored to specific industry needs.</p>
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
+                    <Briefcase className="text-white" size={24} />
+                  </div>
+                  <h4 className="text-xl font-bold text-accent mb-3">Real-World</h4>
+                  <p className="text-slate-300 leading-relaxed text-sm">Exposure to actual case methodologies.</p>
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-lg">
+                    <ShieldAlert className="text-white" size={24} />
+                  </div>
+                  <h4 className="text-xl font-bold text-accent mb-3">Expertise</h4>
+                  <p className="text-slate-300 leading-relaxed text-sm">National-level forensic professionals guiding the sessions.</p>
+                </div>
+              </div>
+            </div>
+
+
+
           </div>
-        </>
+        </Container >
       )
       }
 

@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-accent flex-shrink-0" />
-                <a href="mailto:info@forensictalents.com" className="hover:text-white transition-colors">info@forensictalents.com</a>
+                <span>info@forensictalents.com</span>
               </li>
             </ul>
           </div>
