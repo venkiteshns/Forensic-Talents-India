@@ -615,7 +615,7 @@ export const serviceDetails = {
     "faqs": []
   },
   "forensic-training": {
-    "title": "Professional Forensic Training",
+    "title": "Professional Forensic Training & Capacity Building",
     "file": "",
     "catchyIntro": "Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.",
     "faqs": []

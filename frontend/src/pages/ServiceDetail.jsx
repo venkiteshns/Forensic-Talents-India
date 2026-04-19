@@ -618,14 +618,23 @@ export default function ServiceDetail() {
 
       {/* Workplace Assessments Specific Custom Section */}
       {id === 'workplace-assessments' && (
-        <Container className="py-16 border-t border-slate-100">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Workplace Assessments</h2>
-            <p className="text-slate-600 mb-12 text-lg text-center max-w-3xl mx-auto">
-              Scientific evaluation of workforce behavior, psychological risks, and performance using advanced forensic methodologies for organizational decision-making.
-            </p>
+        <>
+          <div className="bg-white py-16 border-t border-slate-100">
+            <Container>
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4 text-center">Overview</h2>
+                <p className="text-slate-600 text-lg text-center max-w-3xl mx-auto">
+                  The most complex variable in any organization is human behavior. Our Forensic Psychological Workplace Assessments provide organizations with a scientific, independent evaluation of the psychological and behavioral health of their workforce. By utilizing validated psychometric tools and forensic psychology principles, we help management look beneath the surface to identify behavioral risks, optimize cognitive performance, and ensure a secure, resilient, and ethically sound workplace.
+                </p>
+              </div>
+            </Container>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          <div className="bg-slate-50 py-16 border-t border-slate-100">
+            <Container>
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-10 text-center">Core Psychological Assessment Modules</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-t-4 border-t-accent hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                 <div className="w-14 h-14 bg-accent/10 text-accent rounded-lg flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors">
                   <BrainCircuit size={28} />
@@ -738,22 +747,33 @@ export default function ServiceDetail() {
 
 
 
+              </div>
+            </Container>
           </div>
-        </Container>
+        </>
       )}
 
       {/* Forensic Training Specific Custom Section */}
       {id === 'forensic-training' && (
-        <Container className="py-16 border-t border-slate-100">
-          <div className="max-w-6xl mx-auto">
-            {/* PART 1: INTRO PARAGRAPH */}
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-6 text-center animate-in fade-in duration-700">Professional Forensic Training & Capacity Building</h2>
-            <p className="text-slate-600 mb-16 text-lg text-center max-w-4xl mx-auto leading-relaxed animate-in fade-in duration-700 delay-100">
-              In an era where technology-driven crime outpaces traditional security measures, specialized knowledge is the only viable defense. Forensic Talents INDIA LLP provides elite, research-backed training programs designed to empower professionals across the legal, financial, and corporate spectrum. Our programs bridge the gap between academic theory and field application, ensuring that stakeholders can identify, preserve, and utilize evidence with scientific precision and legal defensibility.
-            </p>
+        <>
+          <div className="bg-white py-16 border-t border-slate-100">
+            <Container>
+              <div className="max-w-6xl mx-auto">
+                {/* PART 1: INTRO PARAGRAPH */}
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-6 text-center animate-in fade-in duration-700">Overview</h2>
+                <p className="text-slate-600 text-lg text-center max-w-4xl mx-auto leading-relaxed animate-in fade-in duration-700 delay-100">
+                  In an era where technology-driven crime outpaces traditional security measures, specialized knowledge is the only viable defense. Forensic Talents INDIA LLP provides elite, research-backed training programs designed to empower professionals across the legal, financial, and corporate spectrum. <br /> <br /> Our programs bridge the gap between academic theory and field application, ensuring that stakeholders can identify, preserve, and utilize evidence with scientific precision and legal defensibility.
+                </p>
+              </div>
+            </Container>
+          </div>
 
-            {/* PART 2: TRAINING TRACKS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+          <div className="bg-slate-50 py-16 border-t border-slate-100">
+            <Container>
+              <div className="max-w-6xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary mb-10 text-center">Targeted Training Tracks</h2>
+                {/* PART 2: TRAINING TRACKS */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
               {/* Card 1 */}
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
                 <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
@@ -1001,8 +1021,10 @@ export default function ServiceDetail() {
 
 
 
+              </div>
+            </Container>
           </div>
-        </Container >
+        </>
       )
       }
 

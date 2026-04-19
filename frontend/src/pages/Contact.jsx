@@ -341,7 +341,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-slate-200 mb-1">Email Address</h4>
-                      <p className="text-sm text-slate-300">info@forensictalents.com</p>
+                      <a href="mailto:info@forensictalents.com" className="text-sm text-slate-300 hover:text-white transition-colors">info@forensictalents.com</a>
                     </div>
                   </div>
 
