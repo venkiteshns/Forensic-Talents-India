@@ -10,8 +10,11 @@ export default function Contact() {
     phone: '',
     email: '',
     subject: '',
-    service: '',
-    enquiryType: '',
+    enquiryCategory: '',
+    educationType: '',
+    customRequirement: '',
+    professionalService: '',
+    cyberSubService: '',
     message: ''
   });
 
@@ -20,7 +23,27 @@ export default function Contact() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+      
+      // Reset dependent fields
+      if (name === 'enquiryCategory') {
+        newData.educationType = '';
+        newData.customRequirement = '';
+        newData.professionalService = '';
+        newData.cyberSubService = '';
+      }
+      if (name === 'educationType' && value !== 'Other') {
+        newData.customRequirement = '';
+      }
+      if (name === 'professionalService' && value !== 'Cyber Forensic') {
+        newData.cyberSubService = '';
+      }
+      
+      return newData;
+    });
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
@@ -32,6 +55,23 @@ export default function Contact() {
     if (!formData.phone.trim()) newErrors.phone = "Phone Number is required";
     if (!formData.email.trim()) newErrors.email = "Email Address is required";
     else if (formData.email.indexOf('@') < 1 || formData.email.lastIndexOf('.') < formData.email.indexOf('@') + 2) newErrors.email = "Email Address is invalid";
+    
+    if (!formData.enquiryCategory) newErrors.enquiryCategory = "Type of Enquiry is required";
+    
+    if (formData.enquiryCategory === 'Educational') {
+      if (!formData.educationType) newErrors.educationType = "Educational Enquiry Type is required";
+      if (formData.educationType === 'Other' && !formData.customRequirement.trim()) {
+        newErrors.customRequirement = "Please describe your requirement";
+      }
+    }
+    
+    if (formData.enquiryCategory === 'Professional') {
+      if (!formData.professionalService) newErrors.professionalService = "Professional Service is required";
+      if (formData.professionalService === 'Cyber Forensic' && !formData.cyberSubService) {
+        newErrors.cyberSubService = "Cyber Forensic Service is required";
+      }
+    }
+
     if (!formData.message.trim()) newErrors.message = "Message is required";
     return newErrors;
   };
@@ -49,13 +89,32 @@ export default function Contact() {
     setStatus('loading');
 
     let subjectLine = 'Contact Us Form';
-    if (formData.enquiryType) {
-      subjectLine = formData.enquiryType.includes('internship') ? 'Internship Enquiry' : 'Course Enquiry';
-    } else if (formData.service) {
-      subjectLine = 'Service Enquiry';
+    if (formData.enquiryCategory === 'Educational') {
+      subjectLine = `Educational Enquiry: ${formData.educationType}`;
+    } else if (formData.enquiryCategory === 'Professional') {
+      subjectLine = `Professional Enquiry: ${formData.professionalService}`;
     }
 
-    const payload = { ...formData, subject: subjectLine };
+    let finalMessage = formData.message;
+    let extraDetails = [];
+    if (formData.enquiryCategory) extraDetails.push(`Type of Enquiry: ${formData.enquiryCategory}`);
+    if (formData.educationType) extraDetails.push(`Educational Enquiry Type: ${formData.educationType}`);
+    if (formData.customRequirement) extraDetails.push(`Requirement Description: ${formData.customRequirement}`);
+    if (formData.professionalService) extraDetails.push(`Professional Service: ${formData.professionalService}`);
+    if (formData.cyberSubService) extraDetails.push(`Cyber Forensic Service: ${formData.cyberSubService}`);
+
+    if (extraDetails.length > 0) {
+      finalMessage = `${extraDetails.join('\\n')}\\n\\nOriginal Message:\\n${formData.message}`;
+    }
+
+    const payload = { 
+      ...formData, 
+      subject: subjectLine,
+      message: finalMessage,
+      // For backward compatibility with the currently deployed server
+      enquiryType: formData.educationType || formData.enquiryCategory,
+      service: formData.professionalService || formData.enquiryCategory
+    };
 
     try {
       const response = await fetch("https://forensic-talents-india.onrender.com/api/contact", {
@@ -70,7 +129,7 @@ export default function Contact() {
       if (response.ok) {
         setStatus('success');
         setFormData({
-          name: '', company: '', phone: '', email: '', subject: '', service: '', enquiryType: '', message: ''
+          name: '', company: '', phone: '', email: '', subject: '', enquiryCategory: '', educationType: '', customRequirement: '', professionalService: '', cyberSubService: '', message: ''
         });
         setTimeout(() => setStatus(''), 5000);
       } else {
@@ -147,31 +206,87 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Service of Interest</label>
-                    <select name="service" value={formData.service} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
-                      <option value="">Select a Service</option>
-                      <option value="pcc">Police Clearance Certificate</option>
-                      <option value="qde">Questioned Documents</option>
-                      <option value="fingerprint">Fingerprint Examination</option>
-                      <option value="cyber">Cyber Forensics</option>
-                      <option value="crime-scene">Crime Scene Investigation</option>
-                      <option value="cross-examination">Cross Examination</option>
-                    </select>
+                {/* Type of Enquiry */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-slate-700">Type of Enquiry *</label>
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="enquiryCategory" value="Educational" checked={formData.enquiryCategory === 'Educational'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <span className="text-slate-700">Educational</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="enquiryCategory" value="Professional" checked={formData.enquiryCategory === 'Professional'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <span className="text-slate-700">Professional</span>
+                    </label>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Course / Internship Enquiry</label>
-                    <select name="Course/Internship Enquiry" value={formData.enquiryType} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
-                      <option value="">Select an Option for Course Related Enquiry</option>
-                      <option value="fingerprint-course">Fingerprint Course</option>
-                      <option value="handwriting-course">Handwriting Course</option>
-                      <option value="cyber-course">Cyber Forensics Course</option>
-                      <option value="crime-scene-course">Crime Scene Course</option>
-                      <option value="internship">Internship Opportunity</option>
-                    </select>
-                  </div>
+                  {errors.enquiryCategory && <p className="text-red-500 text-xs mt-1">{errors.enquiryCategory}</p>}
                 </div>
+
+                {/* Conditional Educational */}
+                {formData.enquiryCategory === 'Educational' && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Educational Enquiry Type *</label>
+                      <select name="educationType" value={formData.educationType} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.educationType ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                        <option value="">Select an Option</option>
+                        <option value="Courses">Courses</option>
+                        <option value="Internships">Internships</option>
+                        <option value="Training">Training</option>
+                        <option value="Workshop">Workshop</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {errors.educationType && <p className="text-red-500 text-xs mt-1">{errors.educationType}</p>}
+                    </div>
+
+                    {formData.educationType === 'Other' && (
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Please describe your requirement *</label>
+                        <textarea name="customRequirement" value={formData.customRequirement} onChange={handleChange} rows="3" className={`w-full px-4 py-3 rounded-lg border ${errors.customRequirement ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none`} placeholder="Describe your educational needs..."></textarea>
+                        {errors.customRequirement && <p className="text-red-500 text-xs mt-1">{errors.customRequirement}</p>}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Conditional Professional */}
+                {formData.enquiryCategory === 'Professional' && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Select Professional Service *</label>
+                      <select name="professionalService" value={formData.professionalService} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.professionalService ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                        <option value="">Select a Service</option>
+                        <option value="Fingerprint Verification">Fingerprint Verification</option>
+                        <option value="Signature Verification">Signature Verification</option>
+                        <option value="Handwriting Analysis">Handwriting Analysis</option>
+                        <option value="Polygraph Testing">Polygraph Testing</option>
+                        <option value="Police Clearance Certificate (PCC)">Police Clearance Certificate (PCC)</option>
+                        <option value="Crime Scene Investigation">Crime Scene Investigation</option>
+                        <option value="Cyber Forensic">Cyber Forensic</option>
+                        <option value="Biological Analysis">Biological Analysis</option>
+                        <option value="Toxicology Analysis">Toxicology Analysis</option>
+                      </select>
+                      {errors.professionalService && <p className="text-red-500 text-xs mt-1">{errors.professionalService}</p>}
+                    </div>
+
+                    {formData.professionalService === 'Cyber Forensic' && (
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Select Cyber Forensic Service *</label>
+                        <select name="cyberSubService" value={formData.cyberSubService} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.cyberSubService ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                          <option value="">Select a Cyber Service</option>
+                          <option value="63(4)(c) Certificate BSA">63(4)(c) Certificate BSA</option>
+                          <option value="65B Certificate">65B Certificate</option>
+                          <option value="Audio Analysis">Audio Analysis</option>
+                          <option value="Video Analysis">Video Analysis</option>
+                          <option value="Image Analysis">Image Analysis</option>
+                          <option value="WhatsApp Chat Analysis">WhatsApp Chat Analysis</option>
+                          <option value="Social Media Analysis">Social Media Analysis</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        {errors.cyberSubService && <p className="text-red-500 text-xs mt-1">{errors.cyberSubService}</p>}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Message *</label>
@@ -199,23 +314,43 @@ export default function Contact() {
                       <MapPin size={20} className="text-accent" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-slate-200 mb-1">Office Address</h4>
+                      <h4 className="font-semibold text-slate-200 mb-1">Corporate Office (HEAD Office)</h4>
                       <p className="text-sm text-slate-300 leading-relaxed">
                         A-411, Supath-II Complex,<br />
                         Opp. Old Wadaj Bus Stop,<br />
                         Old Wadaj, Ashram Road,<br />
-                        Ahmedabad – 380013, Gujarat, India
+                        Ahmedabad - 380013, Gujarat, INDIA
+                      </p>
+                      <p className="text-sm text-slate-300 mt-1 flex items-center gap-2"><Phone size={14} className="text-accent" /> +91 704 666 9919</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <MapPin size={20} className="text-accent" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-200 mb-1">Register Office</h4>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        A-19, Narayan Park Society, Nikol,<br />
+                        Ahmedabad, Gujarat, INDIA
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Phone size={20} className="text-accent" />
+                      <MapPin size={20} className="text-accent" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-slate-200 mb-1">Phone Number</h4>
-                      <p className="text-sm text-slate-300">+91 704 666 9919</p>
+                      <h4 className="font-semibold text-slate-200 mb-1">Branch Office (Hyderabad)</h4>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        B-105, Bharani Apartments,<br />
+                        Saleem Nagar Colony, Malakpet Extension,<br />
+                        Malakpet, Hyderabad - 500036,<br />
+                        Telangana, India
+                      </p>
+                      <p className="text-sm text-slate-300 mt-1 flex items-center gap-2"><Phone size={14} className="text-accent" /> +91 98851 14772</p>
                     </div>
                   </div>
 

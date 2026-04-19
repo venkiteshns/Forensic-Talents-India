@@ -7,7 +7,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import ServiceDetail from './pages/ServiceDetail';
 import Education from './pages/Education';
-import SuccessStories from './pages/SuccessStories';
+
 import Contact from './pages/Contact';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
         <Route path="services" element={<Services />} />
         <Route path="services/:id" element={<ServiceDetail />} />
         <Route path="education" element={<Education />} />
-        <Route path="success-stories" element={<SuccessStories />} />
+
         <Route path="contact" element={<Contact />} />
       </Route>
     </Routes>

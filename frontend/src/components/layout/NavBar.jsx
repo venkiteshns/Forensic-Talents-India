@@ -40,7 +40,7 @@ export function NavBar() {
     { name: 'About', path: '/about' },
     { name: 'Services', path: '/services' },
     { name: 'Education', path: '/education' },
-    { name: 'Success Stories', path: '/success-stories' },
+
     { name: 'Contact', path: '/contact' },
   ];
 

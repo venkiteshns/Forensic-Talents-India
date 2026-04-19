@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 // Configure endpoint for contact form submissions
 app.post('/api/contact', async (req, res) => {
   try {
-    const { name, company, phone, email, service, enquiryType, message, age, professionStatus, courseDetails } = req.body;
+    const { name, company, phone, email, enquiryType, enquiryCategory, educationType, customRequirement, professionalService, cyberSubService, message, age, professionStatus, courseDetails } = req.body;
 
     // Validate required fields
     if (!name || !email || !phone) {
@@ -39,8 +39,12 @@ app.post('/api/contact', async (req, res) => {
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         ${company ? `<p><strong>Company:</strong> ${company}</p>` : ''}
-        ${service ? `<p><strong>Service Interest:</strong> ${service}</p>` : ''}
         ${enquiryType ? `<p><strong>Enquiry Type:</strong> ${enquiryType}</p>` : ''}
+        ${enquiryCategory ? `<p><strong>Enquiry Category:</strong> ${enquiryCategory}</p>` : ''}
+        ${educationType ? `<p><strong>Education Type:</strong> ${educationType}</p>` : ''}
+        ${customRequirement ? `<p><strong>Custom Requirement:</strong> ${customRequirement}</p>` : ''}
+        ${professionalService ? `<p><strong>Professional Service:</strong> ${professionalService}</p>` : ''}
+        ${cyberSubService ? `<p><strong>Cyber Service:</strong> ${cyberSubService}</p>` : ''}
         
         ${courseDetails ? `<h3>Enrollment Details</h3>` : ''}
         ${courseDetails ? `<p><strong>Course:</strong> ${courseDetails}</p>` : ''}
