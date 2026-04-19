@@ -110,21 +110,21 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Link to="/education#quiz" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
+            <Link to="education/quiz" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <BrainCircuit className="w-8 h-8 md:w-12 md:h-12 text-accent mb-2 md:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-sm md:text-lg font-bold text-slate-700 leading-tight">Quiz</h3>
             </Link>
-            <Link to="/education#internships" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
+            <Link to="/education/internships" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <GraduationCap className="w-8 h-8 md:w-12 md:h-12 text-accent mb-2 md:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-sm md:text-lg font-bold text-slate-700 leading-tight">Internship</h3>
             </Link>
 
-            <Link to="/education#certificates" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
+            <Link to="education/certificates" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <Award className="w-8 h-8 md:w-12 md:h-12 text-accent mb-2 md:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-sm md:text-lg font-bold text-slate-700 leading-tight">Certificate Courses</h3>
             </Link>
 
-            <Link to="/education#blogs" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
+            <Link to="/education/blogs" className="bg-slate-50 hover:bg-white py-6 px-4 md:p-8 border border-transparent border-l-4 border-l-accent hover:border-slate-100 rounded-lg flex flex-col items-center justify-center text-center aspect-auto md:aspect-square transition-all duration-300 group hover:shadow-xl relative overflow-hidden">
               <FileText className="w-8 h-8 md:w-12 md:h-12 text-accent mb-2 md:mb-4 group-hover:-translate-y-2 transition-transform duration-300" strokeWidth={1.5} />
               <h3 className="text-sm md:text-lg font-bold text-slate-700 leading-tight">Blogs</h3>
             </Link>

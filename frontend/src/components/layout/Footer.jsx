@@ -56,6 +56,8 @@ export function Footer() {
               <li><Link to="/services/crime-scene" className="hover:text-white transition-colors">Crime Scene Investigation</Link></li>
               <li><Link to="/services/cross-examination" className="hover:text-white transition-colors">Cross Examination</Link></li>
               <li><Link to="/services/polygraph" className="hover:text-white transition-colors">Polygraph Examination</Link></li>
+              <li><Link to="/services/workplace-assessments" className="hover:text-white transition-colors">Workplace Assessments</Link></li>
+              <li><Link to="/services/forensic-training" className="hover:text-white transition-colors">Professional Forensic Training & Capacity Building</Link></li>
             </ul>
           </div>
 
@@ -75,7 +77,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-accent flex-shrink-0" />
-                <span>info@forensictalents.com</span>
+                <a href="mailto:info@forensictalents.com" className="hover:text-white transition-colors">info@forensictalents.com</a>
               </li>
             </ul>
           </div>
