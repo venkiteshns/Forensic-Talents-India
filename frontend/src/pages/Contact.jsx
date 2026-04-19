@@ -95,26 +95,7 @@ export default function Contact() {
       subjectLine = `Professional Enquiry: ${formData.professionalService}`;
     }
 
-    let finalMessage = formData.message;
-    let extraDetails = [];
-    if (formData.enquiryCategory) extraDetails.push(`Type of Enquiry: ${formData.enquiryCategory}`);
-    if (formData.educationType) extraDetails.push(`Educational Enquiry Type: ${formData.educationType}`);
-    if (formData.customRequirement) extraDetails.push(`Requirement Description: ${formData.customRequirement}`);
-    if (formData.professionalService) extraDetails.push(`Professional Service: ${formData.professionalService}`);
-    if (formData.cyberSubService) extraDetails.push(`Cyber Forensic Service: ${formData.cyberSubService}`);
-
-    if (extraDetails.length > 0) {
-      finalMessage = `${extraDetails.join('\\n')}\\n\\nOriginal Message:\\n${formData.message}`;
-    }
-
-    const payload = { 
-      ...formData, 
-      subject: subjectLine,
-      message: finalMessage,
-      // For backward compatibility with the currently deployed server
-      enquiryType: formData.educationType || formData.enquiryCategory,
-      service: formData.professionalService || formData.enquiryCategory
-    };
+    const payload = { ...formData, subject: subjectLine };
 
     try {
       const response = await fetch("https://forensic-talents-india.onrender.com/api/contact", {
