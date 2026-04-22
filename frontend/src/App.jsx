@@ -11,6 +11,7 @@ import Certificates from './pages/education/Certificates';
 import Internships from './pages/education/Internships';
 import Blogs from './pages/education/Blogs';
 import Quiz from './pages/education/Quiz';
+import Resources from './pages/education/Resources';
 
 import Contact from './pages/Contact';
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="education/internships" element={<Internships />} />
         <Route path="education/blogs" element={<Blogs />} />
         <Route path="education/quiz" element={<Quiz />} />
+        <Route path="education/resources" element={<Resources />} />
 
         <Route path="contact" element={<Contact />} />
       </Route>

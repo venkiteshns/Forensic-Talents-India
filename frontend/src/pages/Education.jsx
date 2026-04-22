@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { BookOpen, Award, PenTool, BrainCircuit, ArrowRight } from 'lucide-react';
+import { BookOpen, Award, PenTool, BrainCircuit, ArrowRight, FileDown } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../components/education/SharedSections';
 
 export default function Education() {
@@ -37,6 +37,13 @@ export default function Education() {
       icon: <BrainCircuit size={40} className="text-white" />,
       link: "/education/quiz",
       bgClass: "from-primary to-primary-dark"
+    },
+    {
+      title: "Forensic Resources",
+      description: "Access downloadable materials, reference guides, and career-focused resources to support your forensic journey.",
+      icon: <FileDown size={40} className="text-white" />,
+      link: "/education/resources",
+      bgClass: "from-blue-800 to-slate-800"
     }
   ];
 
