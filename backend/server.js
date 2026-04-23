@@ -37,9 +37,7 @@ const storage = new CloudinaryStorage({
     const folder = 'forensic_talents_resources';
 
     if (file.mimetype === 'application/pdf') {
-      // Cloudinary doesn't support transformations (like fl_attachment) on 'raw' files.
-      // Uploading PDFs as 'image' allows fl_attachment to work correctly.
-      return { folder, format: 'pdf', resource_type: 'image', type: 'upload' };
+      return { folder, format: 'pdf', resource_type: 'raw', type: 'upload' };
     }
     // Images
     return { folder, resource_type: 'image', type: 'upload' };

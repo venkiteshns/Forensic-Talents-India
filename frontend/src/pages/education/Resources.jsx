@@ -92,7 +92,7 @@ function ResourceCard({ resource }) {
         <a
           href={actionUrl}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           download={isPdf || isImage}
           className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
         >
