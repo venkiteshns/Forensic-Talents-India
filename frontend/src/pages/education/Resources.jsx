@@ -98,14 +98,14 @@ function ResourceCard({ resource }) {
               window.open(resource.fileUrl, '_blank', 'noopener,noreferrer');
 
               // 2. Trigger force download after 2 seconds
-              setTimeout(() => {
-                const link = document.createElement('a');
-                link.href = actionUrl;
-                link.download = resource.title || 'download.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }, 2000);
+              // setTimeout(() => {
+              //   const link = document.createElement('a');
+              //   link.href = actionUrl;
+              //   link.download = resource.title || 'download.pdf';
+              //   document.body.appendChild(link);
+              //   link.click();
+              //   document.body.removeChild(link);
+              // }, 2000);
             }}
             className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
           >
