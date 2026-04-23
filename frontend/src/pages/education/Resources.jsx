@@ -29,7 +29,8 @@ function ResourceCard({ resource }) {
 
   const getDownloadUrl = (url) => {
     if (!url) return url;
-    if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+    // Only apply fl_attachment to image uploads. Cloudinary rejects transformations on raw files.
+    if (url.includes('cloudinary.com') && url.includes('/image/upload/')) {
       return url.replace('/upload/', '/upload/fl_attachment/');
     }
     return url;
