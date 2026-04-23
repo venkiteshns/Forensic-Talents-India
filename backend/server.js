@@ -24,40 +24,40 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/forensic_ta
 // ══════════════════════════════════════════════════════════════════════════════
 
 const courseSchema = new mongoose.Schema({
-  title:       { type: String, required: true },
-  category:    { type: String, required: true, default: "General Forensics" },
-  duration:    { type: String, required: true },
-  price:       { type: Number, required: true },
-  mode:        { type: [String], required: true },
+  title: { type: String, required: true },
+  category: { type: String, required: true, default: "General Forensics" },
+  duration: { type: String, required: true },
+  price: { type: Number, required: true },
+  mode: { type: [String], required: true },
   description: { type: String, required: true },
-  topics:      { type: [String], required: true },
+  topics: { type: [String], required: true },
 }, { timestamps: true });
 
 const internshipSchema = new mongoose.Schema({
-  type:        { type: String, enum: ['online', 'offline', 'Online', 'Offline'], required: true },
-  duration:    { type: String, required: true },
-  price:       { type: Number, required: true },
+  type: { type: String, enum: ['online', 'offline', 'Online', 'Offline'], required: true },
+  duration: { type: String, required: true },
+  price: { type: Number, required: true },
   description: { type: String, required: true },
-  benefits:    { type: [String], required: true },
-  isActive:    { type: Boolean, default: true },
+  benefits: { type: [String], required: true },
+  isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
 const quizSchema = new mongoose.Schema({
-  title:       { type: String, required: true },
+  title: { type: String, required: true },
   description: { type: String, required: true },
-  date:        { type: Date, required: true },
-  formLink:    { type: String, required: true },
-  isVisible:   { type: Boolean, default: false },
+  date: { type: Date, required: true },
+  formLink: { type: String, required: true },
+  isVisible: { type: Boolean, default: false },
 }, { timestamps: true });
 
-const Course     = mongoose.model('Course', courseSchema);
+const Course = mongoose.model('Course', courseSchema);
 const Internship = mongoose.model('Internship', internshipSchema);
-const Quiz       = mongoose.model('Quiz', quizSchema);
+const Quiz = mongoose.model('Quiz', quizSchema);
 
 const resourceSchema = new mongoose.Schema({
-  title:       { type: String, required: true },
-  type:        { type: String, enum: ['pdf', 'image', 'youtube'], required: true },
-  fileUrl:     { type: String, required: true },
+  title: { type: String, required: true },
+  type: { type: String, enum: ['pdf', 'image', 'youtube'], required: true },
+  fileUrl: { type: String, required: true },
   description: { type: String, default: '' },
 }, { timestamps: true });
 
