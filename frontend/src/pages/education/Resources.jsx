@@ -7,42 +7,69 @@ import bgImage from '../../assets/forensic-lab-bg.png';
 const API_URL = 'https://forensic-talents-india.onrender.com/api';
 
 const TYPE_CONFIG = {
-  pdf:     { label: 'PDF',     Icon: FileText, cta: 'Download', CtaIcon: Download, accent: '#DC2626', bg: '#FEF2F2' },
-  image:   { label: 'Image',   Icon: Image,    cta: 'View',     CtaIcon: Eye,      accent: '#2563EB', bg: '#EFF6FF' },
-  youtube: { label: 'YouTube', Icon: Video,    cta: 'Watch',    CtaIcon: Play,     accent: '#DC2626', bg: '#FFF1F2' },
+  pdf:     { label: 'PDF',     Icon: FileText, cta: 'Download', CtaIcon: Download, color: '#f87171' },
+  image:   { label: 'Image',   Icon: Image,    cta: 'Download', CtaIcon: Download, color: '#60a5fa' },
+  youtube: { label: 'YouTube', Icon: Video,    cta: 'Watch',    CtaIcon: Play,     color: '#f87171' },
 };
 
 function ResourceCard({ resource }) {
   const cfg = TYPE_CONFIG[resource.type] || TYPE_CONFIG.pdf;
   const { Icon, CtaIcon } = cfg;
 
+  const isYoutube = resource.type === 'youtube';
+  const isImage = resource.type === 'image';
+  const isPdf = resource.type === 'pdf';
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col">
-      {/* Type banner */}
-      <div className="px-5 py-4 flex items-center gap-3" style={{ backgroundColor: cfg.bg }}>
-        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-          <Icon size={20} style={{ color: cfg.accent }} />
+    <div className="group bg-[#1e293b] rounded-xl shadow-md border border-slate-700/50 overflow-hidden hover:shadow-xl hover:shadow-black/20 transition-all duration-300 hover:scale-[1.02] flex flex-col">
+      {/* Media Preview (16:9 Aspect Ratio) */}
+      <div className="relative w-full pt-[56.25%] bg-[#0f172a] border-b border-slate-700/50 overflow-hidden">
+        {isImage && (
+          <img src={resource.fileUrl} alt={resource.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        )}
+        
+        {isYoutube && (
+          <iframe 
+            src={resource.fileUrl} 
+            className="absolute inset-0 w-full h-full border-0 pointer-events-none" 
+            title={resource.title}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          ></iframe>
+        )}
+
+        {isPdf && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0f172a] p-4 text-center">
+            <div className="w-16 h-16 bg-red-900/20 rounded-2xl flex items-center justify-center mb-3 border border-red-900/30">
+              <FileText size={32} className="text-red-400" />
+            </div>
+            <span className="text-sm font-semibold text-slate-300">PDF Document</span>
+          </div>
+        )}
+
+        {/* Type Badge Overlay */}
+        <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-sm">
+          <Icon size={14} style={{ color: cfg.color }} />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-white">
+            {cfg.label}
+          </span>
         </div>
-        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: cfg.accent }}>
-          {cfg.label}
-        </span>
       </div>
 
       {/* Content */}
       <div className="p-5 flex-1 flex flex-col">
-        <h3 className="font-bold text-slate-800 text-base mb-2 leading-snug">{resource.title}</h3>
+        <h3 className="font-bold text-slate-100 text-lg mb-2 leading-snug line-clamp-2">{resource.title}</h3>
         {resource.description && (
-          <p className="text-slate-500 text-sm leading-relaxed mb-4 flex-1 line-clamp-3">{resource.description}</p>
+          <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">{resource.description}</p>
         )}
 
         <a
           href={resource.fileUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-md"
-          style={{ backgroundColor: cfg.accent }}
+          className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-semibold text-white bg-blue-700 hover:bg-blue-600 transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/30"
         >
-          <CtaIcon size={16} />
+          <CtaIcon size={18} />
           {cfg.cta}
         </a>
       </div>
