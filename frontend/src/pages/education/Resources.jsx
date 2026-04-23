@@ -7,9 +7,9 @@ import bgImage from '../../assets/forensic-lab-bg.png';
 const API_URL = 'https://forensic-talents-india.onrender.com/api';
 
 const TYPE_CONFIG = {
-  pdf:     { label: 'PDF',     Icon: FileText, cta: 'Download', CtaIcon: Download, color: '#f87171' },
-  image:   { label: 'Image',   Icon: Image,    cta: 'Download', CtaIcon: Download, color: '#60a5fa' },
-  youtube: { label: 'YouTube', Icon: Video,    cta: 'Watch',    CtaIcon: Play,     color: '#f87171' },
+  pdf: { label: 'PDF', Icon: FileText, cta: 'Download', CtaIcon: Download, color: '#f87171' },
+  image: { label: 'Image', Icon: Image, cta: 'Download', CtaIcon: Download, color: '#60a5fa' },
+  youtube: { label: 'YouTube', Icon: Video, cta: 'Watch', CtaIcon: Play, color: '#f87171' },
 };
 
 function ResourceCard({ resource }) {
@@ -45,14 +45,14 @@ function ResourceCard({ resource }) {
         {isImage && (
           <img src={resource.fileUrl} alt={resource.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
         )}
-        
+
         {isYoutube && ytId && (
           <div className="absolute inset-0 flex items-center justify-center bg-black">
-            <img 
-              src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
-              alt={resource.title} 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" 
-              loading="lazy" 
+            <img
+              src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+              alt={resource.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80"
+              loading="lazy"
             />
             <div className="relative z-10 w-12 h-12 bg-red-600/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:bg-red-500 transition-colors">
               <Play size={24} className="text-white ml-1" />
@@ -60,9 +60,9 @@ function ResourceCard({ resource }) {
           </div>
         )}
         {isYoutube && !ytId && (
-           <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
-             <Video size={32} className="text-slate-400" />
-           </div>
+          <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
+            <Video size={32} className="text-slate-400" />
+          </div>
         )}
 
         {isPdf && (
@@ -91,12 +91,12 @@ function ResourceCard({ resource }) {
         )}
 
         {isPdf ? (
-          <button
+          <button target="_blank"
             onClick={(e) => {
               e.preventDefault();
               // 1. Open preview in a new tab immediately
               window.open(resource.fileUrl, '_blank', 'noopener,noreferrer');
-              
+
               // 2. Trigger force download after 2 seconds
               setTimeout(() => {
                 const link = document.createElement('a');
@@ -131,7 +131,7 @@ function ResourceCard({ resource }) {
 
 export default function Resources() {
   const [resources, setResources] = useState([]);
-  const [loading, setLoading]     = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -189,7 +189,7 @@ export default function Resources() {
             <div className="relative overflow-hidden rounded-3xl border border-slate-100 bg-white p-8 text-center shadow-xl duration-700 animate-in fade-in slide-in-from-bottom-8 md:p-16">
               {/* Background Accent */}
               <div className="absolute left-0 top-0 h-2 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-              
+
               {/* Icon */}
               <div className="mb-8 flex justify-center">
                 <div className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-50 shadow-inner">
@@ -200,7 +200,7 @@ export default function Resources() {
               <h2 className="mb-6 font-heading text-3xl font-bold text-slate-800">
                 Resources Coming Soon
               </h2>
-              
+
               <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-600">
                 Downloadable resources will be available soon.
                 <br /><br />
