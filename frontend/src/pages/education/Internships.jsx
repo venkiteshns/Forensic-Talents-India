@@ -4,12 +4,26 @@ import { Button } from '../../components/ui/Button';
 import { Award, Briefcase, MapPin, Search, CheckCircle2, ArrowRight } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
+import api from '../../utils/api';
 
 export default function Internships() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
+  const [internships, setInternships] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const fetchInternships = async () => {
+      try {
+        const res = await api.get('/internships');
+        setInternships(res.data.filter(i => i.isActive));
+      } catch (error) {
+        console.error("Error fetching internships", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInternships();
   }, []);
 
   const handleEnrollClick = (category, duration) => {
@@ -69,74 +83,60 @@ export default function Internships() {
               </ul>
             </div>
 
-            {/* Online Internship */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 transform hover:-translate-y-2 transition-transform duration-300 relative flex flex-col">
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">Online Internship</h3>
-              <p className="text-slate-500 mb-6 font-medium">Virtual Practical Exposure</p>
-
-              <div className="mb-6 flex items-baseline text-slate-900">
-                <span className="text-4xl font-extrabold tracking-tight">₹6,500</span>
-                <span className="ml-1 text-slate-500 font-medium">/ 1 Month</span>
+            {/* Dynamic Internships */}
+            {loading ? (
+              <div className="lg:col-span-2 flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
               </div>
-
-              <div className="border-t border-slate-100 pt-6 flex-grow">
-                <h4 className="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">Benefits included</h4>
-                <ul className="space-y-4 text-slate-600">
-                  <li className="flex items-start gap-3">
-                    <Award className="text-primary flex-shrink-0 mt-0.5" />
-                    <span className="font-medium">Recognized Certificate of Internship</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Search className="text-primary flex-shrink-0 mt-0.5" />
-                    <span className="font-medium">Virtual Case Studies & Assignments</span>
-                  </li>
-                </ul>
+            ) : internships.length === 0 ? (
+              <div className="lg:col-span-2 text-center py-20 bg-white rounded-2xl shadow-lg border border-slate-200">
+                <p className="text-slate-500 text-lg">No internships are currently available. Please check back later.</p>
               </div>
+            ) : (
+              internships.map((internship) => {
+                const isOffline = internship.type.toLowerCase() === 'offline';
+                
+                return (
+                  <div key={internship._id} className={`${isOffline ? 'bg-gradient-to-b from-primary to-primary-dark shadow-2xl border-2 border-accent text-white' : 'bg-white shadow-lg border border-slate-200 text-slate-900'} rounded-2xl p-8 transform hover:-translate-y-2 transition-transform duration-300 relative flex flex-col`}>
+                    {isOffline && (
+                      <div className="absolute top-0 right-0 bg-accent text-primary font-bold text-xs px-3 py-1.5 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">
+                        Best Value / Recommended
+                      </div>
+                    )}
+                    <h3 className={`text-2xl font-bold mb-2 ${isOffline ? 'text-white' : 'text-slate-900'}`}>{internship.type} Internship</h3>
+                    <p className={`mb-6 font-medium ${isOffline ? 'text-accent-light' : 'text-slate-500'}`}>{internship.description}</p>
 
-              <div className="mt-8">
-                <Button variant="outline" size="lg" className="w-full justify-center group border-slate-300 hover:border-primary hover:bg-slate-50 text-slate-800" onClick={() => handleEnrollClick("Online Internship", "1 Month")}>
-                  Apply Now <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-            </div>
+                    <div className={`mb-6 flex items-baseline ${isOffline ? 'text-white' : 'text-slate-900'}`}>
+                      <span className="text-4xl font-extrabold tracking-tight">₹{internship.price}</span>
+                      <span className={`ml-1 font-medium ${isOffline ? 'text-slate-300' : 'text-slate-500'}`}>/ {internship.duration}</span>
+                    </div>
 
-            {/* Offline Internship */}
-            <div className="bg-gradient-to-b from-primary to-primary-dark rounded-2xl p-8 shadow-2xl transform hover:-translate-y-2 transition-transform duration-300 relative border-2 border-accent flex flex-col">
-              <div className="absolute top-0 right-0 bg-accent text-primary font-bold text-xs px-3 py-1.5 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">
-                Best Value / Recommended
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Offline Internship</h3>
-              <p className="text-accent-light mb-6 font-medium">In-Lab Premium Experience</p>
+                    <div className={`border-t pt-6 flex-grow ${isOffline ? 'border-white/10' : 'border-slate-100'}`}>
+                      <h4 className={`font-bold mb-4 text-sm uppercase tracking-wide ${isOffline ? 'text-white' : 'text-slate-800'}`}>Benefits included</h4>
+                      <ul className={`space-y-4 ${isOffline ? 'text-slate-200' : 'text-slate-600'}`}>
+                        {internship.benefits.map((benefit, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <Award className={`flex-shrink-0 mt-0.5 ${isOffline ? 'text-accent' : 'text-primary'}`} />
+                            <span className="font-medium">{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-              <div className="mb-6 flex items-baseline text-white">
-                <span className="text-4xl font-extrabold tracking-tight">₹8,500</span>
-                <span className="ml-1 text-slate-300 font-medium">/ 1 Month</span>
-              </div>
-
-              <div className="border-t border-white/10 pt-6 flex-grow">
-                <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">Benefits included</h4>
-                <ul className="space-y-4 text-slate-200">
-                  <li className="flex items-start gap-3">
-                    <Award className="text-accent flex-shrink-0 mt-0.5" />
-                    <span className="font-medium">Recognized Certificate of Internship</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <Briefcase className="text-accent flex-shrink-0 mt-0.5" />
-                    <span className="font-medium">Exclusive Welcome Kit & Official T-Shirt</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <MapPin className="text-accent flex-shrink-0 mt-0.5" />
-                    <span className="font-medium">Field Visits: Mortuary & Police Station</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8">
-                <Button variant="accent" size="lg" className="w-full justify-center group shadow-[0_0_20px_rgba(46,204,113,0.3)]" onClick={() => handleEnrollClick("Offline Internship", "1 Month")}>
-                  Apply Now <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-            </div>
+                    <div className="mt-8">
+                      <Button 
+                        variant={isOffline ? "accent" : "outline"} 
+                        size="lg" 
+                        className={`w-full justify-center group ${isOffline ? 'shadow-[0_0_20px_rgba(46,204,113,0.3)]' : 'border-slate-300 hover:border-primary hover:bg-slate-50 text-slate-800'}`} 
+                        onClick={() => handleEnrollClick(`${internship.type} Internship`, internship.duration)}
+                      >
+                        Apply Now <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </Container>
       </section>

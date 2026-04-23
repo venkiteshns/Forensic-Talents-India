@@ -1,19 +1,35 @@
 import { useState, useEffect } from 'react';
 import { Container } from '../../components/ui/Container';
 import { Button } from '../../components/ui/Button';
-import { BrainCircuit, CheckCircle, PlayCircle } from 'lucide-react';
+import { BrainCircuit, CheckCircle, PlayCircle, Calendar } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
+import api from '../../utils/api';
 
 export default function Quiz() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
+  const [quiz, setQuiz] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const fetchQuiz = async () => {
+      try {
+        const res = await api.get('/quiz/latest');
+        setQuiz(res.data);
+      } catch (err) {
+        console.error("Error fetching quiz", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuiz();
   }, []);
 
   const handleStartQuiz = () => {
-    setEnrollModal({ isOpen: true, course: { category: "Quiz Participation", prog: { duration: "Monthly" } } });
+    if (quiz && quiz.formLink) {
+      window.open(quiz.formLink, '_blank');
+    }
   };
 
   return (
@@ -63,24 +79,42 @@ export default function Quiz() {
 
             <div className="md:w-1/2 relative z-10">
               <span className="text-accent font-bold tracking-wider uppercase text-sm mb-3 block">Monthly Initiative</span>
-              <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6">Interactive Forensic Quiz</h2>
-              <p className="text-slate-600 text-lg mb-6 leading-relaxed">
-                Our Monthly Forensic Quiz Program aims to promote analytical thinking and the practical application of forensic science concepts using authentic criminal cases.
-              </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-slate-700 font-medium">
-                  <CheckCircle className="text-accent" size={20} /> Case-Based Learning
-                </li>
-                <li className="flex items-center gap-3 text-slate-700 font-medium">
-                  <CheckCircle className="text-accent" size={20} /> Real-life criminal investigations
-                </li>
-                <li className="flex items-center gap-3 text-slate-700 font-medium">
-                  <CheckCircle className="text-accent" size={20} /> Earn Certificates of Merit
-                </li>
-              </ul>
-              <Button variant="primary" size="lg" className="group shadow-lg" onClick={handleStartQuiz}>
-                <PlayCircle size={20} className="mr-2 group-hover:scale-110 transition-transform" /> Register for Quiz Now
-              </Button>
+              
+              {loading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6 mb-6"></div>
+                </div>
+              ) : quiz && quiz.isVisible ? (
+                <>
+                  <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6">{quiz.title}</h2>
+                  <p className="text-slate-600 text-lg mb-6 leading-relaxed">
+                    {quiz.description}
+                  </p>
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-center gap-3 text-slate-700 font-medium">
+                      <Calendar className="text-accent" size={20} /> Date: {new Date(quiz.date).toLocaleDateString()}
+                    </li>
+                    <li className="flex items-center gap-3 text-slate-700 font-medium">
+                      <CheckCircle className="text-accent" size={20} /> Case-Based Learning
+                    </li>
+                    <li className="flex items-center gap-3 text-slate-700 font-medium">
+                      <CheckCircle className="text-accent" size={20} /> Earn Certificates of Merit
+                    </li>
+                  </ul>
+                  <Button variant="primary" size="lg" className="group shadow-lg" onClick={handleStartQuiz}>
+                    <PlayCircle size={20} className="mr-2 group-hover:scale-110 transition-transform" /> Take the Quiz Now
+                  </Button>
+                </>
+              ) : (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm">
+                  <h2 className="text-2xl font-heading font-bold text-primary mb-4">Current Status</h2>
+                  <p className="text-slate-700 leading-relaxed font-medium">
+                    {quiz ? `Previous quiz was conducted on ${new Date(quiz.date).toLocaleDateString()}. A new quiz will be announced shortly.` : "A new quiz will be announced shortly."}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="md:w-1/2 relative z-10">

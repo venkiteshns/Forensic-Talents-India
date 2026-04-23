@@ -1,9 +1,26 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, BrainCircuit, Users, Award, Activity } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, BrainCircuit, Users, Award, Activity, Bell } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
+import api from '../utils/api';
 
 export default function Home() {
+  const [activeQuiz, setActiveQuiz] = useState(null);
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const res = await api.get('/quiz/latest');
+        if (res.data && res.data.isVisible) {
+          setActiveQuiz(res.data);
+        }
+      } catch (err) {
+        console.error("Error fetching quiz", err);
+      }
+    };
+    fetchQuiz();
+  }, []);
   const services = [
     { id: 'pcc', title: 'Police Clearance', desc: 'Secure PCC for visa & employment securely.', icon: <Shield size={24} /> },
     { id: 'questioned-documents', title: 'Questioned Documents', desc: 'Verify authenticity and detect forgery scientifically.', icon: <FileText size={24} /> },
@@ -49,6 +66,21 @@ export default function Home() {
           </div>
         </Container>
       </section>
+
+      {/* Dynamic Quiz Banner */}
+      {activeQuiz && (
+        <div className="bg-accent text-primary py-3 px-4 shadow-md relative z-20">
+          <Container className="flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
+            <div className="flex items-center gap-3 font-semibold mb-2 sm:mb-0">
+              <Bell className="animate-bounce" size={20} />
+              <span>New Quiz Available: {activeQuiz.title} – Participate Now</span>
+            </div>
+            <Link to="/education/quiz" className="bg-primary text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-[#1E293B] transition-colors whitespace-nowrap">
+              Take Quiz
+            </Link>
+          </Container>
+        </div>
+      )}
 
       {/* About Preview */}
       <section className="py-20 bg-white">
