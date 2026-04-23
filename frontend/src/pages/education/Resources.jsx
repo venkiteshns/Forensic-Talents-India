@@ -20,6 +20,13 @@ function ResourceCard({ resource }) {
   const isImage = resource.type === 'image';
   const isPdf = resource.type === 'pdf';
 
+  const getYoutubeId = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return match ? match[1] : null;
+  };
+  const ytId = isYoutube ? getYoutubeId(resource.fileUrl) : null;
+
   return (
     <div className="group bg-[#1e293b] rounded-xl shadow-md border border-slate-700/50 overflow-hidden hover:shadow-xl hover:shadow-black/20 transition-all duration-300 hover:scale-[1.02] flex flex-col">
       {/* Media Preview (16:9 Aspect Ratio) */}
@@ -28,14 +35,23 @@ function ResourceCard({ resource }) {
           <img src={resource.fileUrl} alt={resource.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
         )}
         
-        {isYoutube && (
-          <iframe 
-            src={resource.fileUrl} 
-            className="absolute inset-0 w-full h-full border-0 pointer-events-none" 
-            title={resource.title}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          ></iframe>
+        {isYoutube && ytId && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <img 
+              src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
+              alt={resource.title} 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-60" 
+              loading="lazy" 
+            />
+            <div className="relative z-10 w-12 h-12 bg-red-600/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:bg-red-500 transition-colors">
+              <Play size={24} className="text-white ml-1" />
+            </div>
+          </div>
+        )}
+        {isYoutube && !ytId && (
+           <div className="absolute inset-0 bg-[#0f172a] flex items-center justify-center">
+             <Video size={32} className="text-slate-700" />
+           </div>
         )}
 
         {isPdf && (
