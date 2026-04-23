@@ -29,8 +29,7 @@ function ResourceCard({ resource }) {
 
   const getDownloadUrl = (url) => {
     if (!url) return url;
-    // Only apply fl_attachment to image uploads. Cloudinary rejects transformations on raw files.
-    if (url.includes('cloudinary.com') && url.includes('/image/upload/')) {
+    if (url.includes('cloudinary.com') && url.includes('/upload/')) {
       return url.replace('/upload/', '/upload/fl_attachment/');
     }
     return url;
@@ -90,40 +89,16 @@ function ResourceCard({ resource }) {
           <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">{resource.description}</p>
         )}
 
-        {isPdf ? (
-          <button target="_blank"
-            onClick={(e) => {
-              e.preventDefault();
-              // 1. Open preview in a new tab immediately
-              window.open(resource.fileUrl, '_blank', 'noopener,noreferrer');
-
-              // 2. Trigger force download after 2 seconds
-              // setTimeout(() => {
-              //   const link = document.createElement('a');
-              //   link.href = actionUrl;
-              //   link.download = resource.title || 'download.pdf';
-              //   document.body.appendChild(link);
-              //   link.click();
-              //   document.body.removeChild(link);
-              // }, 2000);
-            }}
-            className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
-          >
-            <CtaIcon size={18} />
-            Download PDF
-          </button>
-        ) : (
-          <a
-            href={actionUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            download={isImage}
-            className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
-          >
-            <CtaIcon size={18} />
-            {isImage ? "Download Image" : cfg.cta}
-          </a>
-        )}
+        <a
+          href={actionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={isPdf || isImage}
+          className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
+        >
+          <CtaIcon size={18} />
+          {isPdf ? "Download PDF" : isImage ? "Download Image" : cfg.cta}
+        </a>
       </div>
     </div>
   );
