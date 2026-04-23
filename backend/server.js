@@ -5,6 +5,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 const Admin = require('./models/Admin');
 
 const app = express();
@@ -18,6 +21,38 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/forensic_talents')
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+// ─── Cloudinary & Multer Setup ──────────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = 'forensic_talents_resources';
+    let format;
+    let resource_type = 'auto'; // automatically detects raw vs image/video
+
+    // If it's a PDF, we must treat it appropriately
+    if (file.mimetype === 'application/pdf') {
+      format = 'pdf';
+      resource_type = 'raw';
+    } else {
+      resource_type = 'auto'; 
+    }
+
+    return {
+      folder: folder,
+      format: format,
+      resource_type: resource_type,
+    };
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SCHEMAS & MODELS
@@ -239,6 +274,16 @@ app.post('/api/resources', protect, async (req, res) => {
     await resource.save();
     res.status(201).json(resource);
   } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+// POST upload file to Cloudinary (protected)
+app.post('/api/upload', protect, upload.single('file'), (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    res.json({ url: req.file.path }); // Cloudinary URL
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // PUT update resource (protected)
