@@ -29,30 +29,36 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    let folder = 'forensic_talents_resources';
-    let format;
-    let resource_type = 'auto'; // automatically detects raw vs image/video
+    const folder = 'forensic_talents_resources';
 
-    // If it's a PDF, we must treat it appropriately
     if (file.mimetype === 'application/pdf') {
-      format = 'pdf';
-      resource_type = 'raw';
-    } else {
-      resource_type = 'auto'; 
+      // Cloudinary doesn't support transformations (like fl_attachment) on 'raw' files.
+      // Uploading PDFs as 'image' allows fl_attachment to work correctly.
+      return { folder, format: 'pdf', resource_type: 'image', type: 'upload' };
     }
-
-    return {
-      folder: folder,
-      format: format,
-      resource_type: resource_type,
-    };
+    // Images
+    return { folder, resource_type: 'image', type: 'upload' };
   },
 });
 
-const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+  if (ALLOWED_MIMETYPES.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error(`Invalid file type. Allowed types: JPEG, PNG, GIF, WebP, PDF`), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB max
+});
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SCHEMAS & MODELS
@@ -215,6 +221,22 @@ app.put('/api/internships/:id', protect, async (req, res) => {
   } catch (err) { res.status(400).json({ message: err.message }); }
 });
 
+// DELETE internship (protected)
+app.delete('/api/internships/:id', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid internship ID' });
+    }
+    const deleted = await Internship.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ success: false, message: 'Internship not found' });
+    return res.json({ success: true, message: 'Internship deleted successfully' });
+  } catch (err) {
+    console.error('Delete internship error:', err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // QUIZ ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
@@ -277,13 +299,21 @@ app.post('/api/resources', protect, async (req, res) => {
 });
 
 // POST upload file to Cloudinary (protected)
-app.post('/api/upload', protect, upload.single('file'), (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-    res.json({ url: req.file.path }); // Cloudinary URL
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+app.post('/api/upload', protect, (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      // Multer / file-filter error
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ success: false, message: 'File too large. Maximum size is 20 MB.' });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    // Cloudinary stores the URL in req.file.path
+    return res.json({ success: true, url: req.file.path });
+  });
 });
 
 // PUT update resource (protected)

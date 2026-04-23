@@ -22,25 +22,35 @@ function ResourceCard({ resource }) {
 
   const getYoutubeId = (url) => {
     if (!url) return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
     return match ? match[1] : null;
   };
   const ytId = isYoutube ? getYoutubeId(resource.fileUrl) : null;
 
+  const getDownloadUrl = (url) => {
+    if (!url) return url;
+    if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+      return url.replace('/upload/', '/upload/fl_attachment/');
+    }
+    return url;
+  };
+
+  const actionUrl = (isPdf || isImage) ? getDownloadUrl(resource.fileUrl) : resource.fileUrl;
+
   return (
-    <div className="group bg-[#1e293b] rounded-xl shadow-md border border-slate-700/50 overflow-hidden hover:shadow-xl hover:shadow-black/20 transition-all duration-300 hover:scale-[1.02] flex flex-col">
+    <div className="group bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
       {/* Media Preview (16:9 Aspect Ratio) */}
-      <div className="relative w-full pt-[56.25%] bg-[#0f172a] border-b border-slate-700/50 overflow-hidden">
+      <div className="relative w-full pt-[56.25%] bg-slate-50 border-b border-slate-100 overflow-hidden">
         {isImage && (
           <img src={resource.fileUrl} alt={resource.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
         )}
         
         {isYoutube && ytId && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
             <img 
               src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
               alt={resource.title} 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-60" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80" 
               loading="lazy" 
             />
             <div className="relative z-10 w-12 h-12 bg-red-600/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:bg-red-500 transition-colors">
@@ -49,44 +59,45 @@ function ResourceCard({ resource }) {
           </div>
         )}
         {isYoutube && !ytId && (
-           <div className="absolute inset-0 bg-[#0f172a] flex items-center justify-center">
-             <Video size={32} className="text-slate-700" />
+           <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
+             <Video size={32} className="text-slate-400" />
            </div>
         )}
 
         {isPdf && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0f172a] p-4 text-center">
-            <div className="w-16 h-16 bg-red-900/20 rounded-2xl flex items-center justify-center mb-3 border border-red-900/30">
-              <FileText size={32} className="text-red-400" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-4 text-center">
+            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-3 border border-red-100 shadow-sm">
+              <FileText size={32} className="text-red-500" />
             </div>
-            <span className="text-sm font-semibold text-slate-300">PDF Document</span>
+            <span className="text-sm font-semibold text-slate-600">PDF Document</span>
           </div>
         )}
 
         {/* Type Badge Overlay */}
-        <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 shadow-sm">
+        <div className="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm">
           <Icon size={14} style={{ color: cfg.color }} />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-white">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">
             {cfg.label}
           </span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 flex-1 flex flex-col">
-        <h3 className="font-bold text-slate-100 text-lg mb-2 leading-snug line-clamp-2">{resource.title}</h3>
+      <div className="p-6 flex-1 flex flex-col">
+        <h3 className="font-semibold text-slate-800 text-lg mb-2 leading-snug line-clamp-2">{resource.title}</h3>
         {resource.description && (
-          <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">{resource.description}</p>
+          <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1 line-clamp-3">{resource.description}</p>
         )}
 
         <a
-          href={resource.fileUrl}
+          href={actionUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-semibold text-white bg-blue-700 hover:bg-blue-600 transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/30"
+          download={isPdf || isImage}
+          className="mt-auto flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-md text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 transition-colors shadow-sm"
         >
           <CtaIcon size={18} />
-          {cfg.cta}
+          {isPdf ? "Download PDF" : isImage ? "Download Image" : cfg.cta}
         </a>
       </div>
     </div>
