@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { Container } from '../../components/ui/Container';
 import { ArrowLeft, FileText, Image, Video, Download, Eye, Play, Loader2 } from 'lucide-react';
 import bgImage from '../../assets/forensic-lab-bg.png';
+import { CardSkeleton } from '../../components/ui/Skeletons';
 
-const API_URL = 'https://forensic-talents-india.onrender.com/api';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
 
 const TYPE_CONFIG = {
   pdf: { label: 'PDF', Icon: FileText, cta: 'Download', CtaIcon: Download, color: '#f87171' },
@@ -150,11 +151,16 @@ export default function Resources() {
           </div>
         </Container>
       </section>
-
+      
       <Container>
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
           </div>
         ) : hasResources ? (
           <>

@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { BrainCircuit, CheckCircle, PlayCircle, Calendar } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
+import { QuizSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
 
 export default function Quiz() {
@@ -81,11 +82,7 @@ export default function Quiz() {
               <span className="text-accent font-bold tracking-wider uppercase text-sm mb-3 block">Monthly Initiative</span>
               
               {loading ? (
-                <div className="animate-pulse">
-                  <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 mb-6"></div>
-                </div>
+                <QuizSkeleton />
               ) : quiz && quiz.isVisible ? (
                 <>
                   <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6">{quiz.title}</h2>

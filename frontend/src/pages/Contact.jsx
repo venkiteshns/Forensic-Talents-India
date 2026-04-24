@@ -28,7 +28,16 @@ export default function Contact() {
   const validate = (data = formData) => {
     let newErrors = {};
     if (!data.name.trim()) newErrors.name = "Full Name is required.";
-    if (!data.phone.trim()) newErrors.phone = "Phone Number is required.";
+    if (!data.phone.trim()) {
+      newErrors.phone = "Phone Number is required.";
+    } else {
+      if (data.nationality === 'India' && !/^[6-9][0-9]{9}$/.test(data.phone.trim())) {
+        newErrors.phone = "Please enter a valid 10-digit Indian phone number.";
+      } else if (data.nationality !== 'India' && !/^\+?[0-9]{8,15}$/.test(data.phone.trim())) {
+        newErrors.phone = "Please enter a valid international phone number.";
+      }
+    }
+
     if (!data.email.trim()) newErrors.email = "Email Address is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
     
@@ -118,7 +127,8 @@ export default function Contact() {
     const payload = { ...formData, subject: subjectLine };
 
     try {
-      const response = await fetch("https://forensic-talents-india.onrender.com/api/contact", {
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
+      const response = await fetch(`${BACKEND_URL}/contact`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',

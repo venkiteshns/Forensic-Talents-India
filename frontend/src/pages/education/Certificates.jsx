@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { BookOpen, Clock, IndianRupee, ChevronDown, ChevronUp, CheckCircle, Globe, MapPin, Fingerprint, Monitor, Search, PenTool, LayoutGrid } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
+import { CardSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
 
 export default function Certificates() {
@@ -111,8 +112,9 @@ export default function Certificates() {
       <section className="py-8 relative z-10">
         <Container>
           {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <CardSkeleton />
+              <CardSkeleton />
             </div>
           ) : groupedCourses.length === 0 ? (
             <div className="text-center py-20">

@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Award, Briefcase, MapPin, Search, CheckCircle2, ArrowRight } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
+import { CardSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
 
 export default function Internships() {
@@ -85,8 +86,9 @@ export default function Internships() {
 
             {/* Dynamic Internships */}
             {loading ? (
-              <div className="lg:col-span-2 flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <CardSkeleton />
+                <CardSkeleton />
               </div>
             ) : internships.length === 0 ? (
               <div className="lg:col-span-2 text-center py-20 bg-white rounded-2xl shadow-lg border border-slate-200">

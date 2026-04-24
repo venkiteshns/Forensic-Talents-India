@@ -37,7 +37,7 @@ const storage = new CloudinaryStorage({
     const folder = 'forensic_talents_resources';
 
     if (file.mimetype === 'application/pdf') {
-      return { folder, format: 'pdf', resource_type: 'raw', type: 'upload' };
+      return { folder, resource_type: 'raw', type: 'upload' };
     }
     // Images
     return { folder, resource_type: 'image', type: 'upload' };
@@ -139,16 +139,83 @@ app.post('/api/auth/login', async (req, res) => {
     const token = jwt.sign(
       { id: admin._id, email: admin.email, role: 'admin' },
       process.env.JWT_SECRET || 'forensic_secret',
-      { expiresIn: '1d' }
+      { expiresIn: '15m' }
     );
+    
+    const refreshToken = jwt.sign(
+      { id: admin._id },
+      process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret',
+      { expiresIn: '7d' }
+    );
+    
+    admin.refreshTokens.push(refreshToken);
+    await admin.save();
+
     return res.json({
       success: true,
       token,
+      refreshToken,
       admin: { name: admin.name, email: admin.email },
     });
   } catch (err) {
     console.error('Login error:', err.message);
     return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.post('/api/auth/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(401).json({ success: false, message: 'Refresh token required' });
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret');
+    const admin = await Admin.findById(decoded.id);
+
+    if (!admin || !admin.refreshTokens.includes(refreshToken)) {
+      return res.status(403).json({ success: false, message: 'Invalid refresh token' });
+    }
+
+    // Token Rotation: Remove the old refresh token
+    admin.refreshTokens = admin.refreshTokens.filter(t => t !== refreshToken);
+
+    // Generate new tokens
+    const newToken = jwt.sign(
+      { id: admin._id, email: admin.email, role: 'admin' },
+      process.env.JWT_SECRET || 'forensic_secret',
+      { expiresIn: '15m' }
+    );
+
+    const newRefreshToken = jwt.sign(
+      { id: admin._id },
+      process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret',
+      { expiresIn: '7d' }
+    );
+
+    admin.refreshTokens.push(newRefreshToken);
+    await admin.save();
+
+    return res.json({ success: true, token: newToken, refreshToken: newRefreshToken });
+  } catch (err) {
+    return res.status(403).json({ success: false, message: 'Invalid or expired refresh token' });
+  }
+});
+
+app.post('/api/auth/logout', async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ success: false, message: 'Refresh token required' });
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret', { ignoreExpiration: true });
+    const admin = await Admin.findById(decoded.id);
+    
+    if (admin) {
+      admin.refreshTokens = admin.refreshTokens.filter(t => t !== refreshToken);
+      await admin.save();
+    }
+    
+    return res.json({ success: true, message: 'Logged out successfully' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Server error during logout' });
   }
 });
 
@@ -363,6 +430,16 @@ app.post('/api/contact', async (req, res) => {
     }
 
     const finalNationality = nationality || 'India';
+
+    if (finalNationality === 'India') {
+      if (!/^[6-9][0-9]{9}$/.test(phone)) {
+        return res.status(400).json({ error: 'Please enter a valid 10-digit Indian phone number.' });
+      }
+    } else {
+      if (!/^\+?[0-9]{8,15}$/.test(phone)) {
+        return res.status(400).json({ error: 'Please enter a valid international phone number.' });
+      }
+    }
 
     const mailOptions = {
       from: `"${name}" <${email}>`,
