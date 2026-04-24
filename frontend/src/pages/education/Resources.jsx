@@ -12,7 +12,7 @@ const TYPE_CONFIG = {
   youtube: { label: 'YouTube', Icon: Video, cta: 'Watch', CtaIcon: Play, color: '#f87171' },
 };
 
-function ResourceCard({ resource }) {
+function ResourceCard({ resource, index }) {
   const cfg = TYPE_CONFIG[resource.type] || TYPE_CONFIG.pdf;
   const { Icon, CtaIcon } = cfg;
 
@@ -65,11 +65,24 @@ function ResourceCard({ resource }) {
         )}
 
         {isPdf && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 p-4 text-center">
-            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-3 border border-red-100 shadow-sm">
-              <FileText size={32} className="text-red-500" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            {/* Background Image */}
+            <img 
+              src={`/images/pdf-bgs/${(index % 7) + 1}.png`} 
+              alt="PDF Background" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+              loading="lazy" 
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-800/40 to-slate-900/60 group-hover:from-slate-800/50 group-hover:to-slate-900/70 transition-colors duration-300"></div>
+            
+            {/* Icon and Label */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border border-white/20 shadow-lg">
+                <FileText size={32} className="text-white" />
+              </div>
+              <span className="text-sm font-semibold text-white drop-shadow-md tracking-wide">PDF Document</span>
             </div>
-            <span className="text-sm font-semibold text-slate-600">PDF Document</span>
           </div>
         )}
 
@@ -155,7 +168,7 @@ export default function Resources() {
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resources.map(r => <ResourceCard key={r._id} resource={r} />)}
+              {resources.map((r, index) => <ResourceCard key={r._id} resource={r} index={index} />)}
             </div>
           </>
         ) : (
