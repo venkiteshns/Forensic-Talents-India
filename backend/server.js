@@ -55,7 +55,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB max
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -366,15 +366,19 @@ app.post('/api/resources', protect, async (req, res) => {
 // POST upload file to Cloudinary (protected)
 app.post('/api/upload', protect, (req, res, next) => {
   upload.single('file')(req, res, (err) => {
+    console.log("Upload route hit. req.file:", req.file);
+    console.log("req.body:", req.body);
+    
     if (err) {
+      console.error("Multer error:", err);
       // Multer / file-filter error
       if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(413).json({ success: false, message: 'File too large. Maximum size is 20 MB.' });
+        return res.status(413).json({ success: false, message: 'File too large. Maximum size is 10 MB.' });
       }
       return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
     }
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
+      return res.status(400).json({ success: false, message: 'File is required' });
     }
     // Cloudinary stores the URL in req.file.path
     return res.json({ success: true, url: req.file.path });
