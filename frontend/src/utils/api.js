@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Will be changed to hosted backend later
+  baseURL: 'https://forensic-talents-india.onrender.com/api',
 });
 
 export default api;
