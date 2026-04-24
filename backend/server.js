@@ -29,20 +29,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  console.error("WARNING: Cloudinary environment variables are missing!");
+}
+
 const ALLOWED_MIMETYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    const folder = 'forensic_talents_resources';
-
-    if (file.mimetype === 'application/pdf') {
-      return { folder, resource_type: 'raw', type: 'upload' };
-    }
-    // Images
-    return { folder, resource_type: 'image', type: 'upload' };
-  },
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (ALLOWED_MIMETYPES.includes(file.mimetype)) {
@@ -366,8 +359,11 @@ app.post('/api/resources', protect, async (req, res) => {
 // POST upload file to Cloudinary (protected)
 app.post('/api/upload', protect, (req, res, next) => {
   upload.single('file')(req, res, (err) => {
-    console.log("Upload route hit. req.file:", req.file);
-    console.log("req.body:", req.body);
+    if (req.file) {
+      console.log("Upload route hit. File size:", req.file.size, "Mimetype:", req.file.mimetype);
+    } else {
+      console.log("Upload route hit, but no file received.");
+    }
     
     if (err) {
       console.error("Multer error:", err);
@@ -377,11 +373,27 @@ app.post('/api/upload', protect, (req, res, next) => {
       }
       return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
     }
+    
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'File is required' });
     }
-    // Cloudinary stores the URL in req.file.path
-    return res.json({ success: true, url: req.file.path });
+    
+    // Determine Cloudinary resource type
+    const resourceType = req.file.mimetype === 'application/pdf' ? 'raw' : 'image';
+    
+    // Upload from buffer
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: 'forensic_talents_resources', resource_type: resourceType },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return res.status(500).json({ success: false, message: 'Failed to upload to Cloudinary' });
+        }
+        return res.json({ success: true, url: result.secure_url });
+      }
+    );
+    
+    uploadStream.end(req.file.buffer);
   });
 });
 
