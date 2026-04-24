@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { SuccessModal } from '../components/ui/SuccessModal';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -15,11 +16,13 @@ export default function Contact() {
     customRequirement: '',
     professionalService: '',
     cyberSubService: '',
-    message: ''
+    message: '',
+    nationality: 'India'
   });
 
   const [status, setStatus] = useState('');
   const [errors, setErrors] = useState({});
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -108,11 +111,11 @@ export default function Contact() {
       });
 
       if (response.ok) {
-        setStatus('success');
+        setStatus('');
         setFormData({
-          name: '', company: '', phone: '', email: '', subject: '', enquiryCategory: '', educationType: '', customRequirement: '', professionalService: '', cyberSubService: '', message: ''
+          name: '', company: '', phone: '', email: '', subject: '', enquiryCategory: '', educationType: '', customRequirement: '', professionalService: '', cyberSubService: '', message: '', nationality: 'India'
         });
-        setTimeout(() => setStatus(''), 5000);
+        setShowSuccessModal(true);
       } else {
         setStatus('server_error');
       }
@@ -145,11 +148,6 @@ export default function Contact() {
             <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
               <h2 className="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
 
-              {status === 'success' && (
-                <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                  Thank you! Your message has been sent successfully. We will get back to you shortly.
-                </div>
-              )}
               {/* {status === 'error' && (
                 <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
                   Please fix the highlighted errors before submitting.
@@ -185,6 +183,20 @@ export default function Contact() {
                     <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`} placeholder="john@example.com" />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Nationality *</label>
+                  <select name="nationality" value={formData.nationality} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
+                    <option value="India">India</option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
 
                 {/* Type of Enquiry */}
@@ -375,6 +387,11 @@ export default function Contact() {
           </div>
         </Container>
       </section>
+
+      <SuccessModal 
+        isOpen={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)} 
+      />
     </div >
   );
 }

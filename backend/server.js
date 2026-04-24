@@ -345,11 +345,24 @@ const transporter = nodemailer.createTransport({
 
 app.post('/api/contact', async (req, res) => {
   try {
-    const { name, company, phone, email, enquiryType, enquiryCategory, educationType, customRequirement, professionalService, cyberSubService, message, age, professionStatus, courseDetails } = req.body;
+    const { name, company, phone, email, enquiryType, enquiryCategory, educationType, customRequirement, professionalService, cyberSubService, message, age, professionStatus, courseDetails, nationality, mode } = req.body;
 
     if (!name || !email || !phone) {
       return res.status(400).json({ error: 'Missing required configuration fields' });
     }
+
+    if (age) {
+      const parsedAge = parseInt(age, 10);
+      if (isNaN(parsedAge) || parsedAge < 0 || parsedAge > 120) {
+        return res.status(400).json({ error: 'Invalid age provided' });
+      }
+    }
+
+    if (mode && !['online', 'offline'].includes(mode)) {
+      return res.status(400).json({ error: 'Invalid mode of learning provided' });
+    }
+
+    const finalNationality = nationality || 'India';
 
     const mailOptions = {
       from: `"${name}" <${email}>`,
@@ -360,6 +373,8 @@ app.post('/api/contact', async (req, res) => {
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
+        ${mode ? `<p><strong>Mode:</strong> ${mode.charAt(0).toUpperCase() + mode.slice(1)}</p>` : ''}
+        <p><strong>Nationality:</strong> ${finalNationality}</p>
         ${company ? `<p><strong>Company:</strong> ${company}</p>` : ''}
         ${enquiryType ? `<p><strong>Enquiry Type:</strong> ${enquiryType}</p>` : ''}
         ${enquiryCategory ? `<p><strong>Enquiry Category:</strong> ${enquiryCategory}</p>` : ''}

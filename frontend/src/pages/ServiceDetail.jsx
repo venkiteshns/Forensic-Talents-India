@@ -6,6 +6,7 @@ import extractedData from '../data/extracted_docs.json';
 
 import { serviceDetails } from '../data/serviceDetails';
 import FAQAccordion from '../components/ui/FAQAccordion';
+import ServiceProcess from '../components/ui/ServiceProcess';
 
 // Utility to parse extracted Word text safely
 function parseContent(text) {
@@ -73,6 +74,8 @@ export default function ServiceDetail() {
           <p className="text-slate-200 text-xl max-w-3xl leading-relaxed drop-shadow">{serviceInfo.catchyIntro}</p>
         </Container>
       </div>
+
+      <ServiceProcess serviceId={id} />
 
       {id !== 'forensic-training' && id !== 'workplace-assessments' && (
         <Container className="py-16">
