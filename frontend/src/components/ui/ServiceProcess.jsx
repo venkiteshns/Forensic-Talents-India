@@ -105,11 +105,11 @@ export default function ServiceProcess({ serviceId }) {
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <div key={index} className="flex-1 bg-white hover:bg-slate-50 p-6 rounded-xl border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 ease-in-out relative z-10 text-center flex flex-col items-center">
-                <div className="w-20 h-20 bg-white text-primary rounded-full flex items-center justify-center mb-6 border-2 border-primary/20 shadow-sm mx-auto relative z-10">
+              <div key={index} className="flex-1 bg-white p-6 rounded-xl border border-slate-200 text-center transition-all duration-300 ease-out hover:bg-slate-50 hover:shadow-md hover:-translate-y-1 hover:border-slate-300 relative z-10">
+                <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6 bg-white text-primary rounded-full border-2 border-primary/20 shadow-sm relative z-10">
                   <Icon size={40} strokeWidth={1.5} />
                 </div>
-                <div className="flex flex-col flex-1">
+                <div className="w-full">
                   <h3 className="text-lg font-medium text-slate-800 mb-3 leading-snug">{step.title}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">{step.desc}</p>
                 </div>

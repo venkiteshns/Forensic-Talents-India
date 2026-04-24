@@ -8,42 +8,72 @@ export function EnrollModal({ isOpen, course, onClose }) {
     name: '', email: '', phone: '', age: '', professionStatus: '', nationality: 'India', mode: 'online', additionalInfo: ''
   });
   const [status, setStatus] = useState('');
-  const [ageError, setAgeError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const validate = (data = formData) => {
+    let newErrors = {};
+    if (!data.name.trim()) newErrors.name = "Full Name is required.";
+    if (!data.email.trim()) newErrors.email = "Email Address is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
+    
+    if (!data.phone.trim()) newErrors.phone = "Contact Number is required.";
+    
+    if (data.age) {
+      const parsedAge = parseInt(data.age, 10);
+      if (isNaN(parsedAge) || parsedAge < 0 || parsedAge > 120) {
+        newErrors.age = "Please enter a valid age.";
+      }
+    }
+    
+    if (!data.professionStatus) newErrors.professionStatus = "Professional Status is required.";
+    
+    if (!data.mode) newErrors.mode = "Mode of Learning is required.";
+    if (data.mode === 'online' && !data.nationality) {
+      newErrors.nationality = "Nationality is required for online learning.";
+    }
+    
+    return newErrors;
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const currentErrors = validate();
+    setErrors(currentErrors);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
-      // Reset nationality if switched to offline (optional behavior, or keep default)
-      if (name === 'mode' && value === 'offline') {
-        updated.nationality = '';
-      }
-      if (name === 'mode' && value === 'online' && !updated.nationality) {
-        updated.nationality = 'India';
-      }
+      if (name === 'mode' && value === 'offline') updated.nationality = '';
+      if (name === 'mode' && value === 'online' && !updated.nationality) updated.nationality = 'India';
       return updated;
     });
-    if (name === 'age') {
-      setAgeError('');
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.phone || !formData.mode) return;
-    if (formData.mode === 'online' && !formData.nationality) return;
-
-    if (formData.age) {
-      const parsedAge = parseInt(formData.age, 10);
-      if (parsedAge < 0) {
-        setAgeError('Age cannot be less than 0');
-        return;
-      }
-      if (parsedAge > 120) {
-        setAgeError('Age cannot be more than 120');
-        return;
-      }
+    const newErrors = validate();
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      const allTouched = Object.keys(newErrors).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+      setTouched(prev => ({ ...prev, ...allTouched }));
+      
+      setTimeout(() => {
+        const firstErrorField = document.querySelector(`[name="${Object.keys(newErrors)[0]}"]`);
+        if (firstErrorField) {
+          firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstErrorField.focus({ preventScroll: true });
+        }
+      }, 50);
+      return;
     }
 
     setStatus('loading');
@@ -81,6 +111,8 @@ export function EnrollModal({ isOpen, course, onClose }) {
       if (response.ok) {
         setStatus('');
         setFormData({ name: '', email: '', phone: '', age: '', professionStatus: '', nationality: 'India', mode: 'online', additionalInfo: '' });
+        setErrors({});
+        setTouched({});
         onClose();
         setShowSuccessModal(true);
       } else {
@@ -109,48 +141,53 @@ export function EnrollModal({ isOpen, course, onClose }) {
         </div>
 
             <div className="p-6 overflow-y-auto flex-grow hide-scrollbar">
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form noValidate onSubmit={handleSubmit} className="space-y-5">
                 {status === 'error' && (
                 <div className="p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 font-medium">
                   Connection error. Please try submitting again.
                 </div>
               )}
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
-                  <input required type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm" placeholder="e.g. Rahul Sharma" />
-                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.name && errors.name ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="e.g. Rahul Sharma" />
+                    {touched.name && errors.name && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.name}</p>}
+                  </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1.5">Email <span className="text-red-500">*</span></label>
-                    <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm" placeholder="rahul@example.com" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Email <span className="text-red-500">*</span></label>
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.email && errors.email ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="rahul@example.com" />
+                      {touched.email && errors.email && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.email}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Contact Number <span className="text-red-500">*</span></label>
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.phone && errors.phone ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="+91 XXXXX XXXXX" />
+                      {touched.phone && errors.phone && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.phone}</p>}
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1.5">Contact Number <span className="text-red-500">*</span></label>
-                    <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm" placeholder="+91 XXXXX XXXXX" />
-                  </div>
-                </div>
 
                 <div className="space-y-3">
                   <label className="block text-sm font-bold text-slate-700">Mode of Learning <span className="text-red-500">*</span></label>
                   <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl flex-1 hover:bg-slate-100 transition-colors">
-                      <input type="radio" name="mode" value="online" checked={formData.mode === 'online'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input type="radio" name="mode" value="online" checked={formData.mode === 'online'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
                       <span className="text-slate-700 font-medium">Online</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl flex-1 hover:bg-slate-100 transition-colors">
-                      <input type="radio" name="mode" value="offline" checked={formData.mode === 'offline'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input type="radio" name="mode" value="offline" checked={formData.mode === 'offline'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
                       <span className="text-slate-700 font-medium">Offline</span>
                     </label>
                   </div>
+                  {touched.mode && errors.mode && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.mode}</p>}
                 </div>
 
                 {formData.mode === 'online' && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                     <label className="block text-sm font-bold text-slate-700 mb-1.5">Nationality <span className="text-red-500">*</span></label>
-                    <select required name="nationality" value={formData.nationality} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm bg-white">
+                    <select name="nationality" value={formData.nationality} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.nationality && errors.nationality ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white`}>
+                      <option value="">Select your country</option>
                       <option value="India">India</option>
                       <option value="United States">United States</option>
                       <option value="United Kingdom">United Kingdom</option>
@@ -160,23 +197,25 @@ export function EnrollModal({ isOpen, course, onClose }) {
                       <option value="Singapore">Singapore</option>
                       <option value="Other">Other</option>
                     </select>
+                    {touched.nationality && errors.nationality && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.nationality}</p>}
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1.5">Age</label>
-                    <input type="number" min="0" max="120" name="age" value={formData.age} onChange={handleChange} className={`w-full px-4 py-3 rounded-xl border ${ageError ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm`} placeholder="e.g. 24" />
-                    {ageError && <p className="text-red-500 text-xs mt-1">{ageError}</p>}
+                    <input type="number" min="0" max="120" name="age" value={formData.age} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.age && errors.age ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="e.g. 24" />
+                    {touched.age && errors.age && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.age}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-700 mb-1.5">Professional Status <span className="text-red-500">*</span></label>
-                    <select required name="professionStatus" value={formData.professionStatus} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all shadow-sm bg-white">
+                    <select name="professionStatus" value={formData.professionStatus} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.professionStatus && errors.professionStatus ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white`}>
                       <option value="">Select Status</option>
                       <option value="Student">Student</option>
                       <option value="Working Professional">Working Professional</option>
                       <option value="Other">Other</option>
                     </select>
+                    {touched.professionStatus && errors.professionStatus && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.professionStatus}</p>}
                   </div>
                 </div>
 

@@ -22,7 +22,42 @@ export default function Contact() {
 
   const [status, setStatus] = useState('');
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const validate = (data = formData) => {
+    let newErrors = {};
+    if (!data.name.trim()) newErrors.name = "Full Name is required.";
+    if (!data.phone.trim()) newErrors.phone = "Phone Number is required.";
+    if (!data.email.trim()) newErrors.email = "Email Address is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
+    
+    if (!data.enquiryCategory) newErrors.enquiryCategory = "Type of Enquiry is required.";
+    
+    if (data.enquiryCategory === 'Educational') {
+      if (!data.educationType) newErrors.educationType = "Educational Enquiry Type is required.";
+      if (data.educationType === 'Other' && !data.customRequirement.trim()) {
+        newErrors.customRequirement = "Please describe your requirement.";
+      }
+    }
+    
+    if (data.enquiryCategory === 'Professional') {
+      if (!data.professionalService) newErrors.professionalService = "Professional Service is required.";
+      if (data.professionalService === 'Cyber Forensic' && !data.cyberSubService) {
+        newErrors.cyberSubService = "Cyber Forensic Service is required.";
+      }
+    }
+
+    if (!data.message.trim()) newErrors.message = "Message is required.";
+    return newErrors;
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const currentErrors = validate();
+    setErrors(currentErrors);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,40 +87,22 @@ export default function Contact() {
     }
   };
 
-  const validate = () => {
-    let newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Full Name is required";
-    if (!formData.phone.trim()) newErrors.phone = "Phone Number is required";
-    if (!formData.email.trim()) newErrors.email = "Email Address is required";
-    else if (formData.email.indexOf('@') < 1 || formData.email.lastIndexOf('.') < formData.email.indexOf('@') + 2) newErrors.email = "Email Address is invalid";
-    
-    if (!formData.enquiryCategory) newErrors.enquiryCategory = "Type of Enquiry is required";
-    
-    if (formData.enquiryCategory === 'Educational') {
-      if (!formData.educationType) newErrors.educationType = "Educational Enquiry Type is required";
-      if (formData.educationType === 'Other' && !formData.customRequirement.trim()) {
-        newErrors.customRequirement = "Please describe your requirement";
-      }
-    }
-    
-    if (formData.enquiryCategory === 'Professional') {
-      if (!formData.professionalService) newErrors.professionalService = "Professional Service is required";
-      if (formData.professionalService === 'Cyber Forensic' && !formData.cyberSubService) {
-        newErrors.cyberSubService = "Cyber Forensic Service is required";
-      }
-    }
-
-    if (!formData.message.trim()) newErrors.message = "Message is required";
-    return newErrors;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setStatus('error');
+      const allTouched = Object.keys(newErrors).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+      setTouched(prev => ({ ...prev, ...allTouched }));
+      
+      setTimeout(() => {
+        const firstErrorField = document.querySelector(`[name="${Object.keys(newErrors)[0]}"]`);
+        if (firstErrorField) {
+          firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          firstErrorField.focus({ preventScroll: true });
+        }
+      }, 50);
       return;
     }
 
@@ -115,6 +132,8 @@ export default function Contact() {
         setFormData({
           name: '', company: '', phone: '', email: '', subject: '', enquiryCategory: '', educationType: '', customRequirement: '', professionalService: '', cyberSubService: '', message: '', nationality: 'India'
         });
+        setErrors({});
+        setTouched({});
         setShowSuccessModal(true);
       } else {
         setStatus('server_error');
@@ -159,29 +178,29 @@ export default function Contact() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form noValidate onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`} placeholder="John Doe" />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.name && errors.name ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="John Doe" />
+                    {touched.name && errors.name && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.name}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Company Name (Optional)</label>
-                    <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Legal Firm LLC" />
+                    <input type="text" name="company" value={formData.company} onChange={handleChange} onBlur={handleBlur} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Legal Firm LLC" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number *</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`} placeholder="+91 XXXXX XXXXX" />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.phone && errors.phone ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="+91 XXXXX XXXXX" />
+                    {touched.phone && errors.phone && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.phone}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`} placeholder="john@example.com" />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.email && errors.email ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="john@example.com" />
+                    {touched.email && errors.email && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.email}</p>}
                   </div>
                 </div>
 
@@ -204,15 +223,15 @@ export default function Contact() {
                   <label className="block text-sm font-medium text-slate-700">Type of Enquiry *</label>
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="enquiryCategory" value="Educational" checked={formData.enquiryCategory === 'Educational'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input type="radio" name="enquiryCategory" value="Educational" checked={formData.enquiryCategory === 'Educational'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
                       <span className="text-slate-700">Educational</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="enquiryCategory" value="Professional" checked={formData.enquiryCategory === 'Professional'} onChange={handleChange} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input type="radio" name="enquiryCategory" value="Professional" checked={formData.enquiryCategory === 'Professional'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
                       <span className="text-slate-700">Professional</span>
                     </label>
                   </div>
-                  {errors.enquiryCategory && <p className="text-red-500 text-xs mt-1">{errors.enquiryCategory}</p>}
+                  {touched.enquiryCategory && errors.enquiryCategory && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.enquiryCategory}</p>}
                 </div>
 
                 {/* Conditional Educational */}
@@ -220,7 +239,7 @@ export default function Contact() {
                   <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Educational Enquiry Type *</label>
-                      <select name="educationType" value={formData.educationType} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.educationType ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                      <select name="educationType" value={formData.educationType} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.educationType && errors.educationType ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
                         <option value="">Select an Option</option>
                         <option value="Courses">Courses</option>
                         <option value="Internships">Internships</option>
@@ -228,14 +247,14 @@ export default function Contact() {
                         <option value="Workshop">Workshop</option>
                         <option value="Other">Other</option>
                       </select>
-                      {errors.educationType && <p className="text-red-500 text-xs mt-1">{errors.educationType}</p>}
+                      {touched.educationType && errors.educationType && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.educationType}</p>}
                     </div>
 
                     {formData.educationType === 'Other' && (
                       <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                         <label className="block text-sm font-medium text-slate-700 mb-2">Please describe your requirement *</label>
-                        <textarea name="customRequirement" value={formData.customRequirement} onChange={handleChange} rows="3" className={`w-full px-4 py-3 rounded-lg border ${errors.customRequirement ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none`} placeholder="Describe your educational needs..."></textarea>
-                        {errors.customRequirement && <p className="text-red-500 text-xs mt-1">{errors.customRequirement}</p>}
+                        <textarea name="customRequirement" value={formData.customRequirement} onChange={handleChange} onBlur={handleBlur} rows="3" className={`w-full px-4 py-3 rounded-lg border ${touched.customRequirement && errors.customRequirement ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`} placeholder="Describe your educational needs..."></textarea>
+                        {touched.customRequirement && errors.customRequirement && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.customRequirement}</p>}
                       </div>
                     )}
                   </div>
@@ -246,7 +265,7 @@ export default function Contact() {
                   <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Select Professional Service *</label>
-                      <select name="professionalService" value={formData.professionalService} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.professionalService ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                      <select name="professionalService" value={formData.professionalService} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.professionalService && errors.professionalService ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
                         <option value="">Select a Service</option>
                         <option value="Fingerprint Verification">Fingerprint Verification</option>
                         <option value="Signature Verification">Signature Verification</option>
@@ -258,13 +277,13 @@ export default function Contact() {
                         <option value="Biological Analysis">Biological Analysis</option>
                         <option value="Toxicology Analysis">Toxicology Analysis</option>
                       </select>
-                      {errors.professionalService && <p className="text-red-500 text-xs mt-1">{errors.professionalService}</p>}
+                      {touched.professionalService && errors.professionalService && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.professionalService}</p>}
                     </div>
 
                     {formData.professionalService === 'Cyber Forensic' && (
                       <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                         <label className="block text-sm font-medium text-slate-700 mb-2">Select Cyber Forensic Service *</label>
-                        <select name="cyberSubService" value={formData.cyberSubService} onChange={handleChange} className={`w-full px-4 py-3 rounded-lg border ${errors.cyberSubService ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white`}>
+                        <select name="cyberSubService" value={formData.cyberSubService} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.cyberSubService && errors.cyberSubService ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
                           <option value="">Select a Cyber Service</option>
                           <option value="63(4)(c) Certificate BSA">63(4)(c) Certificate BSA</option>
                           <option value="65B Certificate">65B Certificate</option>
@@ -275,7 +294,7 @@ export default function Contact() {
                           <option value="Social Media Analysis">Social Media Analysis</option>
                           <option value="Other">Other</option>
                         </select>
-                        {errors.cyberSubService && <p className="text-red-500 text-xs mt-1">{errors.cyberSubService}</p>}
+                        {touched.cyberSubService && errors.cyberSubService && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.cyberSubService}</p>}
                       </div>
                     )}
                   </div>
@@ -283,8 +302,8 @@ export default function Contact() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Message *</label>
-                  <textarea name="message" value={formData.message} onChange={handleChange} rows="5" className={`w-full px-4 py-3 rounded-lg border ${errors.message ? 'border-red-500' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none`} placeholder="How can we help you?"></textarea>
-                  {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+                  <textarea name="message" value={formData.message} onChange={handleChange} onBlur={handleBlur} rows="5" className={`w-full px-4 py-3 rounded-lg border ${touched.message && errors.message ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`} placeholder="How can we help you?"></textarea>
+                  {touched.message && errors.message && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.message}</p>}
                 </div>
 
                 <Button type="submit" variant="primary" size="lg" className="w-full md:w-auto" disabled={status === 'loading'}>
