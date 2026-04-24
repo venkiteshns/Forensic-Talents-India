@@ -381,14 +381,31 @@ app.post('/api/upload', protect, (req, res, next) => {
     // Determine Cloudinary resource type
     const resourceType = req.file.mimetype === 'application/pdf' ? 'raw' : 'image';
     
+    // Generate a unique public_id to prevent overwriting
+    const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const uniquePublicId = `${Date.now()}-${sanitizedName.split('.')[0]}`; // Cloudinary adds extension
+    
     // Upload from buffer
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: 'forensic_talents_resources', resource_type: resourceType },
+      { 
+        folder: 'forensic_talents_resources', 
+        resource_type: resourceType,
+        public_id: uniquePublicId,
+        overwrite: false
+      },
       (error, result) => {
         if (error) {
-          console.error("Cloudinary upload error:", error);
+          console.error(`Cloudinary upload error for ${uniquePublicId}:`, error);
+          if (error.message && error.message.includes("already exists")) {
+            return res.status(400).json({
+              success: false, 
+              message: "A file with the same name already exists. Please rename the file or try again."
+            });
+          }
           return res.status(500).json({ success: false, message: 'Failed to upload to Cloudinary' });
         }
+        
+        console.log(`Successfully uploaded: ${uniquePublicId}`);
         return res.json({ success: true, url: result.secure_url });
       }
     );
