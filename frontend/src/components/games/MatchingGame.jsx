@@ -44,7 +44,6 @@ const generateDeck = (useIcons, customImages) => {
 };
 
 export default function MatchingGame({ onQuit }) {
-  const [initialLoading, setInitialLoading] = useState(true);
   const [gameConfig, setGameConfig] = useState({ useIcons: true, images: [] });
 
   const [deck, setDeck] = useState([]);
@@ -52,30 +51,14 @@ export default function MatchingGame({ onQuit }) {
   const [matchedIds, setMatchedIds] = useState(new Set());
   const [moves, setMoves] = useState(0);
   const [gameState, setGameState] = useState('idle'); // idle, playing, completed
+  const [isGameComplete, setIsGameComplete] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   const gameSectionRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchConfig();
   }, []);
-
-  const fetchConfig = async () => {
-    try {
-      const res = await api.get('/matching');
-      if (res.data) {
-        setGameConfig({
-          useIcons: res.data.useIcons,
-          images: res.data.images || []
-        });
-      }
-    } catch (err) {
-      console.error("Using fallback icons. Error:", err.message);
-    } finally {
-      setInitialLoading(false);
-    }
-  };
 
   useEffect(() => {
     let interval;
@@ -85,17 +68,45 @@ export default function MatchingGame({ onQuit }) {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  const initGame = () => {
-    setDeck(generateDeck(gameConfig.useIcons, gameConfig.images));
+  const handleStartGameClick = async () => {
+    setGameState('loading');
+    
+    setTimeout(() => {
+      gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    let config = { useIcons: true, images: [] };
+    try {
+      const storedPlayedIds = JSON.parse(localStorage.getItem('playedMatchingGameIds') || '[]');
+      const res = await api.get(`/game/matching?playedIds=${storedPlayedIds.join(',')}`);
+      if (res.data) {
+        if (res.data.resetOccurred) {
+          localStorage.setItem('playedMatchingGameIds', JSON.stringify([res.data._id]));
+        } else {
+          localStorage.setItem('playedMatchingGameIds', JSON.stringify([...storedPlayedIds, res.data._id]));
+        }
+        
+        config = {
+          useIcons: res.data.useIcons,
+          images: res.data.images || []
+        };
+      }
+    } catch (err) {
+      console.error("Using fallback icons. Error:", err.message);
+    }
+    
+    setGameConfig(config);
+    setDeck(generateDeck(config.useIcons, config.images));
     setFlippedIndices([]);
     setMatchedIds(new Set());
     setMoves(0);
     setTimeElapsed(0);
     setGameState('playing');
+    setIsGameComplete(false);
+  };
 
-    setTimeout(() => {
-      gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+  const initGame = () => {
+    handleStartGameClick();
   };
 
   const triggerConfetti = () => {
@@ -157,8 +168,12 @@ export default function MatchingGame({ onQuit }) {
           setMatchedIds(prev => {
             const newSet = new Set(prev);
             newSet.add(deck[firstIndex].id);
-            if (newSet.size === ICONS.length) {
+            const totalPairs = deck.length / 2;
+            console.log("Matched:", newSet.size, "Total:", totalPairs);
+            
+            if (newSet.size === totalPairs) {
               setGameState('completed');
+              setIsGameComplete(true);
               triggerConfetti();
             }
             return newSet;
@@ -179,6 +194,18 @@ export default function MatchingGame({ onQuit }) {
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
+
+  // Fallback validation (extra safety)
+  useEffect(() => {
+    if (gameState === 'playing' && deck.length > 0) {
+      const totalPairs = deck.length / 2;
+      if (matchedIds.size === totalPairs && !isGameComplete) {
+        setGameState('completed');
+        setIsGameComplete(true);
+        triggerConfetti();
+      }
+    }
+  }, [matchedIds, deck.length, gameState, isGameComplete]);
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans animate-in fade-in duration-500">
@@ -213,7 +240,7 @@ export default function MatchingGame({ onQuit }) {
             <p className="text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Test your analytical and observation skills with this interactive forensic exercise.
             </p>
-            <Button onClick={initGame} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all">
+            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all">
               <Play size={20} /> Start Game
             </Button>
           </div>
@@ -221,6 +248,22 @@ export default function MatchingGame({ onQuit }) {
       )}
 
       <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+        {gameState === 'loading' && (
+          <Container>
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
+                <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+                <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-8 max-w-3xl mx-auto">
+                {[...Array(16)].map((_, i) => (
+                  <div key={i} className="aspect-[3/4] sm:aspect-square bg-slate-100 rounded-xl sm:rounded-2xl animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        )}
+
         {(gameState === 'playing' || gameState === 'completed') && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
@@ -321,7 +364,7 @@ export default function MatchingGame({ onQuit }) {
                 </button>
               </div>
 
-              {gameState === 'completed' && (
+              {isGameComplete && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 animate-in fade-in zoom-in-95 duration-500">
                   <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100/50">
                     <CheckCircle2 size={40} strokeWidth={2.5} />

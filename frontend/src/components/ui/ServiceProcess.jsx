@@ -81,7 +81,7 @@ const serviceOverrides = {
   }
 };
 
-export default function ServiceProcess({ serviceId }) {
+export default function ServiceProcess({ serviceId, compact = false }) {
   const overrides = serviceOverrides[serviceId] || {};
   
   const steps = defaultSteps.map((step, index) => {
@@ -90,6 +90,51 @@ export default function ServiceProcess({ serviceId }) {
     }
     return step;
   });
+
+  if (compact) {
+    return (
+      <div className="relative animate-in fade-in slide-in-from-right-8 duration-700">
+        <h3 className="text-xl font-bold text-primary mb-6 border-b pb-4">Service Process</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6 relative">
+          {/* Vertical Connector Line */}
+          <div className="absolute left-[19px] md:left-1/2 lg:left-[19px] top-4 bottom-4 w-px bg-slate-200 md:-translate-x-1/2 lg:translate-x-0"></div>
+
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const isEven = index % 2 === 0;
+
+            return (
+              <React.Fragment key={index}>
+                {!isEven && <div className="hidden md:block lg:hidden"></div>}
+
+                <div className={`group relative w-full flex flex-col pl-14 md:pl-0 lg:pl-14 ${isEven ? 'md:items-end lg:items-start' : 'md:items-start lg:items-start'}`}>
+                  
+                  {/* Icon Marker */}
+                  <div className={`absolute w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm z-20 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary
+                    top-4 left-[19px] -translate-x-1/2 
+                    md:top-1/2 md:-translate-y-1/2 
+                    lg:top-4 lg:translate-y-0 lg:left-[19px] lg:right-auto lg:-translate-x-1/2
+                    ${isEven ? 'md:left-auto md:right-[-12px] md:translate-x-1/2' : 'md:left-[-12px] md:-translate-x-1/2'}
+                  `}>
+                    <Icon size={18} strokeWidth={1.5} className="transition-colors duration-300 ease-in-out" />
+                  </div>
+
+                  {/* Card Container */}
+                  <div className={`w-full md:w-[90%] lg:w-full bg-slate-50 p-4 rounded-xl border border-transparent shadow-sm group-hover:shadow-md group-hover:border-slate-200 transition-all duration-300 relative overflow-hidden block ${isEven ? 'md:mr-8 lg:mr-0' : 'md:ml-8 lg:ml-0'}`}>
+                    <h4 className="text-sm font-bold text-slate-800 mb-1">{step.title}</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">{step.desc}</p>
+                  </div>
+
+                </div>
+
+                {isEven && <div className="hidden md:block lg:hidden"></div>}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 py-20 border-b border-slate-100">
@@ -103,41 +148,46 @@ export default function ServiceProcess({ serviceId }) {
           {/* Vertical Connector Line */}
           <div className="absolute left-[35px] md:left-1/2 top-4 bottom-4 w-px bg-slate-200 md:-translate-x-1/2"></div>
 
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const isEven = index % 2 === 0; // index 0, 2, 4 -> Left side
-            const stepNumber = String(index + 1).padStart(2, '0');
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const isEven = index % 2 === 0; // index 0, 2, 4 -> Left side
+              const stepNumber = String(index + 1).padStart(2, '0');
 
-            return (
-              <div 
-                key={index} 
-                className={`group relative flex flex-col md:flex-row items-start md:items-center mb-12 last:mb-0 w-full ${!isEven ? 'md:flex-row-reverse' : ''}`}
-              >
-                {/* Icon Marker */}
-                <div className="absolute left-[35px] md:left-1/2 top-6 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm z-10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
-                  <Icon size={24} strokeWidth={1.5} className="transition-colors duration-300 ease-in-out" />
-                </div>
+              return (
+                <React.Fragment key={index}>
+                  {!isEven && <div className="hidden md:block"></div>}
 
-                {/* Card Container */}
-                <div className={`w-full md:w-1/2 pl-[84px] md:pl-0 ${isEven ? 'md:pr-14' : 'md:pl-14'}`}>
-                  {/* The Card */}
-                  <div className="bg-white p-6 md:p-8 rounded-2xl border border-transparent shadow-sm hover:shadow-md hover:border-slate-200 transform-gpu transition-all duration-300 ease-out hover:-translate-y-1.5 relative overflow-hidden block">
+                  <div className={`group relative w-full flex flex-col pl-[84px] md:pl-0 ${isEven ? 'md:items-end' : 'md:items-start'}`}>
                     
-                    {/* Subtle Background Step Number */}
-                    <div className="absolute -top-6 -right-4 text-slate-50 font-heading font-bold text-[100px] select-none pointer-events-none group-hover:text-slate-100 transition-colors duration-300 leading-none">
-                      {stepNumber}
+                    {/* Icon Marker */}
+                    <div className={`absolute top-6 left-[35px] -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm z-20 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary
+                      ${isEven ? 'md:left-auto md:right-[-12px] md:translate-x-1/2' : 'md:left-[-12px] md:-translate-x-1/2'}
+                    `}>
+                      <Icon size={24} strokeWidth={1.5} className="transition-colors duration-300 ease-in-out" />
                     </div>
 
-                    <h3 className="text-xl font-bold text-slate-800 mb-3 relative z-10 tracking-tight">{step.title}</h3>
-                    <p className="text-slate-600 leading-relaxed relative z-10">{step.desc}</p>
-                  </div>
-                </div>
+                    {/* The Card */}
+                    <div className={`w-full md:w-[90%] max-w-md bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transform-gpu transition-all duration-300 ease-out hover:-translate-y-1 relative overflow-hidden block ${isEven ? 'md:mr-12' : 'md:ml-12'}`}>
+                      
+                      {/* Step Number */}
+                      <div className="absolute top-5 right-5 text-4xl text-slate-200 font-bold select-none pointer-events-none z-0 group-hover:text-slate-300 transition-colors duration-300">
+                        {stepNumber}
+                      </div>
 
-                {/* Empty Space for alternate layout */}
-                <div className="hidden md:block md:w-1/2"></div>
-              </div>
-            );
-          })}
+                      <div className="relative z-10">
+                        <h3 className="text-xl font-bold text-slate-800 mb-2 tracking-tight pr-8">{step.title}</h3>
+                        <p className="text-sm text-slate-600 leading-relaxed">{step.desc}</p>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {isEven && <div className="hidden md:block"></div>}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-16 text-center max-w-3xl mx-auto border-t border-slate-200 pt-8 animate-in fade-in duration-700 delay-300">

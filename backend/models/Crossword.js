@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 
 const CrosswordSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    default: 'Untitled Crossword'
+  },
+  difficulty: {
+    type: String,
+    enum: ['easy', 'medium', 'hard'],
+    default: 'medium'
+  },
   words: [{
     word: {
       type: String,

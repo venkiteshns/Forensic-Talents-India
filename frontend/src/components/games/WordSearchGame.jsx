@@ -10,7 +10,8 @@ const FALLBACK_WORDS = [
   'EVIDENCE',
   'DNA',
   'CRIME',
-  'ANALYSIS'
+  'ANALYSIS',
+  "FINGERPRINT"
 ];
 
 const GRID_SIZE = 14;
@@ -28,7 +29,7 @@ const DIRECTIONS = [
 
 const generateGrid = (wordsToFind) => {
   let grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
-  
+
   const canPlaceWord = (word, startRow, startCol, dr, dc) => {
     for (let i = 0; i < word.length; i++) {
       let r = startRow + i * dr;
@@ -89,16 +90,16 @@ const generateGrid = (wordsToFind) => {
 const getPath = (r1, c1, r2, c2) => {
   const dr = r2 - r1;
   const dc = c2 - c1;
-  
-  if (dr === 0 && dc === 0) return [{r: r1, c: c1}];
-  
+
+  if (dr === 0 && dc === 0) return [{ r: r1, c: c1 }];
+
   if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) {
-    return [{r: r1, c: c1}];
+    return [{ r: r1, c: c1 }];
   }
 
   const stepR = dr === 0 ? 0 : dr > 0 ? 1 : -1;
   const stepC = dc === 0 ? 0 : dc > 0 ? 1 : -1;
-  
+
   const steps = Math.max(Math.abs(dr), Math.abs(dc));
   let path = [];
   for (let i = 0; i <= steps; i++) {
@@ -117,10 +118,10 @@ const Cell = memo(({ letter, r, c, isSelected, isFound, onPointerDown, onPointer
       onPointerUp={onPointerUp}
       className={cn(
         "aspect-square w-full box-border flex items-center justify-center font-bold text-xs sm:text-sm md:text-base cursor-pointer select-none rounded-sm transition-colors shadow-sm",
-        isFound 
-          ? "bg-primary text-white shadow-inner" 
-          : isSelected 
-            ? "bg-primary/20 text-primary ring-2 ring-primary/50" 
+        isFound
+          ? "bg-primary text-white shadow-inner"
+          : isSelected
+            ? "bg-primary/20 text-primary ring-2 ring-primary/50"
             : "bg-white text-slate-900"
       )}
     >
@@ -131,44 +132,24 @@ const Cell = memo(({ letter, r, c, isSelected, isFound, onPointerDown, onPointer
 Cell.displayName = 'Cell';
 
 export default function WordSearchGame({ onQuit }) {
-  const [initialLoading, setInitialLoading] = useState(true);
   const [wordsToFind, setWordsToFind] = useState([]);
-  const [isFallback, setIsFallback] = useState(false);
 
   const [grid, setGrid] = useState([]);
   const [foundWords, setFoundWords] = useState([]);
-  const [foundCells, setFoundCells] = useState(new Set()); 
-  const [gameState, setGameState] = useState('idle'); 
+  const [foundCells, setFoundCells] = useState(new Set());
+  const [gameState, setGameState] = useState('idle');
   const [timeElapsed, setTimeElapsed] = useState(0);
-  
+
   const [isDragging, setIsDragging] = useState(false);
   const [startCell, setStartCell] = useState(null);
   const [currentPath, setCurrentPath] = useState([]);
-  
+
   const gridRef = useRef(null);
   const gameSectionRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchWords();
   }, []);
-
-  const fetchWords = async () => {
-    try {
-      const res = await api.get('/word-search');
-      if (res.data && res.data.words && res.data.words.length >= 5) {
-        setWordsToFind(res.data.words);
-      } else {
-        throw new Error("Invalid active word set");
-      }
-    } catch (err) {
-      console.error("Using fallback words. Error:", err.message);
-      setWordsToFind(FALLBACK_WORDS);
-      setIsFallback(true);
-    } finally {
-      setInitialLoading(false);
-    }
-  };
 
   useEffect(() => {
     let interval;
@@ -178,9 +159,36 @@ export default function WordSearchGame({ onQuit }) {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  const initGame = () => {
-    if (wordsToFind.length === 0) return;
-    setGrid(generateGrid(wordsToFind));
+  const handleStartGameClick = async () => {
+    setGameState('loading');
+
+    setTimeout(() => {
+      gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    let activeWords = [];
+    try {
+      const storedPlayedIds = JSON.parse(localStorage.getItem('playedWordSearchIds') || '[]');
+      const res = await api.get(`/game/word-search?playedIds=${storedPlayedIds.join(',')}`);
+      
+      if (res.data && res.data.words && res.data.words.length >= 5) {
+        activeWords = res.data.words;
+        
+        if (res.data.resetOccurred) {
+          localStorage.setItem('playedWordSearchIds', JSON.stringify([res.data._id]));
+        } else {
+          localStorage.setItem('playedWordSearchIds', JSON.stringify([...storedPlayedIds, res.data._id]));
+        }
+      } else {
+        throw new Error("Invalid active word set");
+      }
+    } catch (err) {
+      console.error("Using fallback words. Error:", err.message);
+      activeWords = FALLBACK_WORDS;
+    }
+
+    setWordsToFind(activeWords);
+    setGrid(generateGrid(activeWords));
     setFoundWords([]);
     setFoundCells(new Set());
     setTimeElapsed(0);
@@ -188,16 +196,16 @@ export default function WordSearchGame({ onQuit }) {
     setIsDragging(false);
     setStartCell(null);
     setCurrentPath([]);
-    
-    setTimeout(() => {
-      gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+  };
+
+  const initGame = () => {
+    handleStartGameClick();
   };
 
   const triggerConfetti = () => {
     const burstDiv = document.createElement('div');
     burstDiv.className = 'fixed inset-0 pointer-events-none z-[200] overflow-hidden';
-    
+
     const style = document.createElement('style');
     style.innerHTML = `
       @keyframes floatUp {
@@ -236,14 +244,14 @@ export default function WordSearchGame({ onQuit }) {
     if (gameState !== 'playing') return;
     e.currentTarget.setPointerCapture(e.pointerId);
     setIsDragging(true);
-    setStartCell({r, c});
-    setCurrentPath([{r, c}]);
+    setStartCell({ r, c });
+    setCurrentPath([{ r, c }]);
   }, [gameState]);
 
   const handlePointerMove = useCallback((e) => {
     if (!isDragging || !startCell || gameState !== 'playing') return;
     e.preventDefault(); // Prevent touch scroll
-    
+
     const element = document.elementFromPoint(e.clientX, e.clientY);
     if (element && element.dataset.row) {
       const r = parseInt(element.dataset.row);
@@ -257,17 +265,17 @@ export default function WordSearchGame({ onQuit }) {
     if (e && e.currentTarget && e.currentTarget.hasPointerCapture && e.currentTarget.hasPointerCapture(e.pointerId)) {
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
-      } catch (err) {}
+      } catch (err) { }
     }
-    
+
     if (!isDragging || gameState !== 'playing') return;
-    
+
     let word = "";
     let revWord = "";
-    currentPath.forEach(({r, c}) => {
+    currentPath.forEach(({ r, c }) => {
       word += grid[r][c];
     });
-    
+
     revWord = word.split('').reverse().join('');
 
     const matchedWord = wordsToFind.find(w => (w === word || w === revWord) && !foundWords.includes(w));
@@ -281,10 +289,10 @@ export default function WordSearchGame({ onQuit }) {
         }
         return newFound;
       });
-      
+
       setFoundCells(prev => {
         const newSet = new Set(prev);
-        currentPath.forEach(({r, c}) => newSet.add(`${r},${c}`));
+        currentPath.forEach(({ r, c }) => newSet.add(`${r},${c}`));
         return newSet;
       });
     }
@@ -316,7 +324,7 @@ export default function WordSearchGame({ onQuit }) {
     <div className="bg-slate-50 min-h-screen pb-20 font-sans animate-in fade-in duration-500">
       <section className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12" style={{ minHeight: '340px' }}>
         <div className="absolute top-8 left-4 md:left-8 z-20">
-          <button 
+          <button
             onClick={onQuit}
             className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm"
           >
@@ -338,14 +346,14 @@ export default function WordSearchGame({ onQuit }) {
         </Container>
       </section>
 
-      {gameState === 'idle' && !initialLoading && (
+      {gameState === 'idle' && (
         <Container className="mb-12 relative z-10">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Ready to Begin?</h2>
             <p className="text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Test your analytical and observation skills with this interactive forensic exercise.
             </p>
-            <Button onClick={initGame} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all">
+            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all">
               <Play size={20} /> Start Game
             </Button>
           </div>
@@ -353,8 +361,8 @@ export default function WordSearchGame({ onQuit }) {
       )}
 
       <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
-        
-        {initialLoading && (
+
+        {gameState === 'loading' && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
               <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
@@ -375,21 +383,14 @@ export default function WordSearchGame({ onQuit }) {
           </Container>
         )}
 
-        {!initialLoading && (gameState === 'playing' || gameState === 'completed') && (
+        {(gameState === 'playing' || gameState === 'completed') && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
-              
-              {isFallback && (
-                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 text-amber-800 animate-in fade-in slide-in-from-top-4">
-                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
-                  <p className="text-sm font-medium">Default puzzle loaded. Custom puzzles will be available shortly.</p>
-                </div>
-              )}
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <Search className="text-primary" size={24} /> 
+                    <Search className="text-primary" size={24} />
                     Find the Words
                   </h2>
                   <p className="text-slate-500 mt-1">Select letters in straight lines to form words.</p>
@@ -414,17 +415,17 @@ export default function WordSearchGame({ onQuit }) {
 
               <div className="flex flex-col lg:flex-row gap-10">
                 <div className="lg:w-2/3 flex-shrink-0 relative w-full overflow-hidden pb-4 px-2 box-border">
-                  <div 
+                  <div
                     ref={gridRef}
                     className="grid gap-[1px] sm:gap-0.5 md:gap-1 bg-slate-100 p-1.5 sm:p-3 rounded-xl select-none w-full box-border mx-auto"
                     style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`, touchAction: 'none' }}
                   >
-                    {grid.map((row, r) => 
+                    {grid.map((row, r) =>
                       row.map((letter, c) => {
                         const cellId = `${r},${c}`;
                         const isFound = foundCells.has(cellId);
                         const isSelected = isCellInPath(r, c);
-                        
+
                         return (
                           <Cell
                             key={cellId}
@@ -450,12 +451,12 @@ export default function WordSearchGame({ onQuit }) {
                       {wordsToFind.map((word) => {
                         const isFound = foundWords.includes(word);
                         return (
-                          <div 
+                          <div
                             key={word}
                             className={cn(
                               "px-3 py-2 rounded-lg text-sm font-semibold transition-colors",
-                              isFound 
-                                ? "bg-green-100 text-green-800 line-through shadow-inner border border-green-200" 
+                              isFound
+                                ? "bg-green-100 text-green-800 line-through shadow-inner border border-green-200"
                                 : "bg-white text-slate-900 shadow-sm border border-slate-300"
                             )}
                           >
@@ -469,7 +470,7 @@ export default function WordSearchGame({ onQuit }) {
                       <Button onClick={initGame} variant="outline" className="w-full flex items-center justify-center gap-2 font-bold text-slate-600 hover:text-slate-900 border-slate-300">
                         <RefreshCw size={16} /> Restart Puzzle
                       </Button>
-                      <button 
+                      <button
                         onClick={onQuit}
                         className="w-full py-2.5 text-sm font-bold text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -488,23 +489,23 @@ export default function WordSearchGame({ onQuit }) {
                   <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2 tracking-tight">Puzzle Completed</h3>
                   <p className="text-slate-600 mb-8 max-w-md text-base leading-relaxed">
                     You have successfully completed the forensic word search.
-                    <br/><br/>
+                    <br /><br />
                     <span className="inline-block bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
                       Time: <span className="text-primary font-bold">{formatTime(timeElapsed)}</span> • Words: <span className="text-primary font-bold">{wordsToFind.length}</span>
                     </span>
                   </p>
-                  
+
                   <div className="mt-4 sm:mt-5 flex flex-col sm:flex-row gap-3 w-full justify-center max-w-sm mx-auto">
-                    <button 
-                      onClick={initGame} 
+                    <button
+                      onClick={initGame}
                       className="w-full sm:w-auto h-10 px-6 bg-slate-900 text-white hover:bg-slate-800 shadow-md transition-all font-bold rounded-lg whitespace-nowrap flex items-center justify-center gap-2"
                     >
                       <RefreshCw className="w-4 h-4" />
                       <span className="hidden sm:inline">Play Again</span>
                       <span className="sm:hidden">Replay</span>
                     </button>
-                    <button 
-                      onClick={onQuit} 
+                    <button
+                      onClick={onQuit}
                       className="w-full sm:w-auto h-10 px-6 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap flex items-center justify-center"
                     >
                       Back to Games

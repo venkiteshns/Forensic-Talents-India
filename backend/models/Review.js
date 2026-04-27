@@ -6,6 +6,7 @@ const reviewSchema = new mongoose.Schema({
   photo: { type: String }, // Optional Cloudinary image URL for user photo
   rating: { type: Number, required: true, min: 1, max: 5 },
   review: { type: String, required: true },
+  type: { type: String, enum: ['service', 'education'], required: true }, // Categorizes where review appears
   isApproved: { type: Boolean, default: false }, // Must be approved by admin
   createdAt: { type: Date, default: Date.now },
 });

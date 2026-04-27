@@ -25,7 +25,7 @@ function parseContent(text) {
     if (line.includes('Our Services Include') || line.includes('Services Our Organization Provides')) {
       currentSection = 'features';
       continue;
-    } else if (line.includes('FAQs') || line.includes('Benefits of Our Services')) {
+    } else if (line.includes('FAQs') || line.includes('Benefits of Our Services') || line.includes('Countries Covered')) {
       break;
     }
 
@@ -82,46 +82,77 @@ export default function ServiceDetail() {
         </Container>
       </div>
 
-      <ServiceProcess serviceId={id} />
-
-      {id !== 'forensic-training' && id !== 'workplace-assessments' && (
+      {id === 'forensic-training' || id === 'workplace-assessments' ? (
+        <ServiceProcess serviceId={id} />
+      ) : (
         <Container className="py-16">
-          <div className="max-w-4xl">
-            {id === 'fingerprint' && (
-              <div className="mb-12 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-primary">
-                <h3 className="text-xl font-bold text-primary mb-3">Expert Legal Validity</h3>
-                <p className="text-slate-700 leading-relaxed text-lg">
-                  We provide complete solutions in fingerprint examination matters, and our expert opinion is acceptable under <span className="font-semibold text-primary">Section 39 of the Bharatiya Sakshya Adhiniyam, 2023</span> (formerly Section 45 of the Indian Evidence Act) by all the Courts of India and abroad. We are pleased to support you, whenever you need our services.
-                </p>
-              </div>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
+            {/* LEFT SIDE (Key Offerings) */}
+            <div className="col-span-1 lg:col-span-2 order-2 lg:order-1 max-w-full">
+              {id === 'fingerprint' && (
+                <div className="mb-12 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-primary">
+                  <h3 className="text-xl font-bold text-primary mb-3">Expert Legal Validity</h3>
+                  <p className="text-slate-700 leading-relaxed text-lg">
+                    We provide complete solutions in fingerprint examination matters, and our expert opinion is acceptable under <span className="font-semibold text-primary">Section 39 of the Bharatiya Sakshya Adhiniyam, 2023</span> (formerly Section 45 of the Indian Evidence Act) by all the Courts of India and abroad. We are pleased to support you, whenever you need our services.
+                  </p>
+                </div>
+              )}
 
-            <h2 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Key Offerings</h2>
-            {parsed.features.length > 0 ? (
-              <div className="space-y-8">
-                {parsed.features.map((feat, idx) => (
-                  <div key={idx} className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
-                    <h3 className="text-xl font-bold text-primary mb-3 flex items-start gap-2">
-                      <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={20} />
-                      {feat.title.replace('Our Services Include', '')}
-                    </h3>
-                    {feat.details && feat.details.length > 0 ? (
-                      <ul className="text-slate-600 leading-relaxed ml-8 list-disc space-y-2">
-                        {feat.details.map((point, pIdx) => (
-                          <li key={pIdx}>{point}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-slate-600 leading-relaxed ml-7">
-                        Specialized forensic handling tailored to case requirement.
-                      </p>
-                    )}
+              <h2 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Key Offerings</h2>
+              {parsed.features.length > 0 ? (
+                <div className="space-y-6">
+                  {parsed.features.map((feat, idx) => (
+                    <div key={idx} className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
+                      <h3 className="text-xl font-bold text-primary mb-3 flex items-start gap-2">
+                        <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={20} />
+                        {feat.title.replace('Our Services Include', '')}
+                      </h3>
+                      {feat.details && feat.details.length > 0 && (
+                        <ul className="text-slate-600 leading-relaxed ml-8 list-disc space-y-2">
+                          {feat.details.map((point, pIdx) => (
+                            <li key={pIdx}>{point}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</p>
+              )}
+
+              {/* Countries Covered Section - PCC Only */}
+              {id === 'pcc' && (
+                <div className="py-10">
+                  <h2 className="text-3xl font-heading font-bold text-primary mb-6 border-b pb-4">Countries Covered</h2>
+                  <p className="text-slate-600 mb-8 leading-relaxed">
+                    Our services are available across multiple countries, ensuring compliance with each region’s legal and procedural standards.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    {[
+                      'USA', 'Canada', 'UK', 'UAE', 'Australia', 'Singapore', 'New Zealand', 'Saudi Arabia'
+                    ].map((country, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-200">
+                        <Globe className="text-accent flex-shrink-0" size={20} />
+                        <span className="font-semibold text-slate-800">{country}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  
+                  <p className="text-slate-600 italic">
+                    And many more. We stay updated with the latest requirements of each country to ensure compliance and smooth processing.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT SIDE (Process Flow) */}
+            <div className="col-span-1 order-1 lg:order-2">
+              <div className="sticky top-24 bg-white lg:border-l lg:border-slate-100 lg:pl-8">
+                <ServiceProcess serviceId={id} compact={true} />
               </div>
-            ) : (
-              <p className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</p>
-            )}
+            </div>
           </div>
         </Container>
       )}
@@ -135,14 +166,6 @@ export default function ServiceDetail() {
             <div className="mb-20">
               <h3 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Why Choose Us?</h3>
               <div className="space-y-4">
-
-                <div className="bg-slate-50 p-6 rounded-lg border border-slate-100 flex items-start gap-4">
-                  <CheckCircle2 size={24} className="text-accent flex-shrink-0 mt-1" />
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-800 mb-2">Benefits of Our Services</h4>
-                    <p className="text-slate-600">Specialized forensic handling tailored to case requirement.</p>
-                  </div>
-                </div>
 
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-100 flex items-start gap-4">
                   <CheckCircle2 size={24} className="text-accent flex-shrink-0 mt-1" />

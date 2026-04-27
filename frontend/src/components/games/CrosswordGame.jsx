@@ -158,7 +158,6 @@ const generateGridData = (puzzleData) => {
 
 export default function CrosswordGame({ onQuit }) {
   const [puzzleData, setPuzzleData] = useState(null);
-  const [initialLoading, setInitialLoading] = useState(true);
 
   const [gridData, setGridData] = useState([]);
   const [userInputs, setUserInputs] = useState({});
@@ -172,29 +171,7 @@ export default function CrosswordGame({ onQuit }) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchPuzzleData();
   }, []);
-
-  const fetchPuzzleData = async () => {
-    try {
-      const res = await api.get('/crossword');
-      if (res.data && res.data.words && res.data.words.length > 0) {
-        const generated = generateLayout(res.data.words);
-        setPuzzleData(generated);
-      }
-    } catch (err) {
-      console.error("Failed to load crossword:", err);
-      // Fallback
-      setPuzzleData(generateLayout([
-        { word: 'FORENSIC', clue: 'Scientific method for crimes' },
-        { word: 'CRIME', clue: 'Punishable offense' },
-        { word: 'EVIDENCE', clue: 'Body of facts' },
-        { word: 'DNA', clue: 'Genetic carrier' }
-      ]));
-    } finally {
-      setInitialLoading(false);
-    }
-  };
 
   useEffect(() => {
     let interval;
@@ -204,20 +181,52 @@ export default function CrosswordGame({ onQuit }) {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  const initGame = () => {
-    if (!puzzleData) return;
-    setGridData(generateGridData(puzzleData));
-    setUserInputs({});
-    if (puzzleData.words.length > 0) {
-      setActiveWordId(puzzleData.words[0].id);
-      setActiveCell({ r: puzzleData.words[0].r, c: puzzleData.words[0].c });
-    }
-    setTimeElapsed(0);
-    setGameState('playing');
+  const handleStartGameClick = async () => {
+    setGameState('loading');
     
     setTimeout(() => {
       gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
+
+    let activeData = null;
+    try {
+      const storedPlayedIds = JSON.parse(localStorage.getItem('playedCrosswordIds') || '[]');
+      const res = await api.get(`/game/crossword?playedIds=${storedPlayedIds.join(',')}`);
+      
+      if (res.data && res.data.words && res.data.words.length > 0) {
+        activeData = generateLayout(res.data.words);
+        
+        if (res.data.resetOccurred) {
+          localStorage.setItem('playedCrosswordIds', JSON.stringify([res.data._id]));
+        } else {
+          localStorage.setItem('playedCrosswordIds', JSON.stringify([...storedPlayedIds, res.data._id]));
+        }
+      } else {
+        throw new Error("Invalid words array");
+      }
+    } catch (err) {
+      console.error("Failed to load crossword:", err.message);
+      activeData = generateLayout([
+        { word: 'FORENSIC', clue: 'Scientific method for crimes' },
+        { word: 'CRIME', clue: 'Punishable offense' },
+        { word: 'EVIDENCE', clue: 'Body of facts' },
+        { word: 'DNA', clue: 'Genetic carrier' }
+      ]);
+    }
+    
+    setPuzzleData(activeData);
+    setGridData(generateGridData(activeData));
+    setUserInputs({});
+    if (activeData.words.length > 0) {
+      setActiveWordId(activeData.words[0].id);
+      setActiveCell({ r: activeData.words[0].r, c: activeData.words[0].c });
+    }
+    setTimeElapsed(0);
+    setGameState('playing');
+  };
+
+  const initGame = () => {
+    handleStartGameClick();
   };
 
   const triggerConfetti = () => {
@@ -391,14 +400,34 @@ export default function CrosswordGame({ onQuit }) {
             <p className="text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Test your analytical and observation skills with this interactive forensic exercise.
             </p>
-            <Button onClick={initGame} variant="primary" disabled={initialLoading || !puzzleData} className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all disabled:opacity-70">
-              <Play size={20} /> {initialLoading ? "Loading Puzzle..." : "Start Game"}
+            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all">
+              <Play size={20} /> Start Game
             </Button>
           </div>
         </Container>
       )}
 
       <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+        {gameState === 'loading' && (
+          <Container>
+            <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
+                <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+                <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="flex flex-col lg:flex-row gap-10">
+                <div className="lg:w-3/5 overflow-x-auto pb-4">
+                  <div className="aspect-[4/3] bg-slate-100 animate-pulse rounded-xl"></div>
+                </div>
+                <div className="lg:w-2/5 flex flex-col gap-8">
+                  <div className="h-64 bg-slate-100 animate-pulse rounded-xl"></div>
+                  <div className="h-64 bg-slate-100 animate-pulse rounded-xl"></div>
+                </div>
+              </div>
+            </div>
+          </Container>
+        )}
+
         {(gameState === 'playing' || gameState === 'completed') && puzzleData && (
           <Container>
             <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">

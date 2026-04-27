@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 
 const wordSearchSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    default: 'Untitled Word Search'
+  },
+  difficulty: {
+    type: String,
+    enum: ['easy', 'medium', 'hard'],
+    default: 'medium'
+  },
   words: {
     type: [String],
     required: true,

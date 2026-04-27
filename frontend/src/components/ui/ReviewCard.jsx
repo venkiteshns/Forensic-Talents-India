@@ -2,6 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Star, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
+// Helper: get initials from name (e.g. "John Ken" → "JK", "John" → "J")
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return parts[0]?.[0]?.toUpperCase() || '?';
+}
+
 export default function ReviewCard({ review }) {
   const [isClamped, setIsClamped] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +46,7 @@ export default function ReviewCard({ review }) {
               <img src={review.photo} alt={review.name} className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-white" />
             ) : (
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary font-bold text-lg shadow-sm shrink-0 border border-slate-100">
-                {review.name.charAt(0).toUpperCase()}
+                {getInitials(review.name)}
               </div>
             )}
             <div>
@@ -95,7 +103,7 @@ export default function ReviewCard({ review }) {
                   <img src={review.photo} alt={review.name} className="w-14 h-14 rounded-full object-cover shadow-sm shrink-0" />
                 ) : (
                   <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl shadow-sm shrink-0">
-                    {review.name.charAt(0).toUpperCase()}
+                    {getInitials(review.name)}
                   </div>
                 )}
                 <div>

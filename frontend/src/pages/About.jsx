@@ -1,12 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '../components/ui/Container';
-import { Target, Eye, ShieldCheck, CheckCircle2, Users, Calendar, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { Eye, ShieldCheck, CheckCircle2, Users, Calendar, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import api from '../utils/api';
 
 export default function About() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Auto-slide refs
+  const autoSlideRef = useRef(null);
+  const isPausedRef = useRef(false);
+
+  // Touch / swipe refs
+  const touchStartXRef = useRef(null);
+  const touchStartYRef = useRef(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -20,28 +29,106 @@ export default function About() {
     fetchEvents();
   }, []);
 
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+  const getImages = useCallback(() => {
+    if (!selectedEvent) return [];
+    return [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
+  }, [selectedEvent]);
+
+  const goTo = useCallback((index) => {
+    if (isTransitioning) return;
+    const imgs = getImages();
+    if (imgs.length === 0) return;
+    setIsTransitioning(true);
+    setCurrentImageIndex(((index % imgs.length) + imgs.length) % imgs.length);
+    setTimeout(() => setIsTransitioning(false), 420);
+  }, [isTransitioning, getImages]);
+
+  const nextImage = useCallback(() => {
+    const imgs = getImages();
+    if (imgs.length === 0) return;
+    goTo(currentImageIndex + 1);
+  }, [currentImageIndex, getImages, goTo]);
+
+  const prevImage = useCallback(() => {
+    const imgs = getImages();
+    if (imgs.length === 0) return;
+    goTo(currentImageIndex - 1);
+  }, [currentImageIndex, getImages, goTo]);
+
+  // ─── Auto-slide ────────────────────────────────────────────────────────────
+  const startAutoSlide = useCallback(() => {
+    stopAutoSlide();
+    autoSlideRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setCurrentImageIndex((prev) => {
+          const imgs = [selectedEvent?.coverImage, ...(selectedEvent?.images || [])].filter(Boolean);
+          if (imgs.length <= 1) return prev;
+          return (prev + 1) % imgs.length;
+        });
+      }
+    }, 3500);
+  }, [selectedEvent]);
+
+  const stopAutoSlide = () => {
+    if (autoSlideRef.current) {
+      clearInterval(autoSlideRef.current);
+      autoSlideRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setCurrentImageIndex(0);
+      setIsTransitioning(false);
+      startAutoSlide();
+    } else {
+      stopAutoSlide();
+    }
+    return () => stopAutoSlide();
+  }, [selectedEvent]);
+
+  // ─── Modal open/close ─────────────────────────────────────────────────────
   const openEventModal = (event) => {
     setSelectedEvent(event);
-    setCurrentImageIndex(0);
   };
 
   const closeEventModal = () => {
+    stopAutoSlide();
     setSelectedEvent(null);
   };
 
-  const nextImage = () => {
-    if (!selectedEvent) return;
-    const allImages = [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
-    if (allImages.length === 0) return;
-    setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+  // ─── Touch / Swipe handlers ───────────────────────────────────────────────
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    isPausedRef.current = true;
   };
 
-  const prevImage = () => {
-    if (!selectedEvent) return;
-    const allImages = [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
-    if (allImages.length === 0) return;
-    setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+  const handleTouchMove = (e) => {
+    // prevent vertical scroll hijack only when horizontal swipe is dominant
+    if (touchStartXRef.current === null) return;
+    const dx = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+    if (dx > dy) e.preventDefault();
   };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartXRef.current;
+    const threshold = 40;
+    if (Math.abs(dx) > threshold) {
+      dx < 0 ? nextImage() : prevImage();
+    }
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    // Resume auto-slide after 2s
+    setTimeout(() => { isPausedRef.current = false; }, 2000);
+  };
+
+  // Pause on hover (desktop)
+  const handleMouseEnter = () => { isPausedRef.current = true; };
+  const handleMouseLeave = () => { isPausedRef.current = false; };
 
   const offerings = [
     { title: "Questioned Document Examination (QDE)", desc: "Scientific analysis of disputed documents to determine authenticity, alterations, forgery, or fabrication." },
@@ -237,64 +324,186 @@ export default function About() {
 
       {/* Event Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-sm overflow-hidden">
-          <div className="w-full max-w-[900px] bg-white rounded-xl shadow-2xl flex flex-col relative animate-in fade-in zoom-in-95 duration-300 overflow-hidden" style={{ maxHeight: '90vh' }}>
-            <button onClick={closeEventModal} className="absolute top-4 right-4 z-[60] text-slate-700 hover:text-black bg-white/80 hover:bg-white transition-colors rounded-full p-2 shadow-md">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 sm:p-6 backdrop-blur-sm overflow-hidden"
+          onClick={closeEventModal}
+        >
+          <div
+            className="w-full max-w-[900px] bg-white rounded-xl shadow-2xl flex flex-col relative overflow-hidden"
+            style={{ maxHeight: '90vh', animation: 'modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <style>{`
+              @keyframes modalIn {
+                from { opacity: 0; transform: scale(0.93) translateY(12px); }
+                to   { opacity: 1; transform: scale(1)   translateY(0); }
+              }
+              .carousel-track {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                will-change: transform;
+                transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+              }
+              .carousel-slide {
+                flex: 0 0 100%;
+                width: 100%;
+                height: 100%;
+                position: relative;
+              }
+              /* Dots */
+              .carousel-dot {
+                width: 8px; height: 8px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.45);
+                cursor: pointer;
+                transition: background 0.25s, transform 0.25s;
+                border: none;
+                padding: 0;
+              }
+              .carousel-dot.active {
+                background: #fff;
+                transform: scale(1.35);
+              }
+              /* Arrow visibility: always visible on mobile, hover on desktop */
+              .carousel-arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0,0,0,0.45);
+                color: #fff;
+                border: none;
+                border-radius: 50%;
+                padding: 8px;
+                cursor: pointer;
+                z-index: 40;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s, opacity 0.2s;
+                /* always visible on mobile */
+                opacity: 0.75;
+              }
+              .carousel-arrow:hover { background: rgba(0,0,0,0.75); opacity: 1; }
+              @media (min-width: 768px) {
+                /* hidden by default on desktop; shown on group-hover */
+                .carousel-arrow { opacity: 0; }
+                .carousel-container:hover .carousel-arrow { opacity: 1; }
+              }
+            `}</style>
+
+            <button
+              onClick={closeEventModal}
+              className="absolute top-4 right-4 z-[60] text-slate-700 hover:text-black bg-white/80 hover:bg-white transition-colors rounded-full p-2 shadow-md"
+              aria-label="Close"
+            >
               <X size={20} />
             </button>
 
             <div className="w-full flex flex-col h-full overflow-hidden">
-              {/* Carousel Area (Sticky Top) */}
-              <div className="w-full h-[260px] md:h-[320px] bg-slate-100 relative flex-shrink-0 group z-10">
-                {(() => {
-                  const allImages = [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
-                  if (allImages.length > 0) {
-                    return (
-                      <>
-                        {/* Blurred Background layer */}
-                        <div className="absolute inset-0 overflow-hidden">
-                          <img src={allImages[currentImageIndex]} className="w-full h-full object-cover blur-xl opacity-30 scale-110 transition-opacity duration-500 ease-in-out" alt="" />
-                        </div>
-
-                        {/* Actual Images with opacity transition */}
-                        {allImages.map((src, idx) => (
-                          <img
-                            key={idx}
-                            src={src}
-                            loading="lazy"
-                            alt="Event gallery"
-                            className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ease-in-out ${idx === currentImageIndex ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}
-                          />
-                        ))}
-
-                        {allImages.length > 1 && (
-                          <div className="z-30 absolute inset-0 pointer-events-none">
-                            <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
-                              <ChevronLeft size={24} />
-                            </button>
-                            <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="pointer-events-auto absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
-                              <ChevronRight size={24} />
-                            </button>
-
-                            <div className="pointer-events-auto absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/20 px-3 py-2 rounded-full backdrop-blur-sm">
-                              {allImages.map((_, idx) => (
-                                <div key={idx} className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`} />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    );
-                  } else {
-                    return (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 z-20 relative">
-                        <ImageIcon size={48} className="mb-2 opacity-50" />
-                        <p>No images available</p>
+              {/* ── Carousel Area ── */}
+              {(() => {
+                const allImages = [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
+                if (allImages.length > 0) {
+                  return (
+                    <div
+                      className="carousel-container w-full h-[260px] md:h-[340px] bg-slate-900 relative flex-shrink-0 overflow-hidden"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                    >
+                      {/* Blurred ambient background */}
+                      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                        <img
+                          src={allImages[currentImageIndex]}
+                          className="w-full h-full object-cover blur-2xl opacity-25 scale-110"
+                          style={{ transition: 'opacity 0.5s ease' }}
+                          alt=""
+                          aria-hidden="true"
+                        />
                       </div>
-                    );
-                  }
-                })()}
-              </div>
+
+                      {/* Sliding track — translateX approach */}
+                      <div
+                        className="carousel-track z-10 relative"
+                        style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                      >
+                        {allImages.map((src, idx) => (
+                          <div key={idx} className="carousel-slide">
+                            <img
+                              src={src}
+                              alt={`Event image ${idx + 1}`}
+                              loading={idx === 0 ? 'eager' : 'lazy'}
+                              draggable={false}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                                display: 'block',
+                                userSelect: 'none',
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Arrows (only if >1 image) */}
+                      {allImages.length > 1 && (
+                        <>
+                          <button
+                            className="carousel-arrow"
+                            style={{ left: '12px' }}
+                            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                            aria-label="Previous image"
+                          >
+                            <ChevronLeft size={22} />
+                          </button>
+                          <button
+                            className="carousel-arrow"
+                            style={{ right: '12px' }}
+                            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                            aria-label="Next image"
+                          >
+                            <ChevronRight size={22} />
+                          </button>
+
+                          {/* Dot indicators */}
+                          <div
+                            className="absolute bottom-4 left-1/2 z-50 flex gap-2 px-3 py-2 rounded-full"
+                            style={{ transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.28)', backdropFilter: 'blur(4px)' }}
+                          >
+                            {allImages.map((_, idx) => (
+                              <button
+                                key={idx}
+                                className={`carousel-dot${idx === currentImageIndex ? ' active' : ''}`}
+                                onClick={(e) => { e.stopPropagation(); goTo(idx); }}
+                                aria-label={`Go to image ${idx + 1}`}
+                              />
+                            ))}
+                          </div>
+
+                          {/* Image counter */}
+                          <div
+                            className="absolute top-3 right-3 z-50 text-xs font-semibold text-white px-2 py-1 rounded-full"
+                            style={{ background: 'rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)' }}
+                          >
+                            {currentImageIndex + 1} / {allImages.length}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="w-full h-[260px] md:h-[340px] bg-slate-100 flex flex-col items-center justify-center text-slate-400 flex-shrink-0">
+                      <ImageIcon size={48} className="mb-2 opacity-40" />
+                      <p className="text-sm">No images available</p>
+                    </div>
+                  );
+                }
+              })()}
 
               {/* Content Area (Scrollable) */}
               <div

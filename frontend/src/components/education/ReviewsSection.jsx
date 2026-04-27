@@ -4,12 +4,20 @@ import { Container } from '../ui/Container';
 import ReviewCard from '../ui/ReviewCard';
 import api from '../../utils/api';
 
+// Helper: get initials from name (e.g. "John Ken" → "JK", "John" → "J")
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return parts[0]?.[0]?.toUpperCase() || '?';
+}
+
 export default function ReviewsSection() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Form state
-  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '' });
+  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '', type: 'education' });
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -22,7 +30,7 @@ export default function ReviewsSection() {
 
   const fetchReviews = async () => {
     try {
-      const res = await api.get('/reviews');
+      const res = await api.get('/reviews?type=education');
       setReviews(res.data);
     } catch (err) {
       console.error('Failed to load reviews:', err);
@@ -51,6 +59,7 @@ export default function ReviewsSection() {
       formData.append('email', form.email);
       formData.append('rating', form.rating);
       formData.append('review', form.review);
+      formData.append('type', form.type);
       if (photoFile) {
         formData.append('photo', photoFile);
       }
@@ -60,7 +69,7 @@ export default function ReviewsSection() {
       });
       
       setSuccessMode(true);
-      setForm({ name: '', email: '', rating: 5, review: '' });
+      setForm({ name: '', email: '', rating: 5, review: '', type: 'education' });
       setPhotoFile(null);
       setPhotoPreview('');
       
@@ -129,6 +138,32 @@ export default function ReviewsSection() {
                 </div>
               </div>
 
+              {/* Review Type Selector */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">Review Type *</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'education', label: 'Education', desc: 'Training & courses' },
+                    { value: 'service', label: 'Service', desc: 'Forensic services' }
+                  ].map(opt => (
+                    <label key={opt.value} className={`flex flex-col gap-0.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      form.type === opt.value
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
+                    }`}>
+                      <input
+                        type="radio" name="reviewTypeSec" value={opt.value}
+                        checked={form.type === opt.value}
+                        onChange={() => setForm(f => ({ ...f, type: opt.value }))}
+                        className="sr-only"
+                      />
+                      <span className="text-sm font-semibold">{opt.label}</span>
+                      <span className="text-xs opacity-70">{opt.desc}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Profile Photo (Optional)</label>
@@ -136,8 +171,8 @@ export default function ReviewsSection() {
                     {photoPreview ? (
                       <img src={photoPreview} alt="Preview" className="w-12 h-12 rounded-full object-cover border border-slate-200" />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400">
-                        <Upload size={20} />
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm border border-primary/20">
+                        {form.name ? getInitials(form.name) : <Upload size={20} className="text-slate-400" />}
                       </div>
                     )}
                     <input type="file" accept="image/*" onChange={handlePhotoChange} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />

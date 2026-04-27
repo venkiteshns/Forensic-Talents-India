@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 
 const MatchingSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    default: 'Untitled Matching Game'
+  },
+  difficulty: {
+    type: String,
+    enum: ['easy', 'medium', 'hard'],
+    default: 'medium'
+  },
   useIcons: {
     type: Boolean,
     default: true

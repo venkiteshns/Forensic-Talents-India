@@ -14,7 +14,9 @@ export default function Quiz() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
     const fetchQuiz = async () => {
       try {
         const res = await api.get('/quiz/latest');
@@ -23,6 +25,14 @@ export default function Quiz() {
         console.error("Error fetching quiz", err);
       } finally {
         setLoading(false);
+        if (window.location.hash) {
+          setTimeout(() => {
+            const element = document.getElementById(window.location.hash.substring(1));
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
       }
     };
     fetchQuiz();
@@ -39,7 +49,7 @@ export default function Quiz() {
       {/* Header */}
       <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
         <div className="absolute top-8 left-4 md:left-8 z-20">
-          <Link 
+          <Link
             to="/education"
             className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm"
           >
@@ -78,7 +88,7 @@ export default function Quiz() {
       />
 
       {/* Quiz Details */}
-      <section className="py-8 relative z-10">
+      <section id="quiz_box_section" className="py-8 relative z-10">
         <Container>
           <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
 
@@ -89,7 +99,7 @@ export default function Quiz() {
 
             <div className="md:w-1/2 relative z-10">
               <span className="text-accent font-bold tracking-wider uppercase text-sm mb-3 block">Monthly Initiative</span>
-              
+
               {loading ? (
                 <QuizSkeleton />
               ) : quiz && quiz.isVisible ? (

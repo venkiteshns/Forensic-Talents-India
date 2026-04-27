@@ -62,7 +62,8 @@ const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   category: { type: String, required: true, default: "General Forensics" },
   duration: { type: String, required: true },
-  price: { type: Number, required: true },
+  priceINR: { type: Number, required: true },
+  priceUSD: { type: Number, required: true },
   mode: { type: [String], required: true },
   description: { type: String, required: true },
   topics: { type: [String], required: true },
@@ -71,7 +72,8 @@ const courseSchema = new mongoose.Schema({
 const internshipSchema = new mongoose.Schema({
   type: { type: String, enum: ['online', 'offline', 'Online', 'Offline'], required: true },
   duration: { type: String, required: true },
-  price: { type: Number, required: true },
+  priceINR: { type: Number, required: true },
+  priceUSD: { type: Number, required: true },
   description: { type: String, required: true },
   benefits: { type: [String], required: true },
   isActive: { type: Boolean, default: true },
@@ -87,6 +89,24 @@ const quizSchema = new mongoose.Schema({
 
 const Course = mongoose.model('Course', courseSchema);
 const Internship = mongoose.model('Internship', internshipSchema);
+
+const internshipBenefitSchema = new mongoose.Schema({
+  internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship', required: true },
+  title: { type: String, required: true },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
+const internshipAreaSchema = new mongoose.Schema({
+  internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship', required: true },
+  title: { type: String, required: true },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
+const InternshipBenefit = mongoose.model('InternshipBenefit', internshipBenefitSchema);
+const InternshipArea = mongoose.model('InternshipArea', internshipAreaSchema);
+
 const Quiz = mongoose.model('Quiz', quizSchema);
 
 const resourceSchema = new mongoose.Schema({
@@ -643,7 +663,12 @@ app.delete('/api/events/:id', protect, async (req, res) => {
 
 app.get('/api/reviews', async (req, res) => {
   try {
-    const reviews = await Review.find({ isApproved: true }).sort({ createdAt: -1 });
+    const { type } = req.query;
+    const query = { isApproved: true };
+    if (type && ['service', 'education'].includes(type)) {
+      query.type = type;
+    }
+    const reviews = await Review.find(query).sort({ createdAt: -1 });
     res.json(reviews);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -661,7 +686,13 @@ app.get('/api/admin/reviews', protect, async (req, res) => {
 
 app.post('/api/reviews', eventUpload.single('photo'), async (req, res) => {
   try {
-    const { name, email, rating, review } = req.body;
+    const { name, email, rating, review, type } = req.body;
+
+    // Validate required type field
+    if (!type || !['service', 'education'].includes(type)) {
+      return res.status(400).json({ message: 'Review type is required. Must be "service" or "education".' });
+    }
+
     let photoUrl = "";
 
     if (req.file) {
@@ -671,7 +702,7 @@ app.post('/api/reviews', eventUpload.single('photo'), async (req, res) => {
       photoUrl = cldRes.secure_url;
     }
 
-    const newReview = new Review({ name, email, rating, review, photo: photoUrl });
+    const newReview = new Review({ name, email, rating, review, type, photo: photoUrl });
     await newReview.save();
     res.status(201).json({ message: "Review submitted for approval" });
   } catch (err) {
@@ -717,80 +748,87 @@ setInterval(() => {
   });
 }, pingInterval);
 
-// --- WORD SEARCH ROUTES ---
-import WordSearch from './models/WordSearch.js';
-
-// GET active word set (public)
-app.get('/api/word-search', async (req, res) => {
+// --- GAME AGGREGATOR ROUTE ---
+app.get('/api/game/:type', async (req, res) => {
   try {
-    const activeSet = await WordSearch.findOne({ isActive: true });
-    if (!activeSet) {
-      return res.status(404).json({ message: 'No active word set found' });
+    const { type } = req.params;
+    const playedIds = req.query.playedIds ? req.query.playedIds.split(',') : [];
+
+    let Model;
+    if (type === 'word-search') Model = WordSearch;
+    else if (type === 'crossword') Model = Crossword;
+    else if (type === 'jigsaw') Model = Jigsaw;
+    else if (type === 'matching') Model = Matching;
+    else return res.status(400).json({ message: 'Invalid game type' });
+
+    const activeSets = await Model.find({ isActive: true });
+    if (activeSets.length === 0) {
+      return res.status(404).json({ message: 'No active sets found' });
     }
-    res.json(activeSet);
+
+    let unplayedSets = activeSets.filter(set => !playedIds.includes(set._id.toString()));
+
+    if (unplayedSets.length === 0) {
+      unplayedSets = activeSets;
+    }
+
+    const shuffledSets = unplayedSets.sort(() => 0.5 - Math.random());
+    const selectedSet = shuffledSets[0];
+
+    // Send a flag indicating if list was reset (optional, but helpful for frontend)
+    res.json({ ...selectedSet.toObject(), resetOccurred: unplayedSets.length === activeSets.length && activeSets.length > 0 && playedIds.length > 0 });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch word search' });
+    res.status(500).json({ message: 'Failed to fetch game data' });
   }
 });
 
-// GET all word sets (admin)
+// --- WORD SEARCH ROUTES ---
+import WordSearch from './models/WordSearch.js';
+
+app.get('/api/word-search', async (req, res) => {
+  // Legacy fallback, mostly replaced by /api/game/word-search
+  try {
+    const activeSet = await WordSearch.findOne({ isActive: true });
+    if (!activeSet) return res.status(404).json({ message: 'No active word set found' });
+    res.json(activeSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch word search' }); }
+});
+
 app.get('/api/word-search/admin/all', protect, async (req, res) => {
   try {
     const sets = await WordSearch.find().sort({ createdAt: -1 });
     res.json(sets);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch word sets' });
-  }
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch word sets' }); }
 });
 
-// POST new word set
 app.post('/api/word-search', protect, async (req, res) => {
   try {
-    const { words, isActive } = req.body;
-
-    // Deactivate others if this is active
-    if (isActive) {
-      await WordSearch.updateMany({}, { isActive: false });
-    }
-
-    const newSet = new WordSearch({ words, isActive });
+    const { title, difficulty, words, isActive } = req.body;
+    const newSet = new WordSearch({ title, difficulty, words, isActive });
     await newSet.save();
     res.status(201).json(newSet);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to save word set', error: error.message });
-  }
+  } catch (error) { res.status(500).json({ message: 'Failed to save word set', error: error.message }); }
 });
 
-// PUT update/toggle active
 app.put('/api/word-search/:id', protect, async (req, res) => {
   try {
-    const { words, isActive } = req.body;
-
-    if (isActive) {
-      // Deactivate all others first
-      await WordSearch.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
-    }
-
+    const { title, difficulty, words, isActive } = req.body;
     const updatedSet = await WordSearch.findByIdAndUpdate(
       req.params.id,
-      { words, isActive },
-      { new: true }
+      { title, difficulty, words, isActive },
+      { returnDocument: 'after' }
     );
     res.json(updatedSet);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update word set', error: error.message });
-  }
+  } catch (error) { res.status(500).json({ message: 'Failed to update word set', error: error.message }); }
 });
 
-// DELETE word set
 app.delete('/api/word-search/:id', protect, async (req, res) => {
   try {
     await WordSearch.findByIdAndDelete(req.params.id);
     res.json({ message: 'Word set deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to delete word set', error: error.message });
-  }
+  } catch (error) { res.status(500).json({ message: 'Failed to delete word set', error: error.message }); }
 });
+
 // --- CROSSWORD ROUTES ---
 import Crossword from './models/Crossword.js';
 
@@ -811,9 +849,8 @@ app.get('/api/crossword/admin/all', protect, async (req, res) => {
 
 app.post('/api/crossword', protect, async (req, res) => {
   try {
-    const { words, isActive } = req.body;
-    if (isActive) await Crossword.updateMany({}, { isActive: false });
-    const newSet = new Crossword({ words, isActive });
+    const { title, difficulty, words, isActive } = req.body;
+    const newSet = new Crossword({ title, difficulty, words, isActive });
     await newSet.save();
     res.status(201).json(newSet);
   } catch (error) { res.status(500).json({ message: 'Failed to save crossword', error: error.message }); }
@@ -821,9 +858,8 @@ app.post('/api/crossword', protect, async (req, res) => {
 
 app.put('/api/crossword/:id', protect, async (req, res) => {
   try {
-    const { words, isActive } = req.body;
-    if (isActive) await Crossword.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
-    const updatedSet = await Crossword.findByIdAndUpdate(req.params.id, { words, isActive }, { new: true });
+    const { title, difficulty, words, isActive } = req.body;
+    const updatedSet = await Crossword.findByIdAndUpdate(req.params.id, { title, difficulty, words, isActive }, { returnDocument: 'after' });
     res.json(updatedSet);
   } catch (error) { res.status(500).json({ message: 'Failed to update crossword' }); }
 });
@@ -855,9 +891,8 @@ app.get('/api/jigsaw/admin/all', protect, async (req, res) => {
 
 app.post('/api/jigsaw', protect, async (req, res) => {
   try {
-    const { imageUrl, isActive } = req.body;
-    if (isActive) await Jigsaw.updateMany({}, { isActive: false });
-    const newSet = new Jigsaw({ imageUrl, isActive });
+    const { title, difficulty, imageUrl, isActive } = req.body;
+    const newSet = new Jigsaw({ title, difficulty, imageUrl, isActive });
     await newSet.save();
     res.status(201).json(newSet);
   } catch (error) { res.status(500).json({ message: 'Failed to save jigsaw' }); }
@@ -865,9 +900,8 @@ app.post('/api/jigsaw', protect, async (req, res) => {
 
 app.put('/api/jigsaw/:id', protect, async (req, res) => {
   try {
-    const { imageUrl, isActive } = req.body;
-    if (isActive) await Jigsaw.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
-    const updatedSet = await Jigsaw.findByIdAndUpdate(req.params.id, { imageUrl, isActive }, { new: true });
+    const { title, difficulty, imageUrl, isActive } = req.body;
+    const updatedSet = await Jigsaw.findByIdAndUpdate(req.params.id, { title, difficulty, imageUrl, isActive }, { returnDocument: 'after' });
     res.json(updatedSet);
   } catch (error) { res.status(500).json({ message: 'Failed to update jigsaw' }); }
 });
@@ -899,9 +933,8 @@ app.get('/api/matching/admin/all', protect, async (req, res) => {
 
 app.post('/api/matching', protect, async (req, res) => {
   try {
-    const { useIcons, images, isActive } = req.body;
-    if (isActive) await Matching.updateMany({}, { isActive: false });
-    const newSet = new Matching({ useIcons, images, isActive });
+    const { title, difficulty, useIcons, images, isActive } = req.body;
+    const newSet = new Matching({ title, difficulty, useIcons, images, isActive });
     await newSet.save();
     res.status(201).json(newSet);
   } catch (error) { res.status(500).json({ message: 'Failed to save matching game' }); }
@@ -909,9 +942,8 @@ app.post('/api/matching', protect, async (req, res) => {
 
 app.put('/api/matching/:id', protect, async (req, res) => {
   try {
-    const { useIcons, images, isActive } = req.body;
-    if (isActive) await Matching.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
-    const updatedSet = await Matching.findByIdAndUpdate(req.params.id, { useIcons, images, isActive }, { new: true });
+    const { title, difficulty, useIcons, images, isActive } = req.body;
+    const updatedSet = await Matching.findByIdAndUpdate(req.params.id, { title, difficulty, useIcons, images, isActive }, { returnDocument: 'after' });
     res.json(updatedSet);
   } catch (error) { res.status(500).json({ message: 'Failed to update matching game' }); }
 });
