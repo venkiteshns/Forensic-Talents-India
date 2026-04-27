@@ -4,7 +4,7 @@ const startKeepAlive = () => {
   const pingInterval = 14 * 60 * 1000;
   setInterval(() => {
     if (!process.env.BACKEND_URL) return;
-    
+
     https.get(process.env.BACKEND_URL, (response) => {
       if (response.statusCode === 200) {
         console.log('Keep-alive ping successful:', new Date().toISOString());

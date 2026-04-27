@@ -13,6 +13,60 @@ export default function Quiz() {
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Certificate Verification State
+  const [certNumber, setCertNumber] = useState('');
+  const [certResult, setCertResult] = useState(null);
+  const [certError, setCertError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+
+  const handleVerify = async () => {
+    setCertError('');
+    setCertResult(null);
+    setResendMessage('');
+
+    if (!certNumber.trim()) {
+      setCertError('Please enter a certificate number.');
+      return;
+    }
+
+    // Format validation: FOR-T/CS/minimum 6 numbers
+    const certRegex = /^FOR-T\/CS\/\d{6,}$/;
+    if (!certRegex.test(certNumber.trim())) {
+      setCertError('Invalid certificate number format. Ensure it matches FOR-T/CS/XXXXXX.');
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const res = await api.post('/certificates/verify', { certificateNumber: certNumber.trim() });
+      setCertResult(res.data);
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setCertError(err.response.data.message);
+      } else {
+        setCertError('Failed to verify certificate. Please try again.');
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setIsResending(true);
+    setResendMessage('');
+    try {
+      const res = await api.post('/certificates/resend', { certificateNumber: certNumber.trim() });
+      setResendMessage(res.data.message);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'We encountered an unexpected issue. Please try again later.';
+      setResendMessage(errorMessage);
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   useEffect(() => {
     if (!window.location.hash) {
       window.scrollTo(0, 0);
@@ -224,24 +278,106 @@ export default function Quiz() {
                         <input
                           type="text"
                           id="cert_verify_input"
-                          placeholder="e.g., FOR-T/AB/XXXX01"
+                          value={certNumber}
+                          onChange={(e) => setCertNumber(e.target.value)}
+                          placeholder="e.g., FOR-T/CS/260501"
                           className="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all font-medium text-lg shadow-sm"
                         />
                       </div>
                       <Button
                         variant="primary"
                         size="lg"
-                        className="sm:px-10 py-4 h-auto rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        onClick={handleVerify}
+                        disabled={isVerifying}
+                        className="sm:px-10 py-4 h-auto rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
                       >
-                        <Search size={20} />
-                        <span>Verify</span>
+                        {isVerifying ? (
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Search size={20} />
+                        )}
+                        <span>{isVerifying ? 'Verifying...' : 'Verify'}</span>
                       </Button>
                     </div>
+                    {certError && (
+                      <p className="mt-3 text-red-500 font-medium text-sm flex items-center gap-2 bg-red-50 p-3 rounded-xl border border-red-100">
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        {certError}
+                      </p>
+                    )}
                   </div>
-                  <p className="mt-6 text-sm text-slate-500 text-center flex items-center justify-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
-                    Unique number can be found at the bottom of your certificate.
-                  </p>
+
+                  {certResult && (
+                    <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4">
+
+                      {/* ── Card 1: Verification Result ── */}
+                      <div className="bg-white border border-green-200 rounded-xl p-5 shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="bg-green-100 p-1.5 rounded-full shrink-0">
+                            <CheckCircle className="text-green-600" size={20} />
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-800 tracking-wide uppercase">
+                            Certificate Verified Successfully
+                          </h4>
+                        </div>
+                        <div className="grid gap-y-2 text-sm" style={{ gridTemplateColumns: '6rem 1fr' }}>
+                          <span className="text-slate-400 font-medium">Recipient</span>
+                          <strong className="text-slate-800">{certResult.name}</strong>
+
+                          <span className="text-slate-400 font-medium">Programme</span>
+                          <strong className="text-slate-800">Case S Quiz - {certResult.quizName}</strong>
+
+                          <span className="text-slate-400 font-medium">Issued by</span>
+                          <strong className="text-slate-800">Forensic Talents India</strong>
+
+                          <span className="text-slate-400 font-medium">Date</span>
+                          <strong className="text-slate-800">{certResult.quizDate}</strong>
+
+                          <span className="text-slate-400 font-medium">Score</span>
+                          <strong className="text-slate-800">{certResult.marksScored}</strong>
+                        </div>
+                      </div>
+
+                      {/* ── Card 2: Resend Action ── */}
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+                        {/* Single row: label + button */}
+                        <div className="flex items-center flex-col justify-between gap-4">
+                          <p className="text-sm text-slate-600 leading-snug">
+                            Resend certificate to registered email
+                          </p>
+                          <button
+                            onClick={handleResend}
+                            disabled={isResending}
+                            className="shrink-0 h-9 px-5 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-700 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isResending ? 'Sending…' : 'Resend to Email'}
+                          </button>
+                        </div>
+
+                        {/* Feedback alert — below the row */}
+                        {resendMessage && (
+                          <div className={`mt-3 flex items-start gap-2.5 p-3 rounded-lg text-sm font-medium border ${resendMessage.toLowerCase().includes('unable') ||
+                            resendMessage.toLowerCase().includes('issue') ||
+                            resendMessage.toLowerCase().includes('error') ||
+                            resendMessage.toLowerCase().includes('unexpected')
+                            ? 'bg-red-50 border-red-200 text-red-700'
+                            : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                            }`}>
+                            <CheckCircle size={15} className="mt-0.5 shrink-0" />
+                            <span>{resendMessage}</span>
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  )}
+
+                  {!certResult && !certError && (
+                    <p className="mt-6 text-sm text-slate-500 text-center flex items-center justify-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                      Unique number can be found at the bottom of your certificate.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

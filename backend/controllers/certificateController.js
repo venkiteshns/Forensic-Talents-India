@@ -17,3 +17,35 @@ export const getCertificates = async (req, res, next) => {
     next(err);
   }
 };
+
+export const verifyCertificate = async (req, res, next) => {
+  try {
+    const { certificateNumber } = req.body;
+    if (!certificateNumber) {
+      return res.status(400).json({ message: 'Certificate number is required' });
+    }
+    const certificate = await certificateService.verifyCertificate(certificateNumber);
+    res.json(certificate);
+  } catch (err) {
+    if (err.message === 'Certificate not found') {
+      return res.status(404).json({ message: err.message });
+    }
+    next(err);
+  }
+};
+
+export const resendCertificate = async (req, res, next) => {
+  try {
+    const { certificateNumber } = req.body;
+    if (!certificateNumber) {
+      return res.status(400).json({ message: 'Certificate number is required' });
+    }
+    const response = await certificateService.resendCertificate(certificateNumber);
+    res.json(response);
+  } catch (err) {
+    if (err.message === 'Certificate not found') {
+      return res.status(404).json({ message: err.message });
+    }
+    next(err);
+  }
+};
