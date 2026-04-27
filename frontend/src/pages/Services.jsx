@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap, Leaf, Landmark, Star, MessageSquare, Send, Upload, Camera } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap, Leaf, Landmark } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import ReviewCard from '../components/ui/ReviewCard';
 import api from '../utils/api';
+import ReviewsSection from '../components/education/ReviewsSection';
 
 // Helper: get initials from name (e.g. "John Ken" → "JK", "John" → "J")
 function getInitials(name) {
@@ -15,55 +15,9 @@ function getInitials(name) {
 }
 
 export default function Services() {
-  const [reviews, setReviews] = useState([]);
-  const [reviewForm, setReviewForm] = useState({ name: '', email: '', rating: 5, review: '', type: 'service' });
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState('');
-  const [reviewStatus, setReviewStatus] = useState({ type: '', message: '' });
-  const fileInputRef = useRef(null);
-
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchReviews = async () => {
-      try {
-        const res = await api.get('/reviews?type=service');
-        setReviews(res.data);
-      } catch (err) {
-        console.error("Error fetching reviews", err);
-      }
-    };
-    fetchReviews();
   }, []);
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPhotoFile(file);
-      setPhotoPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const submitReview = async (e) => {
-    e.preventDefault();
-    setReviewStatus({ type: 'loading', message: 'Submitting...' });
-    try {
-      const formData = new FormData();
-      formData.append('name', reviewForm.name);
-      formData.append('email', reviewForm.email);
-      formData.append('rating', reviewForm.rating);
-      formData.append('review', reviewForm.review);
-      formData.append('type', reviewForm.type);
-      if (photoFile) formData.append('photo', photoFile);
-
-      await api.post('/reviews', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setReviewStatus({ type: 'success', message: 'Review submitted! It will appear after approval.' });
-      setReviewForm({ name: '', email: '', rating: 5, review: '', type: 'service' });
-      setPhotoFile(null);
-      setPhotoPreview('');
-    } catch (err) {
-      setReviewStatus({ type: 'error', message: err.response?.data?.message || 'Failed to submit review' });
-    }
-  };
 
   const servicesList = [
     {
@@ -175,123 +129,7 @@ export default function Services() {
       </Container>
 
       {/* Reviews & Testimonials Section */}
-      <section className="py-20 bg-slate-50 relative overflow-hidden border-t border-slate-200">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Hear what our clients and partners have to say about our forensic services.</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Reviews Carousel/Grid */}
-            <div className="lg:col-span-2">
-              {reviews.length === 0 ? (
-                <div className="bg-white rounded-2xl p-10 text-center border border-slate-100 shadow-sm h-full flex flex-col justify-center items-center">
-                  <MessageSquare className="h-12 w-12 text-slate-300 mb-3" />
-                  <p className="text-slate-500">No testimonials available yet. Be the first to share your experience!</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {reviews.slice(0, 4).map(review => (
-                    <ReviewCard key={review._id} review={review} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Submit Review Form */}
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
-              <h3 className="text-xl font-bold text-primary mb-2">Share Your Experience</h3>
-              <p className="text-sm text-slate-500 mb-6">Your feedback helps us improve and maintain our high standards of service.</p>
-
-              {reviewStatus.message && (
-                <div className={`p-3 rounded-lg text-sm mb-6 ${reviewStatus.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : reviewStatus.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>
-                  {reviewStatus.message}
-                </div>
-              )}
-
-              <form onSubmit={submitReview} className="space-y-4">
-                {/* Photo Upload */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Profile Photo <span className="font-normal text-slate-400 lowercase">(optional)</span></label>
-                  <div className="flex items-center gap-4">
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="relative w-14 h-14 rounded-full shrink-0 overflow-hidden border-2 border-dashed border-slate-300 hover:border-accent transition-colors group">
-                      {photoPreview ? (
-                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-primary/5 flex items-center justify-center text-primary font-bold text-lg group-hover:bg-primary/10 transition-colors">
-                          {reviewForm.name ? getInitials(reviewForm.name) : <Camera size={18} className="text-slate-400" />}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <Upload size={14} className="text-white" />
-                      </div>
-                    </button>
-                    <div className="flex-1">
-                      <p className="text-xs text-slate-500 mb-1">Click circle to upload</p>
-                      <p className="text-[11px] text-slate-400">JPG, PNG or WebP</p>
-                    </div>
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Your Name</label>
-                  <input required type="text" value={reviewForm.name} onChange={e => setReviewForm({ ...reviewForm, name: e.target.value })} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" placeholder="John Doe" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Email <span className="text-slate-400 font-normal lowercase">(private)</span></label>
-                  <input required type="email" value={reviewForm.email} onChange={e => setReviewForm({ ...reviewForm, email: e.target.value })} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" placeholder="john@example.com" />
-                </div>
-
-                {/* Review Type */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Review Type <span className="text-red-400">*</span></label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { value: 'service', label: 'Service', desc: 'Forensic services' },
-                      { value: 'education', label: 'Education', desc: 'Training & courses' }
-                    ].map(opt => (
-                      <label key={opt.value} className={`flex flex-col gap-0.5 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                        reviewForm.type === opt.value
-                          ? 'border-accent bg-accent/5 text-primary'
-                          : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                      }`}>
-                        <input
-                          type="radio" name="reviewType" value={opt.value}
-                          checked={reviewForm.type === opt.value}
-                          onChange={() => setReviewForm({ ...reviewForm, type: opt.value })}
-                          className="sr-only"
-                        />
-                        <span className="text-sm font-semibold">{opt.label}</span>
-                        <span className="text-[11px] opacity-70">{opt.desc}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Rating</label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <button key={star} type="button" onClick={() => setReviewForm({ ...reviewForm, rating: star })} className="focus:outline-none transition-transform hover:scale-110">
-                        <Star size={24} className={star <= reviewForm.rating ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Your Review</label>
-                  <textarea required rows={3} value={reviewForm.review} onChange={e => setReviewForm({ ...reviewForm, review: e.target.value })} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none" placeholder="Tell us about your experience..." />
-                </div>
-                <Button type="submit" variant="primary" className="w-full flex items-center justify-center gap-2" disabled={reviewStatus.type === 'loading'}>
-                  <Send size={16} /> {reviewStatus.type === 'loading' ? 'Submitting...' : 'Submit Feedback'}
-                </Button>
-              </form>
-            </div>
-          </div>
-        </Container>
-      </section>
+      <ReviewsSection />
     </div>
   );
 }

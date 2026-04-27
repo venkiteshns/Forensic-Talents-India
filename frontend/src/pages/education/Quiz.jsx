@@ -6,6 +6,7 @@ import { BrainCircuit, CheckCircle, PlayCircle, Calendar, ArrowLeft } from 'luci
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { QuizSkeleton } from '../../components/ui/Skeletons';
+import ReviewsSection from '../../components/education/ReviewsSection';
 import api from '../../utils/api';
 
 export default function Quiz() {
@@ -155,6 +156,9 @@ export default function Quiz() {
         </Container>
       </section>
 
+
+      {/* Reviews Section */}
+      <ReviewsSection />
 
       <EnrollModal
         isOpen={enrollModal.isOpen}

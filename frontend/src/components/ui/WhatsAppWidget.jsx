@@ -3,30 +3,10 @@ import { MessageCircle, X, Send } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 export default function WhatsAppWidget() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [message, setMessage] = useState('');
   const location = useLocation();
-
-  // Allowed paths where the widget should appear
-  // Using partial match for education and services to include child routes
-  const allowedPaths = ['/', '/contact', '/services', '/education'];
-  const shouldRender = allowedPaths.some(path => location.pathname === path || location.pathname.startsWith(path + '/'));
-
-  useEffect(() => {
-    if (!shouldRender) {
-      setIsVisible(false);
-      setIsExpanded(false);
-      return;
-    }
-
-    // Show launcher after 4 seconds
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, [shouldRender, location.pathname]);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -38,7 +18,7 @@ export default function WhatsAppWidget() {
     setIsExpanded(false);
   };
 
-  if (!shouldRender || !isVisible) return null;
+  if (!isVisible) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

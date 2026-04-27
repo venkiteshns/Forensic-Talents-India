@@ -6,21 +6,31 @@ import { Award, Briefcase, MapPin, Search, CheckCircle2, ArrowRight, ArrowLeft }
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { CardSkeleton } from '../../components/ui/Skeletons';
+import ReviewsSection from '../../components/education/ReviewsSection';
 import api from '../../utils/api';
 
 export default function Internships() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [programBenefits, setProgramBenefits] = useState([]);
+  const [exploreAreas, setExploreAreas] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const fetchInternships = async () => {
       try {
-        const res = await api.get('/internships');
-        setInternships(res.data.filter(i => i.isActive));
+        const [intRes, benefitsRes, areasRes] = await Promise.all([
+          api.get('/internships'),
+          api.get('/internship-benefits'),
+          api.get('/internship-areas')
+        ]);
+        
+        setInternships(intRes.data.filter(i => i.isActive));
+        setProgramBenefits(benefitsRes.data.filter(b => b.isActive));
+        setExploreAreas(areasRes.data.filter(a => a.isActive));
       } catch (error) {
-        console.error("Error fetching internships", error);
+        console.error("Error fetching internships data", error);
       } finally {
         setLoading(false);
       }
@@ -65,15 +75,12 @@ export default function Internships() {
         title="Hands-On Forensic Experience"
         text="Immerse yourself in authentic investigative scenarios. Our internship programs provide crucial real-world and simulated case exposure, fostering critical skill development in evidence handling, crime scene management, and analytical reasoning."
       />
-      <AdvantagesList
-        title="Program Benefits"
-        items={[
-          "Field-level exposure",
-          "Direct mentorship from experts",
-          "Practical investigation training",
-          "Confidence building for real cases"
-        ]}
-      />
+      {programBenefits.length > 0 && (
+        <AdvantagesList
+          title="Program Benefits"
+          items={programBenefits.map(b => b.title)}
+        />
+      )}
 
       {/* Internship Cards Section */}
       <section className="py-8 relative z-10">
@@ -85,11 +92,15 @@ export default function Internships() {
                 <Search size={24} className="text-accent" /> Areas You Will Explore
               </h3>
               <ul className="space-y-4 text-slate-700 flex-grow">
-                <li className="flex items-start gap-3"><CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> Crime Scene Investigation & Management</li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> Questioned Documents</li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> Fingerprint Identification</li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> Digital & Cyber Forensics</li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> Trace Evidence & Biology</li>
+                {exploreAreas.length > 0 ? (
+                  exploreAreas.map((area, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle2 className="text-accent flex-shrink-0 mt-0.5" /> {area.title}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-slate-400 text-sm italic">Areas will be updated soon.</p>
+                )}
               </ul>
             </div>
 
@@ -159,6 +170,9 @@ export default function Internships() {
         </Container>
       </section>
 
+
+      {/* Reviews Section */}
+      <ReviewsSection />
 
       <EnrollModal
         isOpen={enrollModal.isOpen}

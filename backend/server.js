@@ -91,14 +91,12 @@ const Course = mongoose.model('Course', courseSchema);
 const Internship = mongoose.model('Internship', internshipSchema);
 
 const internshipBenefitSchema = new mongoose.Schema({
-  internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship', required: true },
   title: { type: String, required: true },
   order: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
 const internshipAreaSchema = new mongoose.Schema({
-  internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship', required: true },
   title: { type: String, required: true },
   order: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true }
@@ -324,20 +322,20 @@ app.delete('/api/internships/:id', protect, async (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// INTERNSHIP BENEFITS & AREAS ROUTES
+// GLOBAL INTERNSHIP BENEFITS & AREAS ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
 
 // Benefits
-app.get('/api/internships/:id/benefits', async (req, res) => {
+app.get('/api/internship-benefits', async (req, res) => {
   try {
-    const benefits = await InternshipBenefit.find({ internshipId: req.params.id }).sort({ order: 1 });
+    const benefits = await InternshipBenefit.find().sort({ order: 1 });
     res.json(benefits);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-app.post('/api/internships/:id/benefits', protect, async (req, res) => {
+app.post('/api/internship-benefits', protect, async (req, res) => {
   try {
-    const benefit = new InternshipBenefit({ ...req.body, internshipId: req.params.id });
+    const benefit = new InternshipBenefit(req.body);
     await benefit.save();
     res.status(201).json(benefit);
   } catch (err) { res.status(400).json({ message: err.message }); }
@@ -360,16 +358,16 @@ app.delete('/api/benefits/:id', protect, async (req, res) => {
 });
 
 // Areas
-app.get('/api/internships/:id/areas', async (req, res) => {
+app.get('/api/internship-areas', async (req, res) => {
   try {
-    const areas = await InternshipArea.find({ internshipId: req.params.id }).sort({ order: 1 });
+    const areas = await InternshipArea.find().sort({ order: 1 });
     res.json(areas);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-app.post('/api/internships/:id/areas', protect, async (req, res) => {
+app.post('/api/internship-areas', protect, async (req, res) => {
   try {
-    const area = new InternshipArea({ ...req.body, internshipId: req.params.id });
+    const area = new InternshipArea(req.body);
     await area.save();
     res.status(201).json(area);
   } catch (err) { res.status(400).json({ message: err.message }); }
@@ -750,7 +748,15 @@ app.get('/api/reviews', async (req, res) => {
 
 app.get('/api/admin/reviews', protect, async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 });
+    const { type, isApproved } = req.query;
+    const query = {};
+    if (type && ['service', 'education'].includes(type)) {
+      query.type = type;
+    }
+    if (isApproved !== undefined && isApproved !== 'all') {
+      query.isApproved = isApproved === 'true';
+    }
+    const reviews = await Review.find(query).sort({ createdAt: -1 });
     res.json(reviews);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
