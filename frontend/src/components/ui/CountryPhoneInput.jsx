@@ -11,13 +11,14 @@ export default function CountryPhoneInput({
   onCountryChange,
   name = "phone",
   label = "Phone Number", 
-  required = false 
+  required = false,
+  onBlur
 }) {
   const [localNumber, setLocalNumber] = useState('');
 
   const selectedCountry = countries.find(c => c.name === countryName || c.code === countryName) || countries.find(c => c.code === 'IN');
 
-  // Sync external value to internal local number on mount or external changes (excluding user typing)
+  // Sync external value to internal local number on mount or external changes
   useEffect(() => {
     if (value && typeof value === 'string') {
       try {
@@ -38,8 +39,7 @@ export default function CountryPhoneInput({
     } else {
       setLocalNumber('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value, selectedCountry.code]);
 
   const handleChange = (e) => {
     // Only allow numbers and spaces in the input
@@ -57,8 +57,11 @@ export default function CountryPhoneInput({
     onChange({ target: { name, value: fullNumber } });
   };
 
-  const handleBlur = () => {
-    onChange({ target: { name, value: `${selectedCountry.dialCode} ${localNumber}`.trim() }, type: 'blur' });
+  const handleBlur = (e) => {
+    // Call the parent's onBlur if provided
+    if (onBlur) {
+      onBlur({ target: { name, value: `${selectedCountry.dialCode} ${localNumber}`.trim() } });
+    }
   };
 
   return (

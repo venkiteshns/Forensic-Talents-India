@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '../../components/ui/Container';
 import { Button } from '../../components/ui/Button';
-import { BrainCircuit, CheckCircle, PlayCircle, Calendar, ArrowLeft } from 'lucide-react';
+import { BrainCircuit, CheckCircle, PlayCircle, Calendar, ArrowLeft, Award, ShieldCheck, Search } from 'lucide-react';
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { QuizSkeleton } from '../../components/ui/Skeletons';
-import ReviewsSection from '../../components/education/ReviewsSection';
 import api from '../../utils/api';
 
 export default function Quiz() {
@@ -88,6 +87,19 @@ export default function Quiz() {
         ]}
       />
 
+      {/* Certification Info */}
+      <section className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <Container>
+          <div className="max-w-4xl mx-auto text-center">
+            <Award className="mx-auto text-accent mb-4" size={48} />
+            <h2 className="text-3xl font-heading font-bold text-primary mb-4">Certification</h2>
+            <p className="text-slate-600 text-lg leading-relaxed">
+              Participants who participate in the quiz and accomplishes are awarded certificates, which serve as recognition of their knowledge, critical thinking ability, and commitment to learning in the field of forensic science.
+            </p>
+          </div>
+        </Container>
+      </section>
+
       {/* Quiz Details */}
       <section id="quiz_box_section" className="py-8 relative z-10">
         <Container>
@@ -136,17 +148,33 @@ export default function Quiz() {
 
             <div className="md:w-1/2 relative z-10">
               <div className="bg-slate-50 p-6 md:p-8 rounded-2xl shadow-inner border border-slate-100">
-                <div className="border-b border-slate-200 pb-4 mb-4">
-                  <h4 className="font-bold text-slate-800 text-lg">📝 Sample Case Study Format</h4>
+                <div className="border-b border-slate-200 pb-4 mb-6">
+                  <h4 className="font-bold text-slate-800 text-xl">📝 Sample Quiz Format</h4>
+                  <p className="text-slate-600 text-sm mt-1">Each quiz typically includes:</p>
                 </div>
-                <div className="space-y-4">
-                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <h5 className="font-bold text-primary text-sm mb-1">Q: Multiple Choice Question</h5>
-                    <p className="text-slate-600 text-sm italic">Designed to test deeper understanding, interpretation, and application of forensic principles.</p>
+                <div className="space-y-6">
+                  <div className="group transition-all duration-300 hover:translate-x-1">
+                    <h5 className="font-bold text-primary flex items-center gap-2 mb-2 group-hover:text-accent transition-colors">
+                      <span className="text-accent group-hover:scale-125 transition-transform">🔹</span> Case Study Section
+                    </h5>
+                    <p className="text-slate-600 text-sm leading-relaxed pl-7">
+                      A detailed narrative describing the background, crime scene, forensic findings, investigation, and legal proceedings.
+                    </p>
                   </div>
-                  <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm">
-                    <h5 className="font-bold text-primary text-sm mb-1">Q: Short Answer Question</h5>
-                    <p className="text-slate-600 text-sm italic">Focused on key factual and conceptual aspects of the case.</p>
+                  <div>
+                    <h5 className="font-bold text-primary flex items-center gap-2 mb-2">
+                      <span className="text-accent">🔹</span> Question Section
+                    </h5>
+                    <div className="space-y-4 pl-7">
+                      <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-accent/30 transition-all duration-300 cursor-default group/card">
+                        <h6 className="font-bold text-slate-800 text-sm mb-1 group-hover/card:text-primary transition-colors">Q: One-Word / Short Answer Questions</h6>
+                        <p className="text-slate-600 text-sm italic">Focused on key factual and conceptual aspects of the case.</p>
+                      </div>
+                      <div className="p-4 bg-white rounded-lg border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 hover:border-accent/30 transition-all duration-300 cursor-default group/card">
+                        <h6 className="font-bold text-slate-800 text-sm mb-1 group-hover/card:text-primary transition-colors">Q: Multiple Choice Questions (MCQs)</h6>
+                        <p className="text-slate-600 text-sm italic">Designed to test deeper understanding, interpretation, and application of forensic principles.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -156,9 +184,71 @@ export default function Quiz() {
         </Container>
       </section>
 
+      {/* Certificate Verification Section */}
+      <section className="py-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <Container>
+          <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden group">
+            {/* Decorative Background Element */}
+            <div className="absolute -right-16 -top-16 w-64 h-64 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors duration-700"></div>
+            <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-700"></div>
 
-      {/* Reviews Section */}
-      <ReviewsSection />
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-1/2 text-center lg:text-left">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 text-accent mb-6 shadow-sm border border-accent/10">
+                  <ShieldCheck size={32} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Verify Your Certificate</h2>
+                <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                  Authenticity matters in forensics. Use our official verification tool to validate certificates issued for the Monthly Forensic Quiz Program.
+                </p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-6">
+                  <div className="flex items-center gap-2 text-slate-700 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100 shadow-sm">
+                    <CheckCircle className="text-green-500" size={18} />
+                    <span>Official Record</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-700 font-medium bg-slate-50 px-4 py-2 rounded-full border border-slate-100 shadow-sm">
+                    <CheckCircle className="text-green-500" size={18} />
+                    <span>Instant Result</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 w-full">
+                <div className="bg-slate-50/50 p-6 md:p-10 rounded-[2rem] border border-slate-100 shadow-inner backdrop-blur-sm relative">
+                  <label htmlFor="cert_verify_input" className="block text-slate-800 font-bold mb-3 text-lg">
+                    Certificate Number
+                  </label>
+                  <div className="relative">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          id="cert_verify_input"
+                          placeholder="e.g., FOR-T/AB/XXXX01"
+                          className="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all font-medium text-lg shadow-sm"
+                        />
+                      </div>
+                      <Button
+                        variant="primary"
+                        size="lg"
+                        className="sm:px-10 py-4 h-auto rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        <Search size={20} />
+                        <span>Verify</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="mt-6 text-sm text-slate-500 text-center flex items-center justify-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                    Unique number can be found at the bottom of your certificate.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
 
       <EnrollModal
         isOpen={enrollModal.isOpen}

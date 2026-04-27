@@ -129,7 +129,7 @@ export default function Services() {
       </Container>
 
       {/* Reviews & Testimonials Section */}
-      <ReviewsSection />
+      <ReviewsSection type="service" />
     </div>
   );
 }

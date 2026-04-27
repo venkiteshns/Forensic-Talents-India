@@ -4,7 +4,7 @@ import { X, Send, Copy, CreditCard, CheckCircle2 } from 'lucide-react';
 import { SuccessModal } from '../ui/SuccessModal';
 import CountryPhoneInput from '../ui/CountryPhoneInput';
 import SearchableCountrySelect from '../ui/SearchableCountrySelect';
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { validatePhoneNumber } from '../../utils/phoneValidation';
 
 export function EnrollModal({ isOpen, course, onClose }) {
   const [formData, setFormData] = useState({
@@ -37,12 +37,9 @@ export function EnrollModal({ isOpen, course, onClose }) {
     if (!data.email.trim()) newErrors.email = "Email Address is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
 
-    if (!data.phone.trim()) {
-      newErrors.phone = "Contact Number is required.";
-    } else {
-      if (!isValidPhoneNumber(data.phone.trim())) {
-        newErrors.phone = "Please enter a valid phone number for the selected country.";
-      }
+    const phoneValidation = validatePhoneNumber(data.phone, data.nationality || 'India');
+    if (!phoneValidation.isValid) {
+      newErrors.phone = phoneValidation.error;
     }
 
     if (!data.qualification.trim()) newErrors.qualification = "Qualification is required.";
@@ -209,6 +206,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
                       value={formData.phone}
                       countryName={formData.nationality || 'India'}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       error={errors.phone}
                       touched={touched.phone}
                       label="Contact Number"

@@ -6,7 +6,6 @@ import { Award, Briefcase, MapPin, Search, CheckCircle2, ArrowRight, ArrowLeft }
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { CardSkeleton } from '../../components/ui/Skeletons';
-import ReviewsSection from '../../components/education/ReviewsSection';
 import api from '../../utils/api';
 
 export default function Internships() {
@@ -170,9 +169,6 @@ export default function Internships() {
         </Container>
       </section>
 
-
-      {/* Reviews Section */}
-      <ReviewsSection />
 
       <EnrollModal
         isOpen={enrollModal.isOpen}

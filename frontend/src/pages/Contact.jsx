@@ -5,7 +5,7 @@ import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { SuccessModal } from '../components/ui/SuccessModal';
 import CountryPhoneInput from '../components/ui/CountryPhoneInput';
 import SearchableCountrySelect from '../components/ui/SearchableCountrySelect';
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { validatePhoneNumber } from '../utils/phoneValidation';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -31,12 +31,9 @@ export default function Contact() {
   const validate = (data = formData) => {
     let newErrors = {};
     if (!data.name.trim()) newErrors.name = "Full Name is required.";
-    if (!data.phone.trim()) {
-      newErrors.phone = "Phone Number is required.";
-    } else {
-      if (!isValidPhoneNumber(data.phone.trim())) {
-        newErrors.phone = "Please enter a valid phone number for the selected country.";
-      }
+    const phoneValidation = validatePhoneNumber(data.phone, data.nationality || 'India');
+    if (!phoneValidation.isValid) {
+      newErrors.phone = phoneValidation.error;
     }
 
     if (!data.email.trim()) newErrors.email = "Email Address is required.";
@@ -209,6 +206,7 @@ export default function Contact() {
                       value={formData.phone}
                       countryName={formData.nationality}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       error={errors.phone}
                       touched={touched.phone}
                       required={true}

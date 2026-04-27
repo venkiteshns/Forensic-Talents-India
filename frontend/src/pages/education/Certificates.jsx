@@ -6,7 +6,6 @@ import { BookOpen, Clock, IndianRupee, ChevronDown, ChevronUp, CheckCircle, Glob
 import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { CardSkeleton } from '../../components/ui/Skeletons';
-import ReviewsSection from '../../components/education/ReviewsSection';
 import api from '../../utils/api';
 
 export default function Certificates() {
@@ -214,9 +213,6 @@ export default function Certificates() {
       </section>
 
 
-
-      {/* Reviews Section */}
-      <ReviewsSection />
 
       <EnrollModal
         isOpen={enrollModal.isOpen}

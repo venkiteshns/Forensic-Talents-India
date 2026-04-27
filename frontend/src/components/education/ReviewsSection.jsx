@@ -12,7 +12,7 @@ function getInitials(name) {
   return parts[0]?.[0]?.toUpperCase() || '?';
 }
 
-export default function ReviewsSection() {
+export default function ReviewsSection({ type }) {
   const [serviceReviews, setServiceReviews] = useState([]);
   const [educationReviews, setEducationReviews] = useState([]);
   const [visibleService, setVisibleService] = useState(3);
@@ -20,7 +20,7 @@ export default function ReviewsSection() {
   const [loading, setLoading] = useState(true);
   
   // Form state
-  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '', type: 'service' });
+  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '', type: type || 'service' });
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -50,8 +50,16 @@ export default function ReviewsSection() {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPhotoFile(file);
-      setPhotoPreview(URL.createObjectURL(file));
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMsg("Photo size must be less than 5MB.");
+        setPhotoFile(null);
+        setPhotoPreview('');
+        e.target.value = '';
+      } else {
+        setPhotoFile(file);
+        setPhotoPreview(URL.createObjectURL(file));
+        setErrorMsg('');
+      }
     }
   };
 
@@ -77,7 +85,7 @@ export default function ReviewsSection() {
       });
       
       setSuccessMode(true);
-      setForm({ name: '', email: '', rating: 5, review: '', type: 'education' });
+      setForm({ name: '', email: '', rating: 5, review: '', type: type || 'service' });
       setPhotoFile(null);
       setPhotoPreview('');
       
@@ -97,80 +105,84 @@ export default function ReviewsSection() {
       <Container>
         
         {/* Client Testimonials (Service) */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</h2>
-            <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
-            <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</p>
-          </div>
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
+        {(!type || type === 'service') && (
+          <div className="mb-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</h2>
+              <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
+              <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</p>
             </div>
-          ) : serviceReviews.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <p className="text-slate-500 italic">No client reviews yet.</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-                {serviceReviews.slice(0, visibleService).map((r) => (
-                  <ReviewCard key={r._id} review={r} />
-                ))}
+            
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
               </div>
-              
-              {visibleService < serviceReviews.length && (
-                <div className="text-center">
-                  <button 
-                    onClick={() => setVisibleService(prev => prev + 6)}
-                    className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                  >
-                    View More Reviews
-                  </button>
+            ) : serviceReviews.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-slate-500 italic">No client reviews yet.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+                  {serviceReviews.slice(0, visibleService).map((r) => (
+                    <ReviewCard key={r._id} review={r} />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
+                
+                {visibleService < serviceReviews.length && (
+                  <div className="text-center">
+                    <button 
+                      onClick={() => setVisibleService(prev => prev + 6)}
+                      className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                    >
+                      View More Reviews
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Student Testimonials (Education) */}
-        <div className="mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Student Testimonials</h2>
-            <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
-            <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</p>
-          </div>
-          
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
+        {(!type || type === 'education') && (
+          <div className="mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Student Testimonials</h2>
+              <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
+              <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</p>
             </div>
-          ) : educationReviews.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <p className="text-slate-500 italic">No student reviews yet.</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-                {educationReviews.slice(0, visibleEducation).map((r) => (
-                  <ReviewCard key={r._id} review={r} />
-                ))}
+            
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
               </div>
-
-              {visibleEducation < educationReviews.length && (
-                <div className="text-center">
-                  <button 
-                    onClick={() => setVisibleEducation(prev => prev + 6)}
-                    className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                  >
-                    View More Testimonials
-                  </button>
+            ) : educationReviews.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-slate-500 italic">No student reviews yet.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+                  {educationReviews.slice(0, visibleEducation).map((r) => (
+                    <ReviewCard key={r._id} review={r} />
+                  ))}
                 </div>
-              )}
-            </>
-          )}
-        </div>
+
+                {visibleEducation < educationReviews.length && (
+                  <div className="text-center">
+                    <button 
+                      onClick={() => setVisibleEducation(prev => prev + 6)}
+                      className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
+                    >
+                      View More Testimonials
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Submission Form */}
         <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
@@ -208,34 +220,36 @@ export default function ReviewsSection() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  {/* Review Type Selector */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Type of Review *</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { value: 'service', label: 'Service', desc: 'Case work' },
-                        { value: 'education', label: 'Education', desc: 'Training' }
-                      ].map(opt => (
-                        <label key={opt.value} className={`flex flex-col gap-0.5 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          form.type === opt.value
-                            ? 'border-accent bg-accent/5 text-primary'
-                            : 'border-slate-100 bg-slate-50 hover:border-slate-200 text-slate-600'
-                        }`}>
-                          <input
-                            type="radio" name="reviewTypeGlobal" value={opt.value}
-                            checked={form.type === opt.value}
-                            onChange={() => setForm(f => ({ ...f, type: opt.value }))}
-                            className="sr-only"
-                          />
-                          <span className="text-sm font-bold">{opt.label}</span>
-                          <span className="text-xs opacity-60">{opt.desc}</span>
-                        </label>
-                      ))}
+                  {/* Review Type Selector - Only show if type is not fixed */}
+                  {!type && (
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Type of Review *</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { value: 'service', label: 'Service', desc: 'Case work' },
+                          { value: 'education', label: 'Education', desc: 'Training' }
+                        ].map(opt => (
+                          <label key={opt.value} className={`flex flex-col gap-0.5 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                            form.type === opt.value
+                              ? 'border-accent bg-accent/5 text-primary'
+                              : 'border-slate-100 bg-slate-50 hover:border-slate-200 text-slate-600'
+                          }`}>
+                            <input
+                              type="radio" name="reviewTypeGlobal" value={opt.value}
+                              checked={form.type === opt.value}
+                              onChange={() => setForm(f => ({ ...f, type: opt.value }))}
+                              className="sr-only"
+                            />
+                            <span className="text-sm font-bold">{opt.label}</span>
+                            <span className="text-xs opacity-60">{opt.desc}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Rating */}
-                  <div>
+                  <div className={type ? "lg:col-span-2" : ""}>
                     <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Overall Rating *</label>
                     <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 w-fit">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -263,7 +277,7 @@ export default function ReviewsSection() {
                       </div>
                       <div className="flex-1">
                         <input type="file" accept="image/*" onChange={handlePhotoChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer" />
-                        <p className="text-[11px] text-slate-400 mt-2">Recommended: Square image, max 2MB</p>
+                        <p className="text-[11px] text-slate-400 mt-2">Recommended: Square image, max 5MB</p>
                       </div>
                     </div>
                   </div>
@@ -275,7 +289,7 @@ export default function ReviewsSection() {
                 </div>
 
                 <div className="text-center pt-4">
-                  <button type="submit" disabled={submitting} className="inline-flex items-center justify-center w-full sm:w-auto px-12 py-4 bg-primary text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 cursor-pointer">
+                  <button type="submit" disabled={submitting} className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-3.5 bg-primary text-white rounded-2xl font-bold text-base sm:text-lg sm:px-12 sm:py-4 shadow-xl hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300 disabled:opacity-70 disabled:hover:translate-y-0 cursor-pointer">
                     {submitting ? 'Submitting...' : 'Submit Your Feedback'}
                   </button>
                 </div>
@@ -286,5 +300,6 @@ export default function ReviewsSection() {
 
       </Container>
     </section>
+
   );
 }

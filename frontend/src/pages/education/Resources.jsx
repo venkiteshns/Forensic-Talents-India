@@ -4,7 +4,6 @@ import { Container } from '../../components/ui/Container';
 import { ArrowLeft, FileText, Image, Video, Download, Eye, Play, Loader2 } from 'lucide-react';
 import bgImage from '../../assets/forensic-lab-bg.png';
 import { CardSkeleton } from '../../components/ui/Skeletons';
-import ReviewsSection from '../../components/education/ReviewsSection';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
 
@@ -238,8 +237,6 @@ export default function Resources() {
           </div>
         )}
       </Container>
-      {/* Reviews Section */}
-      <ReviewsSection />
     </div>
   );
 }

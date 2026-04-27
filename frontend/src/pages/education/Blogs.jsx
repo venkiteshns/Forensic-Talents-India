@@ -4,7 +4,6 @@ import { Container } from '../../components/ui/Container';
 import { Button } from '../../components/ui/Button';
 import { ExternalLink, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../../components/education/SharedSections';
-import ReviewsSection from '../../components/education/ReviewsSection';
 
 export default function Blogs() {
   useEffect(() => {
@@ -113,9 +112,6 @@ export default function Blogs() {
           </div>
         </Container>
       </section>
-      {/* Reviews Section */}
-      <ReviewsSection />
-
     </div>
   );
 }

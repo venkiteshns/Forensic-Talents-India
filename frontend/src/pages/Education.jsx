@@ -112,7 +112,7 @@ export default function Education() {
       </section>
 
       {/* Reviews Section */}
-      <ReviewsSection />
+      <ReviewsSection type="education" />
 
       {/* Why Choose Us */}
       <WhyChooseUs />
