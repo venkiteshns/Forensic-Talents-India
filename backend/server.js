@@ -311,11 +311,84 @@ app.delete('/api/internships/:id', protect, async (req, res) => {
     }
     const deleted = await Internship.findByIdAndDelete(id);
     if (!deleted) return res.status(404).json({ success: false, message: 'Internship not found' });
-    return res.json({ success: true, message: 'Internship deleted successfully' });
+
+    // Cleanup associated benefits and areas
+    await InternshipBenefit.deleteMany({ internshipId: id });
+    await InternshipArea.deleteMany({ internshipId: id });
+
+    return res.json({ success: true, message: 'Internship and associated data deleted successfully' });
   } catch (err) {
     console.error('Delete internship error:', err);
     return res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INTERNSHIP BENEFITS & AREAS ROUTES
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Benefits
+app.get('/api/internships/:id/benefits', async (req, res) => {
+  try {
+    const benefits = await InternshipBenefit.find({ internshipId: req.params.id }).sort({ order: 1 });
+    res.json(benefits);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+app.post('/api/internships/:id/benefits', protect, async (req, res) => {
+  try {
+    const benefit = new InternshipBenefit({ ...req.body, internshipId: req.params.id });
+    await benefit.save();
+    res.status(201).json(benefit);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+app.put('/api/benefits/:id', protect, async (req, res) => {
+  try {
+    const updated = await InternshipBenefit.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!updated) return res.status(404).json({ message: 'Benefit not found' });
+    res.json(updated);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+app.delete('/api/benefits/:id', protect, async (req, res) => {
+  try {
+    const deleted = await InternshipBenefit.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Benefit not found' });
+    res.json({ message: 'Benefit deleted successfully' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// Areas
+app.get('/api/internships/:id/areas', async (req, res) => {
+  try {
+    const areas = await InternshipArea.find({ internshipId: req.params.id }).sort({ order: 1 });
+    res.json(areas);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+app.post('/api/internships/:id/areas', protect, async (req, res) => {
+  try {
+    const area = new InternshipArea({ ...req.body, internshipId: req.params.id });
+    await area.save();
+    res.status(201).json(area);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+app.put('/api/areas/:id', protect, async (req, res) => {
+  try {
+    const updated = await InternshipArea.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!updated) return res.status(404).json({ message: 'Area not found' });
+    res.json(updated);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+app.delete('/api/areas/:id', protect, async (req, res) => {
+  try {
+    const deleted = await InternshipArea.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Area not found' });
+    res.json({ message: 'Area deleted successfully' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
