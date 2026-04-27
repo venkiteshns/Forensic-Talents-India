@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Container } from '../../components/ui/Container';
 import { Button } from '../../components/ui/Button';
-import { ExternalLink, ArrowRight } from 'lucide-react';
+import { ExternalLink, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../../components/education/SharedSections';
 
 export default function Blogs() {
@@ -13,6 +14,14 @@ export default function Blogs() {
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Header Section */}
       <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+        <div className="absolute top-8 left-4 md:left-8 z-20">
+          <Link 
+            to="/education"
+            className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm"
+          >
+            <ArrowLeft size={18} /> Back to Education
+          </Link>
+        </div>
         <div className="absolute inset-0 z-0">
           <img src="/images/banners/education_banner.png" alt="Blogs Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>

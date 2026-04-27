@@ -28,7 +28,7 @@ def get_docx_text(path):
     return '\n\n'.join(paragraphs)
 
 def main():
-    docs_dir = '../Documents'
+    docs_dir = '../../Documents'
     data = {}
     for filename in os.listdir(docs_dir):
         if filename.endswith('.docx'):

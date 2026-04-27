@@ -3,6 +3,9 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { SuccessModal } from '../components/ui/SuccessModal';
+import CountryPhoneInput from '../components/ui/CountryPhoneInput';
+import SearchableCountrySelect from '../components/ui/SearchableCountrySelect';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -31,10 +34,8 @@ export default function Contact() {
     if (!data.phone.trim()) {
       newErrors.phone = "Phone Number is required.";
     } else {
-      if (data.nationality === 'India' && !/^[6-9][0-9]{9}$/.test(data.phone.trim())) {
-        newErrors.phone = "Please enter a valid 10-digit Indian phone number.";
-      } else if (data.nationality !== 'India' && !/^\+?[0-9]{8,15}$/.test(data.phone.trim())) {
-        newErrors.phone = "Please enter a valid international phone number.";
+      if (!isValidPhoneNumber(data.phone.trim())) {
+        newErrors.phone = "Please enter a valid phone number for the selected country.";
       }
     }
 
@@ -203,9 +204,15 @@ export default function Contact() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number *</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.phone && errors.phone ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="+91 XXXXX XXXXX" />
-                    {touched.phone && errors.phone && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.phone}</p>}
+                    <CountryPhoneInput 
+                      name="phone"
+                      value={formData.phone}
+                      countryName={formData.nationality}
+                      onChange={handleChange}
+                      error={errors.phone}
+                      touched={touched.phone}
+                      required={true}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
@@ -215,17 +222,17 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Nationality *</label>
-                  <select name="nationality" value={formData.nationality} onChange={handleChange} className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-white">
-                    <option value="India">India</option>
-                    <option value="United States">United States</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Australia">Australia</option>
-                    <option value="United Arab Emirates">United Arab Emirates</option>
-                    <option value="Singapore">Singapore</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  <SearchableCountrySelect
+                    label="Nationality"
+                    value={formData.nationality}
+                    onChange={(name, country) => {
+                      setFormData(prev => ({ ...prev, nationality: name }));
+                      if (errors.nationality) setErrors(prev => ({ ...prev, nationality: null }));
+                    }}
+                    error={errors.nationality}
+                    touched={touched.nationality}
+                    required={true}
+                  />
                 </div>
 
                 {/* Type of Enquiry */}

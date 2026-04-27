@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { BookOpen, Award, PenTool, BrainCircuit, ArrowRight, FileDown } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../components/education/SharedSections';
+import ReviewsSection from '../components/education/ReviewsSection';
 
 export default function Education() {
   useEffect(() => {
@@ -109,6 +110,9 @@ export default function Education() {
           </div>
         </Container>
       </section>
+
+      {/* Reviews Section */}
+      <ReviewsSection />
 
       {/* Why Choose Us */}
       <WhyChooseUs />

@@ -1,14 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const nodemailer = require('nodemailer');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { v2: cloudinary } = require('cloudinary');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const multer = require('multer');
-const Admin = require('./models/Admin');
+import dotenv from 'dotenv';
+dotenv.config();
+import express from 'express';
+import nodemailer from 'nodemailer';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
+import Admin from './models/Admin.js';
+import Event from './models/Event.js';
+import Review from './models/Review.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -134,13 +137,13 @@ app.post('/api/auth/login', async (req, res) => {
       process.env.JWT_SECRET || 'forensic_secret',
       { expiresIn: '15m' }
     );
-    
+
     const refreshToken = jwt.sign(
       { id: admin._id },
       process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret',
       { expiresIn: '7d' }
     );
-    
+
     admin.refreshTokens.push(refreshToken);
     await admin.save();
 
@@ -200,12 +203,12 @@ app.post('/api/auth/logout', async (req, res) => {
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'forensic_refresh_secret', { ignoreExpiration: true });
     const admin = await Admin.findById(decoded.id);
-    
+
     if (admin) {
       admin.refreshTokens = admin.refreshTokens.filter(t => t !== refreshToken);
       await admin.save();
     }
-    
+
     return res.json({ success: true, message: 'Logged out successfully' });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Server error during logout' });
@@ -364,7 +367,7 @@ app.post('/api/upload', protect, (req, res, next) => {
     } else {
       console.log("Upload route hit, but no file received.");
     }
-    
+
     if (err) {
       console.error("Multer error:", err);
       // Multer / file-filter error
@@ -373,22 +376,22 @@ app.post('/api/upload', protect, (req, res, next) => {
       }
       return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
     }
-    
+
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'File is required' });
     }
-    
+
     // Determine Cloudinary resource type
     const resourceType = req.file.mimetype === 'application/pdf' ? 'raw' : 'image';
-    
+
     // Generate a unique public_id to prevent overwriting
     const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
     const uniquePublicId = `${Date.now()}-${sanitizedName.split('.')[0]}`; // Cloudinary adds extension
-    
+
     // Upload from buffer
     const uploadStream = cloudinary.uploader.upload_stream(
-      { 
-        folder: 'forensic_talents_resources', 
+      {
+        folder: 'forensic_talents_resources',
         resource_type: resourceType,
         public_id: uniquePublicId,
         overwrite: false
@@ -398,18 +401,18 @@ app.post('/api/upload', protect, (req, res, next) => {
           console.error(`Cloudinary upload error for ${uniquePublicId}:`, error);
           if (error.message && error.message.includes("already exists")) {
             return res.status(400).json({
-              success: false, 
+              success: false,
               message: "A file with the same name already exists. Please rename the file or try again."
             });
           }
           return res.status(500).json({ success: false, message: 'Failed to upload to Cloudinary' });
         }
-        
+
         console.log(`Successfully uploaded: ${uniquePublicId}`);
         return res.json({ success: true, url: result.secure_url });
       }
     );
-    
+
     uploadStream.end(req.file.buffer);
   });
 });
@@ -517,7 +520,188 @@ app.get('/api/ping', (req, res) => {
   res.status(200).send('Server is alive.');
 });
 
-const https = require('https');
+// ══════════════════════════════════════════════════════════════════════════════
+// EVENTS API
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Separate Cloudinary instance for events
+const eventCloudinary = cloudinary;
+if (process.env.CLOUDINARY_EVENT_CLOUD_NAME) {
+  eventCloudinary.config({
+    cloud_name: process.env.CLOUDINARY_EVENT_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_EVENT_API_KEY,
+    api_secret: process.env.CLOUDINARY_EVENT_API_SECRET
+  });
+}
+
+const eventStorage = multer.memoryStorage();
+const eventUpload = multer({
+  storage: eventStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+
+app.get('/api/events', async (req, res) => {
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.post('/api/events', protect, eventUpload.fields([{ name: 'coverImage', maxCount: 1 }, { name: 'additionalImages', maxCount: 9 }]), async (req, res) => {
+  try {
+    const { title, description, eventDate } = req.body;
+    let coverImageUrl = "";
+    let additionalImageUrls = [];
+
+    if (req.files && req.files.coverImage && req.files.coverImage.length > 0) {
+      const file = req.files.coverImage[0];
+      const b64 = Buffer.from(file.buffer).toString('base64');
+      const dataURI = "data:" + file.mimetype + ";base64," + b64;
+      const cldRes = await eventCloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "events" });
+      coverImageUrl = cldRes.secure_url;
+    }
+
+    if (req.files && req.files.additionalImages && req.files.additionalImages.length > 0) {
+      for (const file of req.files.additionalImages) {
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = "data:" + file.mimetype + ";base64," + b64;
+        const cldRes = await eventCloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "events" });
+        additionalImageUrls.push(cldRes.secure_url);
+      }
+    }
+
+    const newEvent = new Event({
+      title,
+      description,
+      eventDate,
+      coverImage: coverImageUrl,
+      images: additionalImageUrls
+    });
+
+    await newEvent.save();
+    res.status(201).json(newEvent);
+  } catch (err) {
+    res.status(500).json({ message: "Error creating event", error: err.message });
+  }
+});
+
+app.put('/api/events/:id', protect, eventUpload.fields([{ name: 'coverImage', maxCount: 1 }, { name: 'additionalImages', maxCount: 9 }]), async (req, res) => {
+  try {
+    const { title, description, eventDate } = req.body;
+    let existingImages = req.body.existingImages ? JSON.parse(req.body.existingImages) : [];
+
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    event.title = title || event.title;
+    event.description = description || event.description;
+    if (eventDate) event.eventDate = eventDate;
+
+    // Update cover image if provided
+    if (req.files && req.files.coverImage && req.files.coverImage.length > 0) {
+      const file = req.files.coverImage[0];
+      const b64 = Buffer.from(file.buffer).toString('base64');
+      const dataURI = "data:" + file.mimetype + ";base64," + b64;
+      const cldRes = await eventCloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "events" });
+      event.coverImage = cldRes.secure_url;
+    }
+
+    // Update additional images
+    let newAdditionalImageUrls = [];
+    if (req.files && req.files.additionalImages && req.files.additionalImages.length > 0) {
+      for (const file of req.files.additionalImages) {
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = "data:" + file.mimetype + ";base64," + b64;
+        const cldRes = await eventCloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "events" });
+        newAdditionalImageUrls.push(cldRes.secure_url);
+      }
+    }
+
+    event.images = [...existingImages, ...newAdditionalImageUrls].slice(0, 9); // Max 9 additional images
+
+    await event.save();
+    res.json(event);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating event", error: err.message });
+  }
+});
+
+app.delete('/api/events/:id', protect, async (req, res) => {
+  try {
+    await Event.findByIdAndDelete(req.params.id);
+    res.json({ message: "Event deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REVIEWS API
+// ══════════════════════════════════════════════════════════════════════════════
+
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find({ isApproved: true }).sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.get('/api/admin/reviews', protect, async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.post('/api/reviews', eventUpload.single('photo'), async (req, res) => {
+  try {
+    const { name, email, rating, review } = req.body;
+    let photoUrl = "";
+
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString('base64');
+      const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "reviews" });
+      photoUrl = cldRes.secure_url;
+    }
+
+    const newReview = new Review({ name, email, rating, review, photo: photoUrl });
+    await newReview.save();
+    res.status(201).json({ message: "Review submitted for approval" });
+  } catch (err) {
+    res.status(500).json({ message: "Error submitting review", error: err.message });
+  }
+});
+
+app.put('/api/reviews/:id/approve', protect, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    review.isApproved = !review.isApproved;
+    await review.save();
+    res.json(review);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.delete('/api/reviews/:id', protect, async (req, res) => {
+  try {
+    await Review.findByIdAndDelete(req.params.id);
+    res.json({ message: "Review deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+import https from 'https';
 const pingInterval = 14 * 60 * 1000;
 const backendUrl = "https://forensic-talents-india.onrender.com/api/ping";
 
@@ -533,6 +717,395 @@ setInterval(() => {
   });
 }, pingInterval);
 
+// --- WORD SEARCH ROUTES ---
+import WordSearch from './models/WordSearch.js';
+
+// GET active word set (public)
+app.get('/api/word-search', async (req, res) => {
+  try {
+    const activeSet = await WordSearch.findOne({ isActive: true });
+    if (!activeSet) {
+      return res.status(404).json({ message: 'No active word set found' });
+    }
+    res.json(activeSet);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch word search' });
+  }
+});
+
+// GET all word sets (admin)
+app.get('/api/word-search/admin/all', protect, async (req, res) => {
+  try {
+    const sets = await WordSearch.find().sort({ createdAt: -1 });
+    res.json(sets);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch word sets' });
+  }
+});
+
+// POST new word set
+app.post('/api/word-search', protect, async (req, res) => {
+  try {
+    const { words, isActive } = req.body;
+
+    // Deactivate others if this is active
+    if (isActive) {
+      await WordSearch.updateMany({}, { isActive: false });
+    }
+
+    const newSet = new WordSearch({ words, isActive });
+    await newSet.save();
+    res.status(201).json(newSet);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to save word set', error: error.message });
+  }
+});
+
+// PUT update/toggle active
+app.put('/api/word-search/:id', protect, async (req, res) => {
+  try {
+    const { words, isActive } = req.body;
+
+    if (isActive) {
+      // Deactivate all others first
+      await WordSearch.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
+    }
+
+    const updatedSet = await WordSearch.findByIdAndUpdate(
+      req.params.id,
+      { words, isActive },
+      { new: true }
+    );
+    res.json(updatedSet);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update word set', error: error.message });
+  }
+});
+
+// DELETE word set
+app.delete('/api/word-search/:id', protect, async (req, res) => {
+  try {
+    await WordSearch.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Word set deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete word set', error: error.message });
+  }
+});
+// --- CROSSWORD ROUTES ---
+import Crossword from './models/Crossword.js';
+
+app.get('/api/crossword', async (req, res) => {
+  try {
+    const activeSet = await Crossword.findOne({ isActive: true });
+    if (!activeSet) return res.status(404).json({ message: 'No active crossword found' });
+    res.json(activeSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch crossword' }); }
+});
+
+app.get('/api/crossword/admin/all', protect, async (req, res) => {
+  try {
+    const sets = await Crossword.find().sort({ createdAt: -1 });
+    res.json(sets);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch crosswords' }); }
+});
+
+app.post('/api/crossword', protect, async (req, res) => {
+  try {
+    const { words, isActive } = req.body;
+    if (isActive) await Crossword.updateMany({}, { isActive: false });
+    const newSet = new Crossword({ words, isActive });
+    await newSet.save();
+    res.status(201).json(newSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to save crossword', error: error.message }); }
+});
+
+app.put('/api/crossword/:id', protect, async (req, res) => {
+  try {
+    const { words, isActive } = req.body;
+    if (isActive) await Crossword.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
+    const updatedSet = await Crossword.findByIdAndUpdate(req.params.id, { words, isActive }, { new: true });
+    res.json(updatedSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to update crossword' }); }
+});
+
+app.delete('/api/crossword/:id', protect, async (req, res) => {
+  try {
+    await Crossword.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
+  } catch (error) { res.status(500).json({ message: 'Failed to delete' }); }
+});
+
+// --- JIGSAW ROUTES ---
+import Jigsaw from './models/Jigsaw.js';
+
+app.get('/api/jigsaw', async (req, res) => {
+  try {
+    const activeSet = await Jigsaw.findOne({ isActive: true });
+    if (!activeSet) return res.status(404).json({ message: 'No active jigsaw found' });
+    res.json(activeSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch jigsaw' }); }
+});
+
+app.get('/api/jigsaw/admin/all', protect, async (req, res) => {
+  try {
+    const sets = await Jigsaw.find().sort({ createdAt: -1 });
+    res.json(sets);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch jigsaws' }); }
+});
+
+app.post('/api/jigsaw', protect, async (req, res) => {
+  try {
+    const { imageUrl, isActive } = req.body;
+    if (isActive) await Jigsaw.updateMany({}, { isActive: false });
+    const newSet = new Jigsaw({ imageUrl, isActive });
+    await newSet.save();
+    res.status(201).json(newSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to save jigsaw' }); }
+});
+
+app.put('/api/jigsaw/:id', protect, async (req, res) => {
+  try {
+    const { imageUrl, isActive } = req.body;
+    if (isActive) await Jigsaw.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
+    const updatedSet = await Jigsaw.findByIdAndUpdate(req.params.id, { imageUrl, isActive }, { new: true });
+    res.json(updatedSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to update jigsaw' }); }
+});
+
+app.delete('/api/jigsaw/:id', protect, async (req, res) => {
+  try {
+    await Jigsaw.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
+  } catch (error) { res.status(500).json({ message: 'Failed to delete' }); }
+});
+
+// --- MATCHING ROUTES ---
+import Matching from './models/Matching.js';
+
+app.get('/api/matching', async (req, res) => {
+  try {
+    const activeSet = await Matching.findOne({ isActive: true });
+    if (!activeSet) return res.status(404).json({ message: 'No active matching game found' });
+    res.json(activeSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch matching game' }); }
+});
+
+app.get('/api/matching/admin/all', protect, async (req, res) => {
+  try {
+    const sets = await Matching.find().sort({ createdAt: -1 });
+    res.json(sets);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch matching games' }); }
+});
+
+app.post('/api/matching', protect, async (req, res) => {
+  try {
+    const { useIcons, images, isActive } = req.body;
+    if (isActive) await Matching.updateMany({}, { isActive: false });
+    const newSet = new Matching({ useIcons, images, isActive });
+    await newSet.save();
+    res.status(201).json(newSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to save matching game' }); }
+});
+
+app.put('/api/matching/:id', protect, async (req, res) => {
+  try {
+    const { useIcons, images, isActive } = req.body;
+    if (isActive) await Matching.updateMany({ _id: { $ne: req.params.id } }, { isActive: false });
+    const updatedSet = await Matching.findByIdAndUpdate(req.params.id, { useIcons, images, isActive }, { new: true });
+    res.json(updatedSet);
+  } catch (error) { res.status(500).json({ message: 'Failed to update matching game' }); }
+});
+
+app.delete('/api/matching/:id', protect, async (req, res) => {
+  try {
+    await Matching.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
+  } catch (error) { res.status(500).json({ message: 'Failed to delete' }); }
+});
+
+// --- PAYMENT SETTINGS ROUTES ---
+import PaymentSettings from './models/PaymentSettings.js';
+
+app.get('/api/payment-settings', async (req, res) => {
+  try {
+    let settings = await PaymentSettings.findOne();
+    if (!settings) {
+      settings = new PaymentSettings({
+        accountName: "Forensic Talents",
+        accountNumber: "1234567890",
+        ifscCode: "XXXX0000000",
+        bankName: "Example Bank",
+      });
+      await settings.save();
+    }
+    res.json(settings);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch payment settings' }); }
+});
+
+app.put('/api/admin/payment-settings', protect, upload.single('qrCode'), async (req, res) => {
+  try {
+    const { accountName, accountNumber, ifscCode, bankName } = req.body;
+    let settings = await PaymentSettings.findOne();
+    if (!settings) {
+      settings = new PaymentSettings({ accountName, accountNumber, ifscCode, bankName });
+    } else {
+      if (accountName) settings.accountName = accountName;
+      if (accountNumber) settings.accountNumber = accountNumber;
+      if (ifscCode) settings.ifscCode = ifscCode;
+      if (bankName) settings.bankName = bankName;
+    }
+
+    if (req.file) {
+      const b64 = Buffer.from(req.file.buffer).toString('base64');
+      const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_payment" });
+      settings.qrCodeUrl = cldRes.secure_url;
+    }
+
+    await settings.save();
+    res.json(settings);
+  } catch (error) { res.status(500).json({ message: 'Failed to update payment settings' }); }
+});
+
+// --- ENROLLMENT ROUTES ---
+import Enrollment from './models/Enrollment.js';
+
+app.post('/api/enroll', upload.single('paymentProof'), async (req, res) => {
+  try {
+    const { name, email, phone, nationality, qualification, status, institutionName, organizationName, transactionId, targetType, targetName, mode, additionalInfo } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ message: 'Payment proof is required' });
+    }
+
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+    const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_enrollments" });
+    const paymentProofUrl = cldRes.secure_url;
+
+    const newEnrollment = new Enrollment({
+      name, email, phone, nationality, qualification, status, institutionName, organizationName, transactionId, paymentProofUrl, targetType, targetName, mode, additionalInfo
+    });
+
+    await newEnrollment.save();
+
+    // Send email to admin
+    const mailOptions = {
+      from: `"${name}" <${email}>`,
+      to: process.env.EMAIL_USER,
+      subject: `New Enrollment: ${targetName}`,
+      html: `
+        <h2>New Enrollment Received</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Nationality:</strong> ${nationality}</p>
+        <p><strong>Qualification:</strong> ${qualification}</p>
+        <p><strong>Status:</strong> ${status}</p>
+        ${institutionName ? `<p><strong>Institution:</strong> ${institutionName}</p>` : ''}
+        ${organizationName ? `<p><strong>Organization:</strong> ${organizationName}</p>` : ''}
+        <hr/>
+        <h3>Enrollment Details</h3>
+        <p><strong>Target Type:</strong> ${targetType}</p>
+        <p><strong>Target Name:</strong> ${targetName}</p>
+        ${mode ? `<p><strong>Mode:</strong> ${mode}</p>` : ''}
+        <p><strong>Transaction ID:</strong> ${transactionId}</p>
+        <p><strong>Payment Proof:</strong> <a href="${paymentProofUrl}">View Image</a></p>
+        ${additionalInfo ? `<p><strong>Additional Info:</strong> ${additionalInfo}</p>` : ''}
+      `
+    };
+
+    transporter.sendMail(mailOptions).catch(err => console.error("Admin enrollment email failed", err));
+
+    res.status(201).json({ message: 'Enrollment successful', enrollment: newEnrollment });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to process enrollment', error: error.message });
+  }
+});
+
+app.get('/api/admin/enrollments', protect, async (req, res) => {
+  try {
+    const { targetType, statusApproval } = req.query;
+    let filter = {};
+    if (targetType && targetType !== 'All') filter.targetType = targetType;
+    if (statusApproval && statusApproval !== 'All') filter.statusApproval = statusApproval;
+
+    const enrollments = await Enrollment.find(filter).sort({ createdAt: -1 });
+    res.json(enrollments);
+  } catch (error) { res.status(500).json({ message: 'Failed to fetch enrollments' }); }
+});
+
+app.put('/api/admin/enrollments/:id/approve', protect, async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findById(req.params.id);
+    if (!enrollment) return res.status(404).json({ message: 'Enrollment not found' });
+
+    enrollment.statusApproval = 'approved';
+    await enrollment.save();
+
+    // Send Approval Email to User
+    const mailOptions = {
+      from: `"Forensic Talents" <${process.env.EMAIL_USER}>`,
+      to: enrollment.email,
+      subject: `Enrollment Approved - ${enrollment.targetName}`,
+      html: `
+        <h2>Congratulations ${enrollment.name}!</h2>
+        <p>Your enrollment for <strong>${enrollment.targetName}</strong> has been successfully approved.</p>
+        <p>Our team will contact you shortly with further updates and instructions.</p>
+        <p>If you have any queries, feel free to reply to this email or contact us.</p>
+        <br/>
+        <p>Best regards,<br/>Forensic Talents Team</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions).catch(err => console.error("User approval email failed", err));
+
+    res.json(enrollment);
+  } catch (error) { res.status(500).json({ message: 'Failed to approve enrollment' }); }
+});
+
+app.put('/api/admin/enrollments/:id/reject', protect, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason) return res.status(400).json({ message: 'Rejection reason is required' });
+
+    const enrollment = await Enrollment.findById(req.params.id);
+    if (!enrollment) return res.status(404).json({ message: 'Enrollment not found' });
+
+    enrollment.statusApproval = 'rejected';
+    enrollment.rejectionReason = reason;
+    await enrollment.save();
+
+    // Send Rejection Email to User
+    const mailOptions = {
+      from: `"Forensic Talents" <${process.env.EMAIL_USER}>`,
+      to: enrollment.email,
+      subject: `Enrollment Update - Application Status`,
+      html: `
+        <p>Dear ${enrollment.name},</p>
+        <p>Thank you for your interest in <strong>${enrollment.targetName}</strong>.</p>
+        <p>Your enrollment request has been reviewed and was not approved.</p>
+        <p><strong>Reason:</strong><br/>${reason}</p>
+        <br/>
+        <p>For further clarification, please contact us at ${process.env.EMAIL_USER} or +91 9089674532</p>
+        <br/>
+        <p>Best regards,<br/>Forensic Talents Team</p>
+      `
+    };
+
+    transporter.sendMail(mailOptions).catch(err => console.error("User rejection email failed", err));
+
+    res.json(enrollment);
+  } catch (error) { res.status(500).json({ message: 'Failed to reject enrollment' }); }
+});
+
+// Add generic error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong on the server' });
+});
+
+// Start Server
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });

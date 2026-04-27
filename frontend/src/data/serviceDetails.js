@@ -619,5 +619,131 @@ export const serviceDetails = {
     "file": "",
     "catchyIntro": "Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.",
     "faqs": []
+  },
+  "environmental": {
+    "title": "Environmental Forensics",
+    "file": "Environmental Forensics.docx",
+    "catchyIntro": "Identifying pollution sources and environmental damages through advanced scientific analysis and site assessment.",
+    "faqs": [
+      {
+        "question": "What technologies are used in environmental forensics?",
+        "answer": "Technologies include chromatography, spectroscopy, and environmental monitoring systems."
+      },
+      {
+        "question": "Can multiple pollution sources be identified?",
+        "answer": "Yes, experts can distinguish between different contamination sources using advanced analysis."
+      },
+      {
+        "question": "Is environmental forensics useful for industries?",
+        "answer": "Yes, it helps industries maintain compliance, manage risks, and address contamination issues."
+      },
+      {
+        "question": "How does it help in environmental protection?",
+        "answer": "By identifying pollution sources and impacts, it supports remediation and sustainable practices."
+      },
+      {
+        "question": "What is the role of experts in this field?",
+        "answer": "Experts analyze data, interpret results, and provide scientifically supported conclusions."
+      },
+      {
+        "question": "Are reports prepared for regulatory use?",
+        "answer": "Yes, reports are prepared according to environmental and legal standards."
+      },
+      {
+        "question": "Can contamination spread be predicted?",
+        "answer": "Yes, modeling techniques help predict how pollutants will move in the future."
+      },
+      {
+        "question": "Do experts provide court testimony?",
+        "answer": "Yes, environmental forensic experts can testify to explain findings and support legal proceedings."
+      }
+    ]
+  },
+  "financial": {
+    "title": "Financial Forensic Investigations",
+    "file": "Financial Forensic Investigations.docx",
+    "catchyIntro": "Detecting, analyzing, and preventing financial fraud and irregularities to maintain financial integrity.",
+    "faqs": [
+      {
+        "question": "What are financial forensic investigations?",
+        "answer": "Financial forensic investigations involve the use of accounting and investigative techniques to detect and analyze financial fraud and irregularities."
+      },
+      {
+        "question": "What types of fraud can be detected?",
+        "answer": "Frauds such as fund diversion, embezzlement, financial misreporting, and asset misappropriation can be identified."
+      },
+      {
+        "question": "Why are financial forensic investigations important?",
+        "answer": "They help maintain financial integrity, prevent losses, and ensure compliance with laws and regulations."
+      },
+      {
+        "question": "What is a forensic audit?",
+        "answer": "A forensic audit is a detailed examination of financial records to detect fraud and irregularities."
+      },
+      {
+        "question": "How are fund flows traced?",
+        "answer": "Through transaction analysis and tracking movement of money across accounts and entities."
+      },
+      {
+        "question": "What is fraud risk assessment?",
+        "answer": "It is the process of identifying weaknesses in systems that could lead to fraud."
+      },
+      {
+        "question": "What is financial statement analysis?",
+        "answer": "It involves reviewing financial reports to identify inconsistencies or manipulation."
+      },
+      {
+        "question": "Can digital data be used in investigations?",
+        "answer": "Yes, digital records and transactions are analyzed to detect financial misconduct."
+      },
+      {
+        "question": "Who requires financial forensic services?",
+        "answer": "Organizations, legal teams, regulatory authorities, and auditors."
+      },
+      {
+        "question": "Can these investigations support legal cases?",
+        "answer": "Yes, findings are documented and can be presented as evidence in court."
+      },
+      {
+        "question": "What is embezzlement investigation?",
+        "answer": "It involves examining cases where funds or assets are misused or stolen."
+      },
+      {
+        "question": "How accurate are forensic findings?",
+        "answer": "They are highly reliable when conducted using proper methods and tools."
+      },
+      {
+        "question": "What tools are used in financial investigations?",
+        "answer": "Tools include data analytics software, forensic accounting tools, and financial modeling systems."
+      },
+      {
+        "question": "Can large volumes of data be analyzed?",
+        "answer": "Yes, advanced technologies allow efficient handling of large datasets."
+      },
+      {
+        "question": "Is confidentiality maintained?",
+        "answer": "Yes, all investigations are conducted with strict confidentiality."
+      },
+      {
+        "question": "How does it help organizations?",
+        "answer": "It helps detect fraud, reduce risks, and improve governance."
+      },
+      {
+        "question": "Are reports legally admissible?",
+        "answer": "Yes, properly prepared reports can be used in legal proceedings."
+      },
+      {
+        "question": "What is the role of experts?",
+        "answer": "Experts analyze financial data and provide evidence-based conclusions."
+      },
+      {
+        "question": "Can internal fraud be detected?",
+        "answer": "Yes, investigations can identify fraud committed within organizations."
+      },
+      {
+        "question": "Do experts testify in court?",
+        "answer": "Yes, forensic experts provide testimony to support legal proceedings."
+      }
+    ]
   }
 };

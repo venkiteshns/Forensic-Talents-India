@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap, Leaf, Landmark } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export default function Services() {
@@ -58,6 +58,18 @@ export default function Services() {
       title: 'Professional Forensic Training & Capacity Building',
       desc: 'Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.',
       icon: <GraduationCap size={32} />
+    },
+    {
+      id: 'environmental',
+      title: 'Environmental Forensics',
+      desc: 'Identifying pollution sources and environmental damages through advanced scientific analysis and site assessment.',
+      icon: <Leaf size={32} />
+    },
+    {
+      id: 'financial',
+      title: 'Financial Forensic Investigations',
+      desc: 'Detecting, analyzing, and preventing financial fraud and irregularities to maintain financial integrity.',
+      icon: <Landmark size={32} />
     },
   ];
 

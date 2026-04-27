@@ -20,7 +20,7 @@ export function Footer() {
           <div className="space-y-6">
             <img src="/assets/logo.png" alt="Forensic Talents India" className="h-16 w-auto object-contain bg-white rounded-lg p-2" />
             <p className="text-sm leading-relaxed">
-              Forensic Talents India offers premier medico-legal, cyber forensics, and psychological testing services. Reports valid under the Indian Evidence Act.
+              Forensic Talents India offers premier medico-legal, cyber forensics, and psychological testing services.
             </p>
             <div className="flex flex-wrap gap-4">
               <a href="https://www.youtube.com/@forensictalents4531" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors" title="YouTube"><YoutubeIcon /></a>
@@ -58,6 +58,8 @@ export function Footer() {
               <li><Link to="/services/polygraph" className="hover:text-white transition-colors">Polygraph Examination</Link></li>
               <li><Link to="/services/workplace-assessments" className="hover:text-white transition-colors">Workplace Assessments</Link></li>
               <li><Link to="/services/forensic-training" className="hover:text-white transition-colors">Professional Forensic Training & Capacity Building</Link></li>
+              <li><Link to="/services/environmental" className="hover:text-white transition-colors">Environmental Forensics</Link></li>
+              <li><Link to="/services/financial" className="hover:text-white transition-colors">Financial Forensic Investigations</Link></li>
             </ul>
           </div>
 

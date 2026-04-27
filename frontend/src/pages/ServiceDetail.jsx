@@ -66,10 +66,17 @@ export default function ServiceDetail() {
         style={{ backgroundImage: `url('/images/services/${id}.png')` }}
       >
         <div className="absolute inset-0 bg-slate-900/85"></div>
-        <Container className="relative z-10">
-          <Link to="/services" className="inline-flex items-center text-accent hover:text-accent-light mb-8 transition-colors">
-            <ArrowLeft size={20} className="mr-2" /> Back to Services
+        
+        <div className="absolute top-8 left-4 md:left-8 z-20">
+          <Link 
+            to="/services"
+            className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm"
+          >
+            <ArrowLeft size={18} /> Back to Services
           </Link>
+        </div>
+
+        <Container className="relative z-10 pt-10">
           <h1 className="text-3xl md:text-5xl font-heading font-bold mb-6 text-white drop-shadow-md">{serviceInfo.title}</h1>
           <p className="text-slate-200 text-xl max-w-3xl leading-relaxed drop-shadow">{serviceInfo.catchyIntro}</p>
         </Container>

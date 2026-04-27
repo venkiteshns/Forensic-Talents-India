@@ -13,6 +13,7 @@
     "autoprefixer": "^10.4.27",
     "axios": "^1.15.2",
     "clsx": "^2.1.1",
+    "libphonenumber-js": "^1.12.42",
     "lucide-react": "^1.8.0",
     "postcss": "^8.5.9",
     "react": "^19.2.4",

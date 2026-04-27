@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, BrainCircuit, Users, Award, Activity, Bell } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, CheckCircle, GraduationCap, Scale, BrainCircuit, Users, Award, Activity, Bell, Leaf, Landmark, Star, MessageSquare, Send } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
+import ReviewCard from '../components/ui/ReviewCard';
 import api from '../utils/api';
 
 export default function Home() {
   const [activeQuiz, setActiveQuiz] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewForm, setReviewForm] = useState({ name: '', email: '', rating: 5, review: '' });
+  const [reviewStatus, setReviewStatus] = useState({ type: '', message: '' });
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -19,8 +23,31 @@ export default function Home() {
         console.error("Error fetching quiz", err);
       }
     };
+    
+    const fetchReviews = async () => {
+      try {
+        const res = await api.get('/reviews');
+        setReviews(res.data);
+      } catch (err) {
+        console.error("Error fetching reviews", err);
+      }
+    };
+
     fetchQuiz();
+    fetchReviews();
   }, []);
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    setReviewStatus({ type: 'loading', message: 'Submitting...' });
+    try {
+      await api.post('/reviews', reviewForm);
+      setReviewStatus({ type: 'success', message: 'Review submitted successfully! It will appear after approval.' });
+      setReviewForm({ name: '', email: '', rating: 5, review: '' });
+    } catch (err) {
+      setReviewStatus({ type: 'error', message: err.response?.data?.message || 'Failed to submit review' });
+    }
+  };
   const services = [
     { id: 'pcc', title: 'Police Clearance', desc: 'Secure PCC for visa & employment securely.', icon: <Shield size={24} /> },
     { id: 'questioned-documents', title: 'Questioned Documents', desc: 'Verify authenticity and detect forgery scientifically.', icon: <FileText size={24} /> },
@@ -31,6 +58,8 @@ export default function Home() {
     { id: 'polygraph', title: 'Polygraph Examination', desc: 'Accurately assess truthfulness with advanced physiological monitoring.', icon: <Activity size={24} /> },
     { id: 'workplace-assessments', title: 'Workplace Assessments', desc: 'Scientific evaluation of workforce behavior, psychological risks, and performance using forensic methodologies.', icon: <Users size={24} /> },
     { id: 'forensic-training', title: 'Professional Forensic Training', desc: 'Advanced, research-based forensic training programs designed for legal, corporate, and investigative professionals.', icon: <GraduationCap size={24} /> },
+    { id: 'environmental', title: 'Environmental Forensics', desc: 'Identifying pollution sources and environmental damages through advanced scientific analysis and site assessment.', icon: <Leaf size={24} /> },
+    { id: 'financial', title: 'Financial Forensic Investigations', desc: 'Detecting, analyzing, and preventing financial fraud and irregularities to maintain financial integrity.', icon: <Landmark size={24} /> },
   ];
 
   const stats = [
@@ -70,12 +99,14 @@ export default function Home() {
       {/* Dynamic Quiz Banner */}
       {activeQuiz && (
         <div className="bg-accent text-primary py-3 px-4 shadow-md relative z-20">
-          <Container className="flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
-            <div className="flex items-center gap-3 font-semibold mb-2 sm:mb-0">
-              <Bell className="animate-bounce" size={20} />
+          <Container className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-3 font-semibold text-center md:text-left">
+              <div className="flex shrink-0 items-center justify-center w-9 h-9 rounded-full bg-black/10 hover:scale-110 transition-transform animate-pulse">
+                <Bell className="h-5 w-5 md:h-6 md:w-6 text-slate-900" />
+              </div>
               <span>New Quiz Available: {activeQuiz.title} – Participate Now</span>
             </div>
-            <Link to="/education/quiz" className="bg-primary text-white px-4 py-1.5 rounded text-sm font-bold hover:bg-[#1E293B] transition-colors whitespace-nowrap">
+            <Link to="/education/quiz" className="bg-primary text-white px-4 py-1.5 rounded-md text-sm font-bold hover:bg-[#1E293B] transition-colors whitespace-nowrap mt-1 md:mt-0">
               Take Quiz
             </Link>
           </Container>
@@ -179,6 +210,74 @@ export default function Home() {
                 <div className="text-slate-300 font-medium uppercase tracking-wider text-sm">{stat.label}</div>
               </div>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Reviews & Testimonials Section */}
+      <section className="py-20 bg-slate-50 relative overflow-hidden">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Hear what our clients and partners have to say about our forensic services and training programs.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            {/* Reviews Carousel/Grid */}
+            <div className="lg:col-span-2">
+              {reviews.length === 0 ? (
+                <div className="bg-white rounded-2xl p-10 text-center border border-slate-100 shadow-sm h-full flex flex-col justify-center items-center">
+                  <MessageSquare className="h-12 w-12 text-slate-300 mb-3" />
+                  <p className="text-slate-500">No testimonials available yet. Be the first to share your experience!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {reviews.slice(0, 4).map(review => (
+                    <ReviewCard key={review._id} review={review} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Submit Review Form */}
+            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
+              <h3 className="text-xl font-bold text-primary mb-2">Share Your Experience</h3>
+              <p className="text-sm text-slate-500 mb-6">Your feedback helps us improve and maintain our high standards of service.</p>
+              
+              {reviewStatus.message && (
+                <div className={`p-3 rounded-lg text-sm mb-6 ${reviewStatus.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : reviewStatus.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>
+                  {reviewStatus.message}
+                </div>
+              )}
+
+              <form onSubmit={submitReview} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Your Name</label>
+                  <input required type="text" value={reviewForm.name} onChange={e => setReviewForm({...reviewForm, name: e.target.value})} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" placeholder="John Doe" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Email <span className="text-slate-400 font-normal lowercase">(kept private)</span></label>
+                  <input required type="email" value={reviewForm.email} onChange={e => setReviewForm({...reviewForm, email: e.target.value})} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent" placeholder="john@example.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Rating</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button key={star} type="button" onClick={() => setReviewForm({...reviewForm, rating: star})} className="focus:outline-none transition-transform hover:scale-110">
+                        <Star size={24} className={star <= reviewForm.rating ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Your Review</label>
+                  <textarea required rows={4} value={reviewForm.review} onChange={e => setReviewForm({...reviewForm, review: e.target.value})} className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-none" placeholder="Tell us about your experience..." />
+                </div>
+                <Button type="submit" variant="primary" className="w-full flex items-center justify-center gap-2" disabled={reviewStatus.type === 'loading'}>
+                  <Send size={16} /> Submit Feedback
+                </Button>
+              </form>
+            </div>
           </div>
         </Container>
       </section>
