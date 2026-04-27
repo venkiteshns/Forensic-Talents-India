@@ -1,5 +1,6 @@
 import Resource from '../models/Resource.js';
 import cloudinary from '../config/cloudinary.js';
+import { deleteFromCloudinary } from '../utils/cloudinaryHelper.js';
 
 export const getAllResources = async () => {
   return await Resource.find().sort({ createdAt: -1 });
@@ -19,6 +20,13 @@ export const updateResource = async (id, data) => {
 export const deleteResource = async (id) => {
   const deleted = await Resource.findByIdAndDelete(id);
   if (!deleted) throw new Error('Resource not found');
+
+  // Delete the file from Cloudinary if it's not a YouTube link
+  if (deleted.fileUrl && deleted.type !== 'youtube') {
+    const resourceType = deleted.type === 'pdf' ? 'raw' : 'image';
+    await deleteFromCloudinary(deleted.fileUrl, resourceType);
+  }
+
   return deleted;
 };
 

@@ -13,6 +13,7 @@ import enrollmentRoutes from './enrollmentRoutes.js';
 import contactRoutes from './contactRoutes.js';
 import pingRoutes from './pingRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import certificateRoutes from './certificateRoutes.js';
 import * as resourceController from '../controllers/resourceController.js';
 import { upload } from '../middleware/multerMiddleware.js';
 import { protect } from '../middleware/authMiddleware.js';
@@ -33,6 +34,7 @@ router.use('/enroll', enrollmentRoutes);
 router.use('/contact', contactRoutes);
 router.use('/ping', pingRoutes);
 router.use('/admin', adminRoutes);
+router.use('/certificates', certificateRoutes);
 
 // Top level upload route
 router.post('/upload', protect, upload.single('file'), resourceController.uploadFile);

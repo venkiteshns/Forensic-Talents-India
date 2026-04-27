@@ -1,5 +1,6 @@
 import Review from '../models/Review.js';
 import cloudinary from '../config/cloudinary.js';
+import { deleteFromCloudinary } from '../utils/cloudinaryHelper.js';
 
 export const getApprovedReviews = async (type) => {
   const query = { isApproved: true };
@@ -47,5 +48,10 @@ export const toggleReviewApproval = async (id) => {
 };
 
 export const deleteReview = async (id) => {
-  return await Review.findByIdAndDelete(id);
+  const review = await Review.findByIdAndDelete(id);
+  // Delete profile picture from Cloudinary if it exists
+  if (review && review.photo) {
+    await deleteFromCloudinary(review.photo, 'image');
+  }
+  return review;
 };

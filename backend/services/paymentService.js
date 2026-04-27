@@ -1,5 +1,6 @@
 import PaymentSettings from '../models/PaymentSettings.js';
 import cloudinary from '../config/cloudinary.js';
+import { deleteFromCloudinary } from '../utils/cloudinaryHelper.js';
 
 export const getPaymentSettings = async () => {
   let settings = await PaymentSettings.findOne();
@@ -28,6 +29,10 @@ export const updatePaymentSettings = async (data, file) => {
   }
 
   if (file) {
+    // Delete old QR code from Cloudinary before uploading the new one
+    if (settings.qrCodeUrl) {
+      await deleteFromCloudinary(settings.qrCodeUrl, 'image');
+    }
     const b64 = Buffer.from(file.buffer).toString('base64');
     const dataURI = "data:" + file.mimetype + ";base64," + b64;
     const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_payment" });
@@ -36,3 +41,4 @@ export const updatePaymentSettings = async (data, file) => {
 
   return await settings.save();
 };
+
