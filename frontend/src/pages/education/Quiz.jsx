@@ -333,7 +333,7 @@ export default function Quiz() {
                           <span className="text-slate-400 font-medium">Date</span>
                           <strong className="text-slate-800">{certResult.quizDate}</strong>
 
-                          <span className="text-slate-400 font-medium">Score</span>
+                          <span className="text-slate-400 font-medium">Score %</span>
                           <strong className="text-slate-800">{certResult.marksScored}</strong>
                         </div>
                       </div>

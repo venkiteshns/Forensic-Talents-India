@@ -1,25 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
-import { X, Send, Copy, CreditCard, CheckCircle2 } from 'lucide-react';
+import { X, Send, Copy, CreditCard, CheckCircle2, Wifi, MapPin } from 'lucide-react';
 import { SuccessModal } from '../ui/SuccessModal';
 import CountryPhoneInput from '../ui/CountryPhoneInput';
 import SearchableCountrySelect from '../ui/SearchableCountrySelect';
 import { validatePhoneNumber } from '../../utils/phoneValidation';
 
+// ── PART 3 & 7: internshipId + internshipMode are passed in; mode is never asked of the user ──
 export function EnrollModal({ isOpen, course, onClose }) {
+  // course: { category, prog: { duration }, internshipId, internshipMode }
+  const internshipId   = course?.internshipId   ?? null;
+  const internshipMode = course?.internshipMode  ?? null;   // 'online' | 'offline' | null
+
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', nationality: 'India', mode: 'online',
+    name: '', email: '', phone: '', nationality: 'India',
     qualification: '', status: '', institutionName: '', organizationName: '',
     transactionId: '', additionalInfo: ''
   });
-  const [paymentProof, setPaymentProof] = useState(null);
-  const [status, setStatus] = useState('');
-  const [errors, setErrors] = useState({});
-  const [touched, setTouched] = useState({});
+  const [paymentProof, setPaymentProof]       = useState(null);
+  const [status, setStatus]                   = useState('');
+  const [errors, setErrors]                   = useState({});
+  const [touched, setTouched]                 = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentSettings, setPaymentSettings] = useState(null);
-  const [copiedField, setCopiedField] = useState('');
+  const [copiedField, setCopiedField]         = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -31,24 +36,32 @@ export function EnrollModal({ isOpen, course, onClose }) {
     }
   }, [isOpen]);
 
+  // ── PART 3: nationality is only relevant for online internships ───────────
+  // Pre-clear nationality when switching away from an online internship
+  useEffect(() => {
+    if (internshipMode === 'offline') {
+      setFormData(prev => ({ ...prev, nationality: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, nationality: prev.nationality || 'India' }));
+    }
+  }, [internshipMode]);
+
   const validate = (data = formData) => {
     let newErrors = {};
-    if (!data.name.trim()) newErrors.name = "Full Name is required.";
+    if (!data.name.trim())  newErrors.name  = "Full Name is required.";
     if (!data.email.trim()) newErrors.email = "Email Address is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
 
     const phoneValidation = validatePhoneNumber(data.phone, data.nationality || 'India');
-    if (!phoneValidation.isValid) {
-      newErrors.phone = phoneValidation.error;
-    }
+    if (!phoneValidation.isValid) newErrors.phone = phoneValidation.error;
 
     if (!data.qualification.trim()) newErrors.qualification = "Qualification is required.";
-    if (!data.status) newErrors.status = "Current Status is required.";
+    if (!data.status)               newErrors.status        = "Current Status is required.";
     if (!data.transactionId.trim()) newErrors.transactionId = "Transaction ID is required.";
-    if (!paymentProof) newErrors.paymentProof = "Payment proof is required.";
+    if (!paymentProof)              newErrors.paymentProof  = "Payment proof is required.";
 
-    if (!data.mode) newErrors.mode = "Mode of Learning is required.";
-    if (data.mode === 'online' && !data.nationality) {
+    // Nationality is required only for online internships
+    if (internshipMode === 'online' && !data.nationality) {
       newErrors.nationality = "Nationality is required for online learning.";
     }
 
@@ -58,21 +71,13 @@ export function EnrollModal({ isOpen, course, onClose }) {
   const handleBlur = (e) => {
     const { name } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
-    const currentErrors = validate();
-    setErrors(currentErrors);
+    setErrors(validate());
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value };
-      if (name === 'mode' && value === 'offline') updated.nationality = '';
-      if (name === 'mode' && value === 'online' && !updated.nationality) updated.nationality = 'India';
-      return updated;
-    });
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
 
   const handleFileChange = (e) => {
@@ -111,34 +116,37 @@ export function EnrollModal({ isOpen, course, onClose }) {
     setStatus('loading');
 
     let targetType = 'Course';
-    if (course?.category?.toLowerCase().includes('quiz')) targetType = 'Quiz';
+    if (course?.category?.toLowerCase().includes('quiz'))       targetType = 'Quiz';
     else if (course?.category?.toLowerCase().includes('internship')) targetType = 'Internship';
 
+    // ── PART 4: Submission payload — mode is sourced from internshipMode, never from user ──
     const payload = new FormData();
-    payload.append('name', formData.name);
-    payload.append('email', formData.email);
-    payload.append('phone', formData.phone);
-    payload.append('nationality', formData.nationality);
-    payload.append('mode', formData.mode);
+    payload.append('name',          formData.name);
+    payload.append('email',         formData.email);
+    payload.append('phone',         formData.phone);
+    if (formData.nationality) payload.append('nationality', formData.nationality);
     payload.append('qualification', formData.qualification);
-    payload.append('status', formData.status);
-    if (formData.institutionName) payload.append('institutionName', formData.institutionName);
+    payload.append('status',        formData.status);
+    if (formData.institutionName)  payload.append('institutionName',  formData.institutionName);
     if (formData.organizationName) payload.append('organizationName', formData.organizationName);
     payload.append('transactionId', formData.transactionId);
     payload.append('additionalInfo', formData.additionalInfo);
-    payload.append('targetType', targetType);
-    payload.append('targetName', `${course?.category || 'Program'} - ${course?.prog?.duration || ''}`.trim());
+    payload.append('targetType',    targetType);
+    payload.append('targetName',    `${course?.category || 'Program'} - ${course?.prog?.duration || ''}`.trim());
+    if (internshipId)   payload.append('internshipId', internshipId);
+    if (internshipMode) payload.append('mode', internshipMode);   // backend will override from DB anyway
     payload.append('paymentProof', paymentProof);
 
     try {
       const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
-      const response = await fetch(`${BACKEND_URL}/enroll`, {
-        method: "POST",
-        body: payload
-      });
+      const response = await fetch(`${BACKEND_URL}/enroll`, { method: "POST", body: payload });
       if (response.ok) {
         setStatus('');
-        setFormData({ name: '', email: '', phone: '', nationality: 'India', mode: 'online', qualification: '', status: '', institutionName: '', organizationName: '', transactionId: '', additionalInfo: '' });
+        setFormData({
+          name: '', email: '', phone: '', nationality: 'India',
+          qualification: '', status: '', institutionName: '', organizationName: '',
+          transactionId: '', additionalInfo: ''
+        });
         setPaymentProof(null);
         setErrors({});
         setTouched({});
@@ -160,17 +168,39 @@ export function EnrollModal({ isOpen, course, onClose }) {
     setTimeout(() => setCopiedField(''), 2000);
   };
 
+  // ── PART 7: Read-only mode badge ─────────────────────────────────────────
+  const ModeBadge = () => {
+    if (!internshipMode) return null;
+    const isOnline = internshipMode === 'online';
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border ${
+        isOnline
+          ? 'bg-blue-50 text-blue-700 border-blue-200'
+          : 'bg-amber-50 text-amber-700 border-amber-200'
+      }`}>
+        {isOnline ? <Wifi size={12} /> : <MapPin size={12} />}
+        Internship Type: {isOnline ? 'Online' : 'Offline'}
+      </div>
+    );
+  };
+
   return (
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 flex-shrink-0">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50 flex-shrink-0">
               <div>
                 <h3 className="text-xl font-bold text-primary">Enrollment Request</h3>
                 <p className="text-sm text-slate-500 mt-1 font-medium">
                   {course?.category} - {course?.prog?.duration}
                 </p>
+                {/* ── PART 7: Read-only internship type badge ── */}
+                {internshipMode && (
+                  <div className="mt-2">
+                    <ModeBadge />
+                  </div>
+                )}
               </div>
               <button onClick={() => { onClose(); setStatus(''); }} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition-colors">
                 <X size={20} />
@@ -249,29 +279,16 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   )}
                 </div>
 
-                <div className="space-y-4 pt-2">
-                  <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Program Preferences</h4>
-                  <div className="flex flex-col gap-1 mb-4">
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Mode of Learning <span className="text-red-500">*</span></label>
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl flex-1 hover:bg-slate-100 transition-colors">
-                        <input type="radio" name="mode" value="online" checked={formData.mode === 'online'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
-                        <span className="text-slate-700 font-medium">Online</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl flex-1 hover:bg-slate-100 transition-colors">
-                        <input type="radio" name="mode" value="offline" checked={formData.mode === 'offline'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
-                        <span className="text-slate-700 font-medium">Offline</span>
-                      </label>
-                    </div>
-                    {touched.mode && errors.mode && <p className="text-red-500 text-sm mt-1">{errors.mode}</p>}
-                  </div>
-
-                  {formData.mode === 'online' && (
+                {/* ── PART 1: "Program Preferences" section removed — no mode dropdown/radio ── */}
+                {/* ── PART 7: Nationality shown only for online internships ─────────────────── */}
+                {internshipMode === 'online' && (
+                  <div className="space-y-4 pt-2">
+                    <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Location Details</h4>
                     <div className="flex flex-col gap-1 mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <SearchableCountrySelect
                         label="Nationality"
                         value={formData.nationality}
-                        onChange={(name, country) => {
+                        onChange={(name) => {
                           setFormData(prev => ({ ...prev, nationality: name }));
                           if (errors.nationality) setErrors(prev => ({ ...prev, nationality: null }));
                         }}
@@ -280,8 +297,8 @@ export function EnrollModal({ isOpen, course, onClose }) {
                         required={true}
                       />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 <div className="space-y-4 pt-2">
                   <div className="flex justify-between items-end border-b border-slate-100 pb-2">
@@ -350,42 +367,22 @@ export function EnrollModal({ isOpen, course, onClose }) {
                 </div>
               )}
               <div className="space-y-4">
-                <div className="flex justify-between items-center group">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Account Name</p>
-                    <p className="text-sm font-bold text-slate-800">{paymentSettings.accountName}</p>
+                {[
+                  { label: 'Account Name',   value: paymentSettings.accountName,   key: 'name' },
+                  { label: 'Account Number', value: paymentSettings.accountNumber, key: 'acc' },
+                  { label: 'IFSC Code',      value: paymentSettings.ifscCode,      key: 'ifsc' },
+                  { label: 'Bank Name',      value: paymentSettings.bankName,      key: 'bank' },
+                ].map(({ label, value, key }) => (
+                  <div key={key} className="flex justify-between items-center group">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">{label}</p>
+                      <p className="text-sm font-bold text-slate-800">{value}</p>
+                    </div>
+                    <button type="button" onClick={() => copyToClipboard(value, key)} className="text-slate-400 hover:text-primary transition-colors p-1.5" title="Copy">
+                      {copiedField === key ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
+                    </button>
                   </div>
-                  <button type="button" onClick={() => copyToClipboard(paymentSettings.accountName, 'name')} className="text-slate-400 hover:text-primary transition-colors p-1.5" title="Copy">
-                    {copiedField === 'name' ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-                  </button>
-                </div>
-                <div className="flex justify-between items-center group">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Account Number</p>
-                    <p className="text-sm font-bold text-slate-800">{paymentSettings.accountNumber}</p>
-                  </div>
-                  <button type="button" onClick={() => copyToClipboard(paymentSettings.accountNumber, 'acc')} className="text-slate-400 hover:text-primary transition-colors p-1.5" title="Copy">
-                    {copiedField === 'acc' ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-                  </button>
-                </div>
-                <div className="flex justify-between items-center group">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">IFSC Code</p>
-                    <p className="text-sm font-bold text-slate-800">{paymentSettings.ifscCode}</p>
-                  </div>
-                  <button type="button" onClick={() => copyToClipboard(paymentSettings.ifscCode, 'ifsc')} className="text-slate-400 hover:text-primary transition-colors p-1.5" title="Copy">
-                    {copiedField === 'ifsc' ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-                  </button>
-                </div>
-                <div className="flex justify-between items-center group">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Bank Name</p>
-                    <p className="text-sm font-bold text-slate-800">{paymentSettings.bankName}</p>
-                  </div>
-                  <button type="button" onClick={() => copyToClipboard(paymentSettings.bankName, 'bank')} className="text-slate-400 hover:text-primary transition-colors p-1.5" title="Copy">
-                    {copiedField === 'bank' ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
             <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">

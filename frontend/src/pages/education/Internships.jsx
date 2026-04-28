@@ -37,8 +37,17 @@ export default function Internships() {
     fetchInternships();
   }, []);
 
-  const handleEnrollClick = (category, duration) => {
-    setEnrollModal({ isOpen: true, course: { category, prog: { duration } } });
+  // PART 3: pass internshipId and mode — do NOT ask the user for mode
+  const handleEnrollClick = (internship) => {
+    setEnrollModal({
+      isOpen: true,
+      course: {
+        category: `${internship.type} Internship`,
+        prog: { duration: internship.duration },
+        internshipId:   internship._id,
+        internshipMode: internship.mode,   // system source of truth
+      }
+    });
   };
 
   return (
@@ -156,7 +165,7 @@ export default function Internships() {
                         variant={isOffline ? "accent" : "outline"} 
                         size="lg" 
                         className={`w-full justify-center group ${isOffline ? 'shadow-[0_0_20px_rgba(46,204,113,0.3)]' : 'border-slate-300 hover:border-primary hover:bg-slate-50 text-slate-800'}`} 
-                        onClick={() => handleEnrollClick(`${internship.type} Internship`, internship.duration)}
+                        onClick={() => handleEnrollClick(internship)}
                       >
                         Apply Now <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>

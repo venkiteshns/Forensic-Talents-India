@@ -1,11 +1,35 @@
 import Enrollment from '../models/Enrollment.js';
+import Internship from '../models/Internship.js';
 import cloudinary from '../config/cloudinary.js';
 import transporter from '../config/nodemailer.js';
 
 export const processEnrollment = async (data, file) => {
-  const { name, email, phone, nationality, qualification, status, institutionName, organizationName, transactionId, targetType, targetName, mode, additionalInfo } = data;
+  const {
+    name, email, phone, nationality, qualification, status,
+    institutionName, organizationName, transactionId,
+    targetType, targetName, internshipId, additionalInfo
+  } = data;
 
   if (!file) throw new Error('Payment proof is required');
+
+  // ── PART 5: Backend mode validation ──────────────────────────────────────
+  let resolvedMode = undefined;
+
+  if (targetType === 'Internship') {
+    if (!internshipId) throw new Error('internshipId is required for Internship enrollments');
+
+    const internship = await Internship.findById(internshipId);
+    if (!internship) throw new Error('Internship not found. Cannot process enrollment.');
+
+    // Mode is always sourced from the DB — user input is ignored / overridden
+    resolvedMode = internship.mode;
+
+    // Reject if the submitted mode (if any) doesn't match DB record
+    if (data.mode && data.mode !== internship.mode) {
+      throw new Error(`Mode mismatch: submitted "${data.mode}" but internship is "${internship.mode}".`);
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const b64 = Buffer.from(file.buffer).toString('base64');
   const dataURI = "data:" + file.mimetype + ";base64," + b64;
@@ -13,7 +37,12 @@ export const processEnrollment = async (data, file) => {
   const paymentProofUrl = cldRes.secure_url;
 
   const newEnrollment = new Enrollment({
-    name, email, phone, nationality, qualification, status, institutionName, organizationName, transactionId, paymentProofUrl, targetType, targetName, mode, additionalInfo
+    name, email, phone, nationality, qualification, status,
+    institutionName, organizationName, transactionId, paymentProofUrl,
+    targetType, targetName,
+    internshipId: targetType === 'Internship' ? internshipId : undefined,
+    mode: resolvedMode,
+    additionalInfo
   });
 
   await newEnrollment.save();
@@ -28,7 +57,7 @@ export const processEnrollment = async (data, file) => {
       <p><strong>Name:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>Nationality:</strong> ${nationality}</p>
+      <p><strong>Nationality:</strong> ${nationality || 'N/A'}</p>
       <p><strong>Qualification:</strong> ${qualification}</p>
       <p><strong>Status:</strong> ${status}</p>
       ${institutionName ? `<p><strong>Institution:</strong> ${institutionName}</p>` : ''}
@@ -37,7 +66,7 @@ export const processEnrollment = async (data, file) => {
       <h3>Enrollment Details</h3>
       <p><strong>Target Type:</strong> ${targetType}</p>
       <p><strong>Target Name:</strong> ${targetName}</p>
-      ${mode ? `<p><strong>Mode:</strong> ${mode}</p>` : ''}
+      ${resolvedMode ? `<p><strong>Mode (system-verified):</strong> ${resolvedMode}</p>` : ''}
       <p><strong>Transaction ID:</strong> ${transactionId}</p>
       <p><strong>Payment Proof:</strong> <a href="${paymentProofUrl}">View Image</a></p>
       ${additionalInfo ? `<p><strong>Additional Info:</strong> ${additionalInfo}</p>` : ''}

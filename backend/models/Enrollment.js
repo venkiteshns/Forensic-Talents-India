@@ -4,7 +4,7 @@ const enrollmentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
-  nationality: { type: String, required: true },
+  nationality: { type: String },
   qualification: { type: String, required: true },
   status: { type: String, enum: ['Student', 'Professional'], required: true },
   institutionName: { type: String }, // For Student
@@ -12,8 +12,9 @@ const enrollmentSchema = new mongoose.Schema({
   transactionId: { type: String, required: true },
   paymentProofUrl: { type: String, required: true },
   targetType: { type: String, required: true }, // e.g., 'Course', 'Internship', 'Quiz'
-  targetName: { type: String, required: true }, // e.g., 'Cyber Security - 6 Months'
-  mode: { type: String }, // online/offline
+  targetName: { type: String, required: true }, // e.g., 'Online Internship - 2 months'
+  internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship' }, // set when targetType = Internship
+  mode: { type: String, enum: ['online', 'offline'] }, // system-derived from internship; not user-controlled
   additionalInfo: { type: String },
   statusApproval: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   rejectionReason: { type: String }
