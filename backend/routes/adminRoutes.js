@@ -2,6 +2,7 @@ import express from 'express';
 import * as reviewController from '../controllers/reviewController.js';
 import * as paymentController from '../controllers/paymentController.js';
 import * as enrollmentController from '../controllers/enrollmentController.js';
+import * as quizResultController from '../controllers/quizResultController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/multerMiddleware.js';
 
@@ -12,5 +13,9 @@ router.put('/payment-settings', protect, upload.single('qrCode'), paymentControl
 router.get('/enrollments', protect, enrollmentController.getEnrollments);
 router.put('/enrollments/:id/approve', protect, enrollmentController.approveEnrollment);
 router.put('/enrollments/:id/reject', protect, enrollmentController.rejectEnrollment);
+
+// Quiz Results
+router.get('/quiz-results', protect, quizResultController.getQuizResults);
+router.get('/quiz-results/quiz-names', protect, quizResultController.getDistinctQuizNames);
 
 export default router;
