@@ -10,13 +10,13 @@ export const getApprovedReviews = async (type) => {
   return await Review.find(query).sort({ createdAt: -1 });
 };
 
-export const getAllReviewsAdmin = async (type, isApproved) => {
+export const getAllReviewsAdmin = async (type, status) => {
   const query = {};
-  if (type && ['service', 'education'].includes(type)) {
+  if (type && type !== 'all') {
     query.type = type;
   }
-  if (isApproved !== undefined && isApproved !== 'all') {
-    query.isApproved = isApproved === 'true';
+  if (status && status !== 'all') {
+    query.isApproved = status === 'approved';
   }
   return await Review.find(query).sort({ createdAt: -1 });
 };

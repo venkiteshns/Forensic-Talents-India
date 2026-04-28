@@ -10,8 +10,8 @@ export const getReviews = async (req, res, next) => {
 
 export const getAdminReviews = async (req, res, next) => {
   try {
-    const { type, isApproved } = req.query;
-    const reviews = await reviewService.getAllReviewsAdmin(type, isApproved);
+    const { status, type } = req.query;
+    const reviews = await reviewService.getAllReviewsAdmin(type, status);
     res.json(reviews);
   } catch (err) { next(err); }
 };
