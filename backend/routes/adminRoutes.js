@@ -13,6 +13,7 @@ router.put('/payment-settings', protect, upload.single('qrCode'), paymentControl
 router.get('/enrollments', protect, enrollmentController.getEnrollments);
 router.put('/enrollments/:id/approve', protect, enrollmentController.approveEnrollment);
 router.put('/enrollments/:id/reject', protect, enrollmentController.rejectEnrollment);
+router.delete('/enrollments/:id', protect, enrollmentController.deleteEnrollment);
 
 // Quiz Results
 router.get('/quiz-results', protect, quizResultController.getQuizResults);

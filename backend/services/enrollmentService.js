@@ -35,10 +35,11 @@ export const processEnrollment = async (data, file) => {
   const dataURI = "data:" + file.mimetype + ";base64," + b64;
   const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_enrollments" });
   const paymentProofUrl = cldRes.secure_url;
+  const paymentScreenshotPublicId = cldRes.public_id;
 
   const newEnrollment = new Enrollment({
     name, email, phone, nationality, qualification, status,
-    institutionName, organizationName, transactionId, paymentProofUrl,
+    institutionName, organizationName, transactionId, paymentProofUrl, paymentScreenshotPublicId,
     targetType, targetName,
     internshipId: targetType === 'Internship' ? internshipId : undefined,
     mode: resolvedMode,
@@ -123,6 +124,7 @@ export const rejectEnrollment = async (id, reason) => {
 
   enrollment.statusApproval = 'rejected';
   enrollment.rejectionReason = reason;
+  enrollment.rejectedAt = new Date();
   await enrollment.save();
 
   const mailOptions = {
@@ -147,4 +149,19 @@ export const rejectEnrollment = async (id, reason) => {
   transporter.sendMail(mailOptions).catch(err => console.error("User rejection email failed", err));
 
   return enrollment;
+};
+
+export const deleteEnrollment = async (id) => {
+  const enrollment = await Enrollment.findById(id);
+  if (!enrollment) throw new Error('Enrollment not found');
+
+  if (enrollment.paymentScreenshotPublicId) {
+    try {
+      await cloudinary.uploader.destroy(enrollment.paymentScreenshotPublicId);
+    } catch (err) {
+      console.error('Failed to delete cloudinary image:', err);
+    }
+  }
+
+  await enrollment.deleteOne();
 };

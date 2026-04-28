@@ -9,6 +9,10 @@ export const getCourses = async (req, res, next) => {
 
 export const createCourse = async (req, res, next) => {
   try {
+    const { priceINR, priceUSD } = req.body;
+    if (!priceINR && !priceUSD) {
+      return res.status(400).json({ message: 'At least one price must be provided' });
+    }
     const course = await courseService.createCourse(req.body);
     res.status(201).json(course);
   } catch (err) { next(err); }
@@ -16,6 +20,10 @@ export const createCourse = async (req, res, next) => {
 
 export const updateCourse = async (req, res, next) => {
   try {
+    const { priceINR, priceUSD } = req.body;
+    if (!priceINR && !priceUSD) {
+      return res.status(400).json({ message: 'At least one price must be provided' });
+    }
     const updated = await courseService.updateCourse(req.params.id, req.body);
     res.json(updated);
   } catch (err) { next(err); }

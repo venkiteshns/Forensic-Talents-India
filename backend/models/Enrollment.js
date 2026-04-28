@@ -17,7 +17,9 @@ const enrollmentSchema = new mongoose.Schema({
   mode: { type: String, enum: ['online', 'offline'] }, // system-derived from internship; not user-controlled
   additionalInfo: { type: String },
   statusApproval: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-  rejectionReason: { type: String }
+  rejectionReason: { type: String },
+  rejectedAt: { type: Date, default: null },
+  paymentScreenshotPublicId: { type: String }
 }, { timestamps: true });
 
 export default mongoose.model('Enrollment', enrollmentSchema);

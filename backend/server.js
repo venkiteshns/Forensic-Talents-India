@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import apiRoutes from './routes/index.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 import startKeepAlive from './utils/keepAlive.js';
+import { startCronJobs } from './utils/cronJobs.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -24,6 +25,9 @@ app.use(errorHandler);
 
 // Start Keep-Alive Ping
 startKeepAlive();
+
+// Start Cron Jobs
+startCronJobs();
 
 // Start Server
 app.listen(port, () => {

@@ -29,3 +29,10 @@ export const rejectEnrollment = async (req, res, next) => {
     res.json(enrollment);
   } catch (err) { next(err); }
 };
+
+export const deleteEnrollment = async (req, res, next) => {
+  try {
+    await enrollmentService.deleteEnrollment(req.params.id);
+    res.json({ success: true });
+  } catch (err) { next(err); }
+};

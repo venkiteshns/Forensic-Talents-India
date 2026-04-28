@@ -1,173 +1,123 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
-import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, PenTool } from 'lucide-react';
+import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, PenTool, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
+import CrosswordWorker from './crosswordWorker?worker';
 
-const generateLayout = (wordList) => {
-  const gridSize = 30; // large enough for initial placement
-  const grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
-  const placedWords = [];
+const fetchWordSet = async () => {
+  try {
+    const storedPlayedIds = JSON.parse(localStorage.getItem('playedCrosswordIds') || '[]');
+    const res = await api.get(`/game/crossword?playedIds=${storedPlayedIds.join(',')}`);
 
-  const sortedWords = [...wordList].sort((a, b) => b.word.length - a.word.length);
-
-  const canPlace = (word, r, c, dir) => {
-    if (dir === 'across') {
-      if (c < 0 || c + word.length > gridSize || r < 0 || r >= gridSize) return false;
-      for (let i = 0; i < word.length; i++) {
-        if (grid[r][c+i] !== null && grid[r][c+i] !== word[i]) return false;
-        if (grid[r][c+i] === null) {
-          if (r > 0 && grid[r-1][c+i] !== null) return false;
-          if (r < gridSize-1 && grid[r+1][c+i] !== null) return false;
-        }
-      }
-      if (c > 0 && grid[r][c-1] !== null) return false;
-      if (c + word.length < gridSize && grid[r][c+word.length] !== null) return false;
-    } else {
-      if (r < 0 || r + word.length > gridSize || c < 0 || c >= gridSize) return false;
-      for (let i = 0; i < word.length; i++) {
-        if (grid[r+i][c] !== null && grid[r+i][c] !== word[i]) return false;
-        if (grid[r+i][c] === null) {
-          if (c > 0 && grid[r+i][c-1] !== null) return false;
-          if (c < gridSize-1 && grid[r+i][c+1] !== null) return false;
-        }
-      }
-      if (r > 0 && grid[r-1][c] !== null) return false;
-      if (r + word.length < gridSize && grid[r+word.length][c] !== null) return false;
-    }
-    return true;
-  };
-
-  const placeWord = (wordObj, r, c, dir, num) => {
-    const word = wordObj.word;
-    placedWords.push({
-      id: `${num}${dir === 'across' ? 'A' : 'D'}`,
-      num,
-      dir,
-      ans: word,
-      clue: wordObj.clue,
-      r,
-      c
-    });
-    for (let i = 0; i < word.length; i++) {
-      if (dir === 'across') {
-        grid[r][c+i] = word[i];
+    if (res.data && res.data.words && res.data.words.length > 0) {
+      if (res.data.resetOccurred) {
+        localStorage.setItem('playedCrosswordIds', JSON.stringify([res.data._id]));
       } else {
-        grid[r+i][c] = word[i];
+        localStorage.setItem('playedCrosswordIds', JSON.stringify([...storedPlayedIds, res.data._id]));
       }
+      return res.data.words;
     }
-  };
-
-  let num = 1;
-  if (sortedWords.length > 0) {
-    const first = sortedWords.shift();
-    const r = Math.floor(gridSize / 2);
-    const c = Math.floor((gridSize - first.word.length) / 2);
-    placeWord(first, r, c, 'across', num++);
-  }
-
-  const unplaced = [];
-  for (const wordObj of sortedWords) {
-    const word = wordObj.word;
-    let placed = false;
-    for (const pw of placedWords) {
-      if (placed) break;
-      for (let i = 0; i < word.length; i++) {
-        if (placed) break;
-        for (let j = 0; j < pw.ans.length; j++) {
-          if (word[i] === pw.ans[j]) {
-            const dir = pw.dir === 'across' ? 'down' : 'across';
-            const r = pw.dir === 'across' ? pw.r - i : pw.r + j;
-            const c = pw.dir === 'across' ? pw.c + j : pw.c - i;
-            if (canPlace(word, r, c, dir)) {
-              const existing = placedWords.find(w => w.r === r && w.c === c);
-              placeWord(wordObj, r, c, dir, existing ? existing.num : num++);
-              placed = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-    if (!placed) unplaced.push(wordObj);
-  }
-
-  for (const wordObj of unplaced) {
-    const word = wordObj.word;
-    let placed = false;
-    for (let r = 0; r < gridSize; r++) {
-      for (let c = 0; c < gridSize; c++) {
-        if (canPlace(word, r, c, 'across')) {
-          placeWord(wordObj, r, c, 'across', num++);
-          placed = true;
-          break;
-        }
-      }
-      if (placed) break;
-    }
-  }
-
-  if (placedWords.length === 0) return { gridSizeR: 0, gridSizeC: 0, words: [] };
-
-  let minR = gridSize, maxR = 0, minC = gridSize, maxC = 0;
-  placedWords.forEach(pw => {
-    minR = Math.min(minR, pw.r);
-    maxR = Math.max(maxR, pw.dir === 'down' ? pw.r + pw.ans.length - 1 : pw.r);
-    minC = Math.min(minC, pw.c);
-    maxC = Math.max(maxC, pw.dir === 'across' ? pw.c + pw.ans.length - 1 : pw.c);
-  });
-
-  placedWords.forEach(pw => {
-    pw.r -= minR;
-    pw.c -= minC;
-  });
-
-  return {
-    gridSizeR: maxR - minR + 1,
-    gridSizeC: maxC - minC + 1,
-    words: placedWords
-  };
+  } catch (err) {}
+  
+  return [
+    { word: 'FORENSIC', clue: 'Scientific analysis for crime' },
+    { word: 'CRIME', clue: 'Unlawful act' },
+    { word: 'SCENE', clue: 'Location of the crime' },
+    { word: 'EVIDENCE', clue: 'Material proof' },
+    { word: 'CLUE', clue: 'Lead for investigation' },
+  ];
 };
 
-const generateGridData = (puzzleData) => {
-  if (!puzzleData || !puzzleData.words) return [];
-  let grid = Array(puzzleData.gridSizeR).fill(null).map(() => 
-    Array(puzzleData.gridSizeC).fill({ isActive: false, char: '', num: null, words: [] })
-  );
-
-  puzzleData.words.forEach(w => {
-    for (let i = 0; i < w.ans.length; i++) {
-      const r = w.dir === 'across' ? w.r : w.r + i;
-      const c = w.dir === 'across' ? w.c + i : w.c;
-      
-      const isStart = i === 0;
-      
-      grid[r][c] = {
-        ...grid[r][c],
-        isActive: true,
-        correctChar: w.ans[i],
-        num: isStart ? w.num : grid[r][c].num,
-        words: [...grid[r][c].words, w.id]
-      };
-    }
+const generatePuzzleWithWorker = (worker, words) => {
+  return new Promise((resolve, reject) => {
+    if (!worker) return reject(new Error("Worker not initialized"));
+    
+    const handleMessage = (e) => {
+      worker.removeEventListener('message', handleMessage);
+      if (e.data.success) resolve({ puzzleData: e.data.puzzleData, gridData: e.data.gridData });
+      else reject(new Error(e.data.error));
+    };
+    
+    worker.addEventListener('message', handleMessage);
+    worker.postMessage({ type: 'GENERATE', words });
   });
+};
 
-  return grid;
+const generateWithTimeout = (worker, words, ms = 10000) => {
+  return Promise.race([
+    generatePuzzleWithWorker(worker, words),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Generation timeout")), ms))
+  ]);
 };
 
 export default function CrosswordGame({ onQuit }) {
   const [puzzleData, setPuzzleData] = useState(null);
-
   const [gridData, setGridData] = useState([]);
   const [userInputs, setUserInputs] = useState({});
   const [activeWordId, setActiveWordId] = useState(null);
-  const [activeCell, setActiveCell] = useState(null); 
-  const [gameState, setGameState] = useState('idle');
+  const [activeCell, setActiveCell] = useState(null);
+  const [gameState, setGameState] = useState('idle'); // idle, loading, playing, completed, error
   const [timeElapsed, setTimeElapsed] = useState(0);
+
+  const [puzzleQueue, setPuzzleQueue] = useState([]);
+  const isGeneratingRef = useRef(false);
+  const workerRef = useRef(null);
 
   const gameSectionRef = useRef(null);
   const inputRefs = useRef({});
+
+  useEffect(() => {
+    workerRef.current = new CrosswordWorker();
+    
+    const cached = localStorage.getItem('crosswordPuzzleCache');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setPuzzleQueue(parsed);
+        }
+      } catch (e) {}
+    }
+    
+    return () => {
+      if (workerRef.current) workerRef.current.terminate();
+    };
+  }, []);
+
+  const generateInBackground = () => {
+    if (!workerRef.current || isGeneratingRef.current) return;
+    
+    setPuzzleQueue(prev => {
+      if (prev.length >= 2) return prev;
+      
+      isGeneratingRef.current = true;
+      (async () => {
+        try {
+          const words = await fetchWordSet();
+          const result = await generateWithTimeout(workerRef.current, words, 10000);
+          
+          setPuzzleQueue(q => {
+            const newQ = [...q, result];
+            if (newQ.length > 3) newQ.shift();
+            localStorage.setItem('crosswordPuzzleCache', JSON.stringify(newQ));
+            return newQ;
+          });
+        } catch (err) {
+          console.error("Background generation failed:", err);
+        } finally {
+          isGeneratingRef.current = false;
+        }
+      })();
+      
+      return prev;
+    });
+  };
+
+  useEffect(() => {
+    generateInBackground();
+  }, [puzzleQueue]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -181,48 +131,52 @@ export default function CrosswordGame({ onQuit }) {
     return () => clearInterval(interval);
   }, [gameState]);
 
+  useEffect(() => {
+    if (gameState === 'completed') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [gameState]);
+
+  const applyPuzzle = (puzzle) => {
+    setPuzzleData(puzzle.puzzleData);
+    setGridData(puzzle.gridData);
+    setUserInputs({});
+    if (puzzle.puzzleData.words.length > 0) {
+      setActiveWordId(puzzle.puzzleData.words[0].id);
+      setActiveCell({ r: puzzle.puzzleData.words[0].r, c: puzzle.puzzleData.words[0].c });
+    }
+    setTimeElapsed(0);
+    setGameState('playing');
+  };
+
   const handleStartGameClick = async () => {
     setGameState('loading');
-    
     setTimeout(() => {
       gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 
-    let activeData = null;
-    try {
-      const storedPlayedIds = JSON.parse(localStorage.getItem('playedCrosswordIds') || '[]');
-      const res = await api.get(`/game/crossword?playedIds=${storedPlayedIds.join(',')}`);
+    if (puzzleQueue.length > 0) {
+      const nextPuzzle = puzzleQueue[0];
+      const remaining = puzzleQueue.slice(1);
+      setPuzzleQueue(remaining);
+      localStorage.setItem('crosswordPuzzleCache', JSON.stringify(remaining));
       
-      if (res.data && res.data.words && res.data.words.length > 0) {
-        activeData = generateLayout(res.data.words);
-        
-        if (res.data.resetOccurred) {
-          localStorage.setItem('playedCrosswordIds', JSON.stringify([res.data._id]));
-        } else {
-          localStorage.setItem('playedCrosswordIds', JSON.stringify([...storedPlayedIds, res.data._id]));
-        }
-      } else {
-        throw new Error("Invalid words array");
+      setTimeout(() => applyPuzzle(nextPuzzle), 50);
+    } else {
+      try {
+        const words = await fetchWordSet();
+        const result = await generateWithTimeout(workerRef.current, words, 10000);
+        applyPuzzle(result);
+      } catch (err) {
+        console.error("Sync generation failed", err);
+        setGameState('error');
       }
-    } catch (err) {
-      console.error("Failed to load crossword:", err.message);
-      activeData = generateLayout([
-        { word: 'FORENSIC', clue: 'Scientific method for crimes' },
-        { word: 'CRIME', clue: 'Punishable offense' },
-        { word: 'EVIDENCE', clue: 'Body of facts' },
-        { word: 'DNA', clue: 'Genetic carrier' }
-      ]);
     }
-    
-    setPuzzleData(activeData);
-    setGridData(generateGridData(activeData));
-    setUserInputs({});
-    if (activeData.words.length > 0) {
-      setActiveWordId(activeData.words[0].id);
-      setActiveCell({ r: activeData.words[0].r, c: activeData.words[0].c });
-    }
-    setTimeElapsed(0);
-    setGameState('playing');
   };
 
   const initGame = () => {
@@ -232,7 +186,7 @@ export default function CrosswordGame({ onQuit }) {
   const triggerConfetti = () => {
     const burstDiv = document.createElement('div');
     burstDiv.className = 'fixed inset-0 pointer-events-none z-[200] overflow-hidden';
-    
+
     const style = document.createElement('style');
     style.innerHTML = `
       @keyframes floatUp {
@@ -289,55 +243,94 @@ export default function CrosswordGame({ onQuit }) {
     }
   };
 
+  const moveTo = (r, c) => {
+    if (gridData[r] && gridData[r][c] && gridData[r][c].isActive) {
+      setActiveCell({ r, c });
+      const cellWords = gridData[r][c].words;
+      if (cellWords && cellWords.length > 0 && !cellWords.includes(activeWordId)) {
+        setActiveWordId(cellWords[0]);
+      }
+      setTimeout(() => {
+        inputRefs.current[`${r}-${c}`]?.focus();
+      }, 0);
+    }
+  };
+
+  const getDirection = () => {
+    if (!activeWordId || !puzzleData) return 'across';
+    const activeWord = puzzleData.words.find(w => w.id === activeWordId);
+    return activeWord ? activeWord.dir : 'across';
+  };
+
+  const moveToNext = (r, c) => {
+    if (getDirection() === "across") moveTo(r, c + 1);
+    else moveTo(r + 1, c);
+  };
+
+  const moveToPrevious = (r, c) => {
+    if (getDirection() === "across") {
+      const targetR = r;
+      const targetC = c - 1;
+      if (gridData[targetR] && gridData[targetR][targetC] && gridData[targetR][targetC].isActive) {
+        clearCell(targetR, targetC);
+        moveTo(targetR, targetC);
+      }
+    } else {
+      const targetR = r - 1;
+      const targetC = c;
+      if (gridData[targetR] && gridData[targetR][targetC] && gridData[targetR][targetC].isActive) {
+        clearCell(targetR, targetC);
+        moveTo(targetR, targetC);
+      }
+    }
+  };
+
+  const clearCell = (r, c) => {
+    const newInputs = { ...userInputs, [`${r}-${c}`]: '' };
+    setUserInputs(newInputs);
+  };
+
+  const setLetter = (r, c, letter) => {
+    const newInputs = { ...userInputs, [`${r}-${c}`]: letter };
+    setUserInputs(newInputs);
+    checkWin(newInputs);
+  };
+
   const handleCellChange = (r, c, val) => {
-    if (!puzzleData) return;
+    if (!puzzleData || gameState !== 'playing') return;
     const char = val.slice(-1).toUpperCase(); // only keep last typed char
     if (!/^[A-Z]*$/.test(char)) return; // letters only
 
-    const newInputs = { ...userInputs, [`${r}-${c}`]: char };
-    setUserInputs(newInputs);
-
     if (char) {
-      // Move to next cell
-      const activeWord = puzzleData.words.find(w => w.id === activeWordId);
-      if (activeWord) {
-        let nextR = r;
-        let nextC = c;
-        if (activeWord.dir === 'across') nextC += 1;
-        else nextR += 1;
-
-        if (gridData[nextR] && gridData[nextR][nextC] && gridData[nextR][nextC].isActive) {
-          setActiveCell({ r: nextR, c: nextC });
-          setTimeout(() => {
-            inputRefs.current[`${nextR}-${nextC}`]?.focus();
-          }, 0);
-        } else {
-          // check win when word ends
-          checkWin(newInputs);
-        }
-      }
+      setLetter(r, c, char);
+      moveToNext(r, c);
     } else {
-      checkWin(newInputs);
+      clearCell(r, c);
     }
   };
 
   const handleKeyDown = (e, r, c) => {
-    if (!puzzleData) return;
-    if (e.key === 'Backspace' && !userInputs[`${r}-${c}`]) {
-      // Move back
-      const activeWord = puzzleData.words.find(w => w.id === activeWordId);
-      if (activeWord) {
-        let prevR = r;
-        let prevC = c;
-        if (activeWord.dir === 'across') prevC -= 1;
-        else prevR -= 1;
+    if (!puzzleData || gameState !== 'playing') return;
 
-        if (gridData[prevR] && gridData[prevR][prevC] && gridData[prevR][prevC].isActive) {
-          setActiveCell({ r: prevR, c: prevC });
-          setTimeout(() => {
-            inputRefs.current[`${prevR}-${prevC}`]?.focus();
-          }, 0);
-        }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveTo(r - 1, c);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      moveTo(r + 1, c);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      moveTo(r, c - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      moveTo(r, c + 1);
+    } else if (e.key === 'Backspace') {
+      if (!userInputs[`${r}-${c}`]) {
+        e.preventDefault();
+        moveToPrevious(r, c);
+      } else {
+        e.preventDefault();
+        clearCell(r, c);
       }
     }
   };
@@ -371,7 +364,7 @@ export default function CrosswordGame({ onQuit }) {
     <div className="bg-slate-50 min-h-screen pb-20 font-sans animate-in fade-in duration-500">
       <section className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12" style={{ minHeight: '340px' }}>
         <div className="absolute top-8 left-4 md:left-8 z-20">
-          <button 
+          <button
             onClick={onQuit}
             className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm"
           >
@@ -428,14 +421,36 @@ export default function CrosswordGame({ onQuit }) {
           </Container>
         )}
 
+        {gameState === 'error' && (
+          <Container>
+            <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-3xl p-8 text-center shadow-sm">
+              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <X size={32} strokeWidth={2.5} />
+              </div>
+              <h2 className="text-2xl font-bold text-red-900 mb-3">Invalid Puzzle Configuration</h2>
+              <p className="text-red-700 mb-8 leading-relaxed">
+                The generated crossword contains structural mismatches and cannot be rendered safely. Please restart or try another set.
+              </p>
+              <div className="flex justify-center gap-4">
+                <Button onClick={initGame} variant="primary" className="bg-red-600 hover:bg-red-700 border-none px-6">
+                  <RefreshCw size={18} className="mr-2" /> Try Again
+                </Button>
+                <button onClick={onQuit} className="px-6 py-2 text-red-600 font-semibold hover:bg-red-100 rounded-lg transition-colors">
+                  Go Back
+                </button>
+              </div>
+            </div>
+          </Container>
+        )}
+
         {(gameState === 'playing' || gameState === 'completed') && puzzleData && (
           <Container>
             <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
-              
+
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 w-full">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <PenTool className="text-primary" size={24} /> 
+                    <PenTool className="text-primary" size={24} />
                     Crossword Grid
                   </h2>
                   <p className="text-slate-500 mt-1">Fill in the answers based on the clues below.</p>
@@ -453,33 +468,37 @@ export default function CrosswordGame({ onQuit }) {
               </div>
 
               <div className="flex flex-col lg:flex-row gap-10">
-                
+
                 {/* The Grid */}
-                <div className="lg:w-3/5 overflow-x-auto pb-4">
-                  <div 
-                    className="inline-grid gap-0 border border-slate-300 bg-slate-300"
-                    style={{ gridTemplateColumns: `repeat(${puzzleData.gridSizeC}, minmax(0, 1fr))` }}
+                <div className="lg:w-3/5 pb-4 w-full max-w-full overflow-hidden flex justify-center items-start">
+                  <div
+                    className="grid bg-slate-300 border border-slate-300 mx-auto"
+                    style={{
+                      gridTemplateColumns: `repeat(${puzzleData.gridSizeC}, 1fr)`,
+                      gap: '2px',
+                      width: 'min(100%, 500px)',
+                    }}
                   >
-                    {gridData.map((row, r) => 
+                    {gridData.map((row, r) =>
                       row.map((cell, c) => {
                         if (!cell.isActive) {
-                          return <div key={`${r}-${c}`} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-transparent" />;
+                          return <div key={`${r}-${c}`} className="w-full aspect-square bg-transparent" />;
                         }
 
                         const isActiveWord = cell.words.includes(activeWordId);
                         const isActiveCell = activeCell?.r === r && activeCell?.c === c;
 
                         return (
-                          <div 
-                            key={`${r}-${c}`} 
+                          <div
+                            key={`${r}-${c}`}
                             className={cn(
-                              "relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border border-slate-300 transition-colors",
-                              isActiveCell ? "bg-amber-200" : isActiveWord ? "bg-amber-50" : "bg-white"
+                              "relative w-full aspect-square transition-colors cell",
+                              isActiveCell ? "active bg-[#facc1533] outline outline-2 outline-[#facc15] z-20" : isActiveWord ? "bg-amber-50" : "bg-white"
                             )}
                             onClick={() => handleCellClick(r, c, cell.words)}
                           >
                             {cell.num && (
-                              <span className="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold text-slate-600 select-none pointer-events-none">
+                              <span className="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold text-slate-600 select-none pointer-events-none leading-none z-10">
                                 {cell.num}
                               </span>
                             )}
@@ -493,7 +512,7 @@ export default function CrosswordGame({ onQuit }) {
                               onFocus={() => handleCellClick(r, c, cell.words)}
                               disabled={gameState === 'completed'}
                               className={cn(
-                                "w-full h-full text-center font-bold text-sm sm:text-base md:text-xl uppercase bg-transparent outline-none caret-transparent cursor-pointer",
+                                "absolute inset-0 w-full h-full text-center font-bold text-sm sm:text-lg md:text-xl uppercase bg-transparent outline-none caret-transparent cursor-pointer m-0 p-0",
                                 gameState === 'completed' && userInputs[`${r}-${c}`] === cell.correctChar ? "text-green-600" : "text-slate-800"
                               )}
                             />
@@ -510,8 +529,8 @@ export default function CrosswordGame({ onQuit }) {
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Across</h3>
                     <ul className="space-y-3">
                       {puzzleData.words.filter(w => w.dir === 'across').map(w => (
-                        <li 
-                          key={w.id} 
+                        <li
+                          key={w.id}
                           onClick={() => {
                             if (gameState !== 'playing') return;
                             setActiveWordId(w.id);
@@ -534,8 +553,8 @@ export default function CrosswordGame({ onQuit }) {
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Down</h3>
                     <ul className="space-y-3">
                       {puzzleData.words.filter(w => w.dir === 'down').map(w => (
-                        <li 
-                          key={w.id} 
+                        <li
+                          key={w.id}
                           onClick={() => {
                             if (gameState !== 'playing') return;
                             setActiveWordId(w.id);
@@ -558,7 +577,7 @@ export default function CrosswordGame({ onQuit }) {
                     <Button onClick={initGame} variant="outline" className="w-full flex items-center justify-center gap-2 font-bold text-slate-600 hover:text-slate-900 border-slate-300">
                       <RefreshCw size={16} /> Restart Puzzle
                     </Button>
-                    <button 
+                    <button
                       onClick={onQuit}
                       className="w-full py-2.5 text-sm font-bold text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
@@ -567,43 +586,53 @@ export default function CrosswordGame({ onQuit }) {
                   </div>
                 </div>
 
+                </div>
+              </div>
+            </Container>
+          )}
+
+        {gameState === 'completed' && (
+          <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500">
+            <div className="w-full max-w-[300px] sm:max-w-[360px] min-h-[220px] bg-white rounded-[12px] sm:rounded-[16px] shadow-2xl p-5 sm:p-6 text-center box-border animate-in zoom-in-95 duration-300 flex flex-col items-center justify-center">
+
+              {/* Icon */}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-100/60">
+                <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />
               </div>
 
-              {gameState === 'completed' && (
-                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 animate-in fade-in zoom-in-95 duration-500">
-                  <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100/50">
-                    <CheckCircle2 size={40} strokeWidth={2.5} />
-                  </div>
-                  <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2 tracking-tight">Puzzle Completed!</h3>
-                  <p className="text-slate-600 mb-8 max-w-md text-base leading-relaxed">
-                    Great job filling out all the forensic clues.
-                    <br/><br/>
-                    <span className="inline-block bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-                      Time: <span className="text-primary font-bold">{formatTime(timeElapsed)}</span>
-                    </span>
-                  </p>
-                  
-                  <div className="mt-4 sm:mt-5 flex flex-col sm:flex-row gap-3 w-full justify-center max-w-sm mx-auto">
-                    <button 
-                      onClick={initGame} 
-                      className="w-full sm:w-auto h-10 px-6 bg-slate-900 text-white hover:bg-slate-800 shadow-md transition-all font-bold rounded-lg whitespace-nowrap flex items-center justify-center gap-2"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      <span className="hidden sm:inline">Play Again</span>
-                      <span className="sm:hidden">Replay</span>
-                    </button>
-                    <button 
-                      onClick={onQuit} 
-                      className="w-full sm:w-auto h-10 px-6 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap flex items-center justify-center"
-                    >
-                      Back to Games
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Title */}
+              <h2 className="text-[18px] sm:text-[22px] font-heading font-bold text-slate-900 mb-2 tracking-tight">
+                Puzzle Completed!
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-slate-500 text-[13px] sm:text-sm mb-4 leading-relaxed">
+                Great job filling out all the forensic clues.
+              </p>
+
+              {/* Time badge */}
+              <div className="inline-block bg-slate-50 border border-slate-200 rounded-lg px-4 py-1.5 text-sm font-semibold text-slate-700 mb-4">
+                Time: <span className="text-primary font-bold">{formatTime(timeElapsed)}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-[10px] justify-center w-full">
+                <button
+                  onClick={initGame}
+                  className="w-full h-10 px-6 bg-slate-900 text-white hover:bg-slate-800 shadow-md transition-all font-bold rounded-lg flex items-center justify-center gap-2 text-sm"
+                >
+                  <RefreshCw className="w-4 h-4" /> Play Again
+                </button>
+                <button
+                  onClick={onQuit}
+                  className="w-full h-10 px-6 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center text-sm"
+                >
+                  Back to Games
+                </button>
+              </div>
 
             </div>
-          </Container>
+          </div>
         )}
       </div>
     </div>

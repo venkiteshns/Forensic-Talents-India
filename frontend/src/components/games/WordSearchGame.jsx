@@ -159,6 +159,17 @@ export default function WordSearchGame({ onQuit }) {
     return () => clearInterval(interval);
   }, [gameState]);
 
+  useEffect(() => {
+    if (gameState === 'completed') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [gameState]);
+
   const handleStartGameClick = async () => {
     setGameState('loading');
 
@@ -480,42 +491,52 @@ export default function WordSearchGame({ onQuit }) {
                   </div>
                 </div>
               </div>
-
-              {gameState === 'completed' && (
-                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 animate-in fade-in zoom-in-95 duration-500">
-                  <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100/50">
-                    <CheckCircle2 size={40} strokeWidth={2.5} />
-                  </div>
-                  <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2 tracking-tight">Puzzle Completed</h3>
-                  <p className="text-slate-600 mb-8 max-w-md text-base leading-relaxed">
-                    You have successfully completed the forensic word search.
-                    <br /><br />
-                    <span className="inline-block bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-                      Time: <span className="text-primary font-bold">{formatTime(timeElapsed)}</span> • Words: <span className="text-primary font-bold">{wordsToFind.length}</span>
-                    </span>
-                  </p>
-
-                  <div className="mt-4 sm:mt-5 flex flex-col sm:flex-row gap-3 w-full justify-center max-w-sm mx-auto">
-                    <button
-                      onClick={initGame}
-                      className="w-full sm:w-auto h-10 px-6 bg-slate-900 text-white hover:bg-slate-800 shadow-md transition-all font-bold rounded-lg whitespace-nowrap flex items-center justify-center gap-2"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      <span className="hidden sm:inline">Play Again</span>
-                      <span className="sm:hidden">Replay</span>
-                    </button>
-                    <button
-                      onClick={onQuit}
-                      className="w-full sm:w-auto h-10 px-6 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap flex items-center justify-center"
-                    >
-                      Back to Games
-                    </button>
-                  </div>
-                </div>
-              )}
-
             </div>
           </Container>
+        )}
+
+        {gameState === 'completed' && (
+          <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500">
+            <div className="w-full max-w-[300px] sm:max-w-[360px] min-h-[220px] bg-white rounded-[12px] sm:rounded-[16px] shadow-2xl p-5 sm:p-6 text-center box-border animate-in zoom-in-95 duration-300 flex flex-col items-center justify-center">
+
+              {/* Icon */}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-100/60">
+                <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />
+              </div>
+
+              {/* Title */}
+              <h2 className="text-[18px] sm:text-[22px] font-heading font-bold text-slate-900 mb-2 tracking-tight">
+                Puzzle Completed!
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-slate-500 text-[13px] sm:text-sm mb-4 leading-relaxed">
+                You have successfully completed the forensic word search.
+              </p>
+
+              {/* Time & Words badge */}
+              <div className="inline-block bg-slate-50 border border-slate-200 rounded-lg px-4 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 mb-4">
+                Time: <span className="text-primary font-bold">{formatTime(timeElapsed)}</span> • Words: <span className="text-primary font-bold">{wordsToFind.length}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-[10px] justify-center w-full">
+                <button
+                  onClick={initGame}
+                  className="w-full h-10 px-6 bg-slate-900 text-white hover:bg-slate-800 shadow-md transition-all font-bold rounded-lg flex items-center justify-center gap-2 text-sm"
+                >
+                  <RefreshCw className="w-4 h-4" /> Play Again
+                </button>
+                <button
+                  onClick={onQuit}
+                  className="w-full h-10 px-6 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center text-sm"
+                >
+                  Back to Games
+                </button>
+              </div>
+
+            </div>
+          </div>
         )}
       </div>
     </div>
