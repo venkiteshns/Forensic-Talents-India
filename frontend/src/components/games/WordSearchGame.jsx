@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { RefreshCw, Play, CheckCircle2, Clock, Trophy, Search, AlertCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 const FALLBACK_WORDS = [
   'FORENSIC',
@@ -194,7 +195,7 @@ export default function WordSearchGame({ onQuit }) {
         throw new Error("Invalid active word set");
       }
     } catch (err) {
-      console.error("Using fallback words. Error:", err.message);
+      console.error("Using fallback words. Error:", getErrorMessage(err));
       activeWords = FALLBACK_WORDS;
     }
 

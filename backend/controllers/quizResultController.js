@@ -7,27 +7,35 @@ import Certificate from '../models/Certificate.js';
  */
 export const getQuizResults = async (req, res, next) => {
   try {
-    const { quizName, startDate, endDate } = req.query;
-    const filter = {};
+    const { quizName, date } = req.query;
+    const query = {};
 
     if (quizName) {
-      filter.quizName = { $regex: quizName, $options: 'i' };
+      query.quizName = { $regex: quizName, $options: 'i' };
     }
 
-    if (startDate || endDate) {
-      filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = new Date(startDate);
-      if (endDate) {
-        // Include the full end day
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        filter.createdAt.$lte = end;
-      }
+    if (date) {
+      // quizDate is stored in mixed formats across records:
+      //   New records: "2026-04-18"  (ISO, from certificateService)
+      //   Old records: "18 April 2026" (human-readable, legacy)
+      // Match BOTH so filtering works regardless of which format a record uses.
+      const [year, month, day] = date.split('-');
+      const months = ['January','February','March','April','May','June',
+                      'July','August','September','October','November','December'];
+      const humanFormat = `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
+      // date itself is already the ISO format e.g. "2026-04-18"
+      query.quizDate = { $in: [date, humanFormat] };
     }
 
-    const results = await Certificate.find(filter)
+    const results = await Certificate.find(query)
       .sort({ createdAt: -1 })
       .lean();
+
+    if (date) {
+      console.log("Selected date (raw):", date);
+      console.log("Filtering quizDate ==", query.quizDate);
+      console.log("Results count:", results.length);
+    }
 
     res.json(results);
   } catch (err) {

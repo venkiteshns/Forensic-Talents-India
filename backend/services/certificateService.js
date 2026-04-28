@@ -10,10 +10,8 @@ export const createCertificate = async ({ name, email, marksScored }) => {
     throw new Error('No quiz found in the database');
   }
 
-  // Format date: Day Month Year (e.g., 27 March 2026)
-  const d = new Date(quiz.date);
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const formattedDate = `${d.getUTCDate()} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  // Store date like: "2026-04-25"
+  const formattedDate = new Date(quiz.date).toISOString().split('T')[0];
 
   // Atomically get and increment the counter
   let counter = await Counter.findOneAndUpdate(

@@ -16,7 +16,7 @@ const enrollmentSchema = new mongoose.Schema({
   internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship' }, // set when targetType = Internship
   mode: { type: String, enum: ['online', 'offline'] }, // system-derived from internship; not user-controlled
   additionalInfo: { type: String },
-  statusApproval: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  statusApproval: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', index: true },
   rejectionReason: { type: String },
   rejectedAt: { type: Date, default: null },
   paymentScreenshotPublicId: { type: String }

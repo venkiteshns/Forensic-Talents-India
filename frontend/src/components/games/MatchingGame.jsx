@@ -5,6 +5,7 @@ import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Fingerprint, Dna, Micr
 import { cn } from '../../utils/cn';
 
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 const ICONS = [
   { id: 'fingerprint', component: Fingerprint, color: 'text-blue-500' },
@@ -103,7 +104,7 @@ export default function MatchingGame({ onQuit }) {
         };
       }
     } catch (err) {
-      console.error("Using fallback icons. Error:", err.message);
+      console.error("Using fallback icons. Error:", getErrorMessage(err));
     }
     
     setGameConfig(config);

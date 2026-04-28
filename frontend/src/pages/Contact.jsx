@@ -6,6 +6,7 @@ import { SuccessModal } from '../components/ui/SuccessModal';
 import CountryPhoneInput from '../components/ui/CountryPhoneInput';
 import SearchableCountrySelect from '../components/ui/SearchableCountrySelect';
 import { validatePhoneNumber } from '../utils/phoneValidation';
+import { getErrorMessage } from '../utils/errorHandler';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ export default function Contact() {
   });
 
   const [status, setStatus] = useState('');
+  const [serverError, setServerError] = useState('');
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -114,6 +116,7 @@ export default function Contact() {
     }
 
     setStatus('loading');
+    setServerError('');
 
     let subjectLine = 'Contact Us Form';
     if (formData.enquiryCategory === 'Educational') {
@@ -144,10 +147,13 @@ export default function Contact() {
         setTouched({});
         setShowSuccessModal(true);
       } else {
-        setStatus('server_error');
+        setStatus('');
+        const errData = await response.json().catch(() => ({}));
+        setServerError(getErrorMessage({ response: { status: response.status, data: errData } }));
       }
     } catch (error) {
-      setStatus('server_error');
+      setStatus('');
+      setServerError(getErrorMessage(error));
     }
   };
 
@@ -175,14 +181,9 @@ export default function Contact() {
             <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
               <h2 className="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
 
-              {/* {status === 'error' && (
+              {serverError && (
                 <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
-                  Please fix the highlighted errors before submitting.
-                </div>
-              )} */}
-              {status === 'server_error' && (
-                <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
-                  Something went wrong while sending your message. Please try again later.
+                  {serverError}
                 </div>
               )}
 

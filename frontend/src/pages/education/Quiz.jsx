@@ -7,6 +7,7 @@ import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { QuizSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 export default function Quiz() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
@@ -43,11 +44,7 @@ export default function Quiz() {
       const res = await api.post('/certificates/verify', { certificateNumber: certNumber.trim() });
       setCertResult(res.data);
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setCertError(err.response.data.message);
-      } else {
-        setCertError('Failed to verify certificate. Please try again.');
-      }
+      setCertError(getErrorMessage(err, { 500: 'Failed to verify certificate. Please try again.' }));
     } finally {
       setIsVerifying(false);
     }
@@ -60,8 +57,7 @@ export default function Quiz() {
       const res = await api.post('/certificates/resend', { certificateNumber: certNumber.trim() });
       setResendMessage(res.data.message);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'We encountered an unexpected issue. Please try again later.';
-      setResendMessage(errorMessage);
+      setResendMessage(getErrorMessage(err, { 500: 'We encountered an unexpected issue. Please try again later.' }));
     } finally {
       setIsResending(false);
     }

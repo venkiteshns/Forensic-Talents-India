@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, PenTool, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 import CrosswordWorker from './crosswordWorker?worker';
 
 const fetchWordSet = async () => {
@@ -19,7 +20,9 @@ const fetchWordSet = async () => {
       }
       return res.data.words;
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error("Failed to fetch crossword words:", getErrorMessage(err));
+  }
   
   return [
     { word: 'FORENSIC', clue: 'Scientific analysis for crime' },
@@ -105,7 +108,7 @@ export default function CrosswordGame({ onQuit }) {
             return newQ;
           });
         } catch (err) {
-          console.error("Background generation failed:", err);
+          console.error("Background generation failed:", getErrorMessage(err));
         } finally {
           isGeneratingRef.current = false;
         }
@@ -173,7 +176,7 @@ export default function CrosswordGame({ onQuit }) {
         const result = await generateWithTimeout(workerRef.current, words, 10000);
         applyPuzzle(result);
       } catch (err) {
-        console.error("Sync generation failed", err);
+        console.error("Sync generation failed:", getErrorMessage(err));
         setGameState('error');
       }
     }

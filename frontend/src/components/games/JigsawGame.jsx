@@ -5,6 +5,7 @@ import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Image as ImageIcon } f
 import { cn } from '../../utils/cn';
 
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 // Fallback theme image
 const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=800&auto=format&fit=crop';
@@ -128,7 +129,7 @@ export default function JigsawGame({ onQuit }) {
         }
       }
     } catch (err) {
-      console.error("Using fallback jigsaw. Error:", err.message);
+      console.error("Using fallback jigsaw. Error:", getErrorMessage(err));
     }
     
     setPuzzleImage(imgUrl);

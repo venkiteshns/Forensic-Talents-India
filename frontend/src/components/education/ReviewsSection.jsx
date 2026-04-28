@@ -3,6 +3,7 @@ import { Star, Upload, CheckCircle2 } from 'lucide-react';
 import { Container } from '../ui/Container';
 import ReviewCard from '../ui/ReviewCard';
 import api from '../../utils/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 // Helper: get initials from name (e.g. "John Ken" → "JK", "John" → "J")
 function getInitials(name) {
@@ -134,7 +135,7 @@ export default function ReviewsSection({ type }) {
       }, 5000);
       
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Something went wrong. Please try again.');
+      setErrorMsg(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }

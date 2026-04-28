@@ -3,10 +3,13 @@ import * as reviewController from '../controllers/reviewController.js';
 import * as paymentController from '../controllers/paymentController.js';
 import * as enrollmentController from '../controllers/enrollmentController.js';
 import * as quizResultController from '../controllers/quizResultController.js';
+import * as pendingCountsController from '../controllers/pendingCountsController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/multerMiddleware.js';
 
 const router = express.Router();
+
+router.get('/pending-counts', protect, pendingCountsController.getPendingCounts);
 
 router.get('/reviews', protect, reviewController.getAdminReviews);
 router.put('/payment-settings', protect, upload.single('qrCode'), paymentController.updatePaymentSettings);
