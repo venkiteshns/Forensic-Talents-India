@@ -65,8 +65,7 @@ export const processEnrollment = async (data, file) => {
       ${organizationName ? `<p><strong>Organization:</strong> ${organizationName}</p>` : ''}
       <hr/>
       <h3>Enrollment Details</h3>
-      <p><strong>Target Type:</strong> ${targetType}</p>
-      <p><strong>Target Name:</strong> ${targetName}</p>
+      <p><strong>${targetType === 'Internship' ? 'Internship Name' : 'Course Name'}:</strong> ${targetName}</p>
       ${resolvedMode ? `<p><strong>Mode (system-verified):</strong> ${resolvedMode}</p>` : ''}
       <p><strong>Transaction ID:</strong> ${transactionId}</p>
       <p><strong>Payment Proof:</strong> <a href="${paymentProofUrl}">View Image</a></p>
@@ -106,7 +105,7 @@ export const approveEnrollment = async (id) => {
       <br/>
       <p>Best regards,<br/>
         <strong>Mr. Arunkumar Kavad</strong><br/>
-        CEO, FOR-T INDIA | Gujarat, INDIA
+        CEO, FOR-T INDIA <br/> Gujarat, INDIA
         </p>
     `
   };

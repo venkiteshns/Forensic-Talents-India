@@ -4,12 +4,16 @@ import * as paymentController from '../controllers/paymentController.js';
 import * as enrollmentController from '../controllers/enrollmentController.js';
 import * as quizResultController from '../controllers/quizResultController.js';
 import * as pendingCountsController from '../controllers/pendingCountsController.js';
+import * as adminSecurityController from '../controllers/adminSecurityController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/multerMiddleware.js';
 
 const router = express.Router();
 
 router.get('/pending-counts', protect, pendingCountsController.getPendingCounts);
+
+router.post('/change-password', protect, adminSecurityController.changePassword);
+router.post('/change-email', protect, adminSecurityController.changeEmail);
 
 router.get('/reviews', protect, reviewController.getAdminReviews);
 router.put('/payment-settings', protect, upload.single('qrCode'), paymentController.updatePaymentSettings);
