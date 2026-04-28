@@ -20,12 +20,14 @@ export default function ReviewsSection({ type }) {
   const [loading, setLoading] = useState(true);
   
   // Form state
-  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '', type: type || 'service' });
+  const [reviewType, setReviewType] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', rating: 5, review: '' });
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [successMode, setSuccessMode] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({ type: '', name: '', email: '', review: '' });
 
   useEffect(() => {
     fetchReviews();
@@ -63,10 +65,46 @@ export default function ReviewsSection({ type }) {
     }
   };
 
-  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const set = (key) => (e) => {
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+    setFieldErrors((fe) => ({ ...fe, [key]: '' }));
+  };
+
+  const validate = () => {
+    const errs = { type: '', name: '', email: '', review: '' };
+    let valid = true;
+    if (!reviewType) {
+      errs.type = 'Please select a type — Service (Case work) or Education (Training).';
+      valid = false;
+    }
+    if (!form.name.trim()) {
+      errs.name = 'Full name is required.';
+      valid = false;
+    } else if (form.name.trim().length < 2) {
+      errs.name = 'Name must be at least 2 characters.';
+      valid = false;
+    }
+    if (!form.email.trim()) {
+      errs.email = 'Email address is required.';
+      valid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      errs.email = 'Please enter a valid email address.';
+      valid = false;
+    }
+    if (!form.review.trim()) {
+      errs.review = 'Please write your review before submitting.';
+      valid = false;
+    } else if (form.review.trim().length < 10) {
+      errs.review = 'Review must be at least 10 characters.';
+      valid = false;
+    }
+    setFieldErrors(errs);
+    return valid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
     setSubmitting(true);
     setErrorMsg('');
     try {
@@ -75,7 +113,7 @@ export default function ReviewsSection({ type }) {
       formData.append('email', form.email);
       formData.append('rating', form.rating);
       formData.append('review', form.review);
-      formData.append('type', form.type);
+      formData.append('type', reviewType);
       if (photoFile) {
         formData.append('photo', photoFile);
       }
@@ -85,7 +123,9 @@ export default function ReviewsSection({ type }) {
       });
       
       setSuccessMode(true);
-      setForm({ name: '', email: '', rating: 5, review: '', type: type || 'service' });
+      setForm({ name: '', email: '', rating: 5, review: '' });
+      setReviewType('');
+      setFieldErrors({ type: '', name: '', email: '', review: '' });
       setPhotoFile(null);
       setPhotoPreview('');
       
@@ -94,7 +134,7 @@ export default function ReviewsSection({ type }) {
       }, 5000);
       
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Failed to submit review');
+      setErrorMsg(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -203,61 +243,100 @@ export default function ReviewsSection({ type }) {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-8">
                 {errorMsg && (
-                  <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100">
-                    {errorMsg}
+                  <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-100 flex items-start gap-2">
+                    <span className="mt-0.5">⚠️</span>
+                    <span>{errorMsg}</span>
                   </div>
                 )}
-                
+
+                {/* ── Type of Review ── Always visible ── */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Type of Review *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { value: 'service',   label: 'Service',   desc: 'Case work' },
+                      { value: 'education', label: 'Education', desc: 'Training' }
+                    ].map(opt => (
+                      <label
+                        key={opt.value}
+                        className={`flex flex-col gap-1 rounded-lg border p-4 cursor-pointer transition-all ${
+                          reviewType === opt.value
+                            ? 'border-yellow-500 bg-yellow-50 shadow-sm'
+                            : fieldErrors.type
+                              ? 'bg-white border-red-300 hover:border-red-400'
+                              : 'bg-white border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="reviewType"
+                          value={opt.value}
+                          checked={reviewType === opt.value}
+                          onChange={() => {
+                            setReviewType(opt.value);
+                            setFieldErrors(fe => ({ ...fe, type: '' }));
+                          }}
+                          className="sr-only"
+                        />
+                        <span className={`text-sm font-bold ${
+                          reviewType === opt.value ? 'text-yellow-700' : 'text-slate-700'
+                        }`}>{opt.label}</span>
+                        <span className={`text-xs ${
+                          reviewType === opt.value ? 'text-yellow-600' : 'text-slate-400'
+                        }`}>{opt.desc}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {fieldErrors.type && (
+                    <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+                      <span>⚠</span> {fieldErrors.type}
+                    </p>
+                  )}
+                </div>
+
+                {/* ── Name & Email ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Full Name *</label>
-                    <input type="text" required value={form.name} onChange={set('name')} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all" placeholder="Enter your name" />
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={set('name')}
+                      className={`w-full px-5 py-3.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all ${
+                        fieldErrors.name ? 'border-red-400 bg-red-50' : 'border-slate-200'
+                      }`}
+                      placeholder="Enter your name"
+                    />
+                    {fieldErrors.name && (
+                      <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><span>⚠</span> {fieldErrors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Email Address *</label>
-                    <input type="email" required value={form.email} onChange={set('email')} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all" placeholder="your@email.com" />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={set('email')}
+                      className={`w-full px-5 py-3.5 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all ${
+                        fieldErrors.email ? 'border-red-400 bg-red-50' : 'border-slate-200'
+                      }`}
+                      placeholder="your@email.com"
+                    />
+                    {fieldErrors.email && (
+                      <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><span>⚠</span> {fieldErrors.email}</p>
+                    )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  {/* Review Type Selector - Only show if type is not fixed */}
-                  {!type && (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Type of Review *</label>
-                      <div className="grid grid-cols-2 gap-4">
-                        {[
-                          { value: 'service', label: 'Service', desc: 'Case work' },
-                          { value: 'education', label: 'Education', desc: 'Training' }
-                        ].map(opt => (
-                          <label key={opt.value} className={`flex flex-col gap-0.5 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                            form.type === opt.value
-                              ? 'border-accent bg-accent/5 text-primary'
-                              : 'border-slate-100 bg-slate-50 hover:border-slate-200 text-slate-600'
-                          }`}>
-                            <input
-                              type="radio" name="reviewTypeGlobal" value={opt.value}
-                              checked={form.type === opt.value}
-                              onChange={() => setForm(f => ({ ...f, type: opt.value }))}
-                              className="sr-only"
-                            />
-                            <span className="text-sm font-bold">{opt.label}</span>
-                            <span className="text-xs opacity-60">{opt.desc}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Rating */}
-                  <div className={type ? "lg:col-span-2" : ""}>
-                    <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Overall Rating *</label>
-                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 w-fit">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} className="p-1.5 transition-transform hover:scale-125 focus:outline-none group">
-                          <Star size={32} className={star <= form.rating ? "text-accent fill-accent" : "text-slate-300 group-hover:text-slate-400"} />
-                        </button>
-                      ))}
-                    </div>
+                {/* ── Rating ── */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">Overall Rating *</label>
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-200 w-fit">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} className="p-1.5 transition-transform hover:scale-125 focus:outline-none group">
+                        <Star size={32} className={star <= form.rating ? "text-accent fill-accent" : "text-slate-300 group-hover:text-slate-400"} />
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -284,7 +363,18 @@ export default function ReviewsSection({ type }) {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Detailed Review *</label>
-                    <textarea required rows={5} value={form.review} onChange={set('review')} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all resize-none" placeholder="Describe your experience with our team..."></textarea>
+                    <textarea
+                      rows={5}
+                      value={form.review}
+                      onChange={set('review')}
+                      className={`w-full px-5 py-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all resize-none ${
+                        fieldErrors.review ? 'border-red-400 bg-red-50' : 'border-slate-200'
+                      }`}
+                      placeholder="Describe your experience with our team..."
+                    />
+                    {fieldErrors.review && (
+                      <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1"><span>⚠</span> {fieldErrors.review}</p>
+                    )}
                   </div>
                 </div>
 
