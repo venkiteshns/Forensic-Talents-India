@@ -45,6 +45,15 @@ export const getAllSets = async (type) => {
 export const createSet = async (type, data) => {
   const Model = getModel(type);
   if (!Model) throw new Error('Invalid game type');
+
+  // Business Rule: Only one Forensic Icons set can exist at a time.
+  if (type === 'matching' && data.useIcons) {
+    const existingIconsSet = await Model.findOne({ useIcons: true });
+    if (existingIconsSet) {
+      throw new Error('A Forensic Icons set already exists. Please delete the existing one before adding a new one.');
+    }
+  }
+
   const newSet = new Model(data);
   return await newSet.save();
 };
