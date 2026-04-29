@@ -55,6 +55,10 @@ const generateWithTimeout = (worker, words, ms = 10000) => {
   ]);
 };
 
+// Bump this constant whenever the puzzle generation logic changes.
+// It ensures stale cached puzzles (with old numbering) are discarded.
+const CACHE_VERSION = 'v3';
+
 export default function CrosswordGame({ onQuit }) {
   const [puzzleData, setPuzzleData] = useState(null);
   const [gridData, setGridData] = useState([]);
@@ -73,17 +77,24 @@ export default function CrosswordGame({ onQuit }) {
 
   useEffect(() => {
     workerRef.current = new CrosswordWorker();
-    
+
     const cached = localStorage.getItem('crosswordPuzzleCache');
-    if (cached) {
+    const cachedVersion = localStorage.getItem('crosswordPuzzleCacheVersion');
+    if (cached && cachedVersion === CACHE_VERSION) {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setPuzzleQueue(parsed);
         }
-      } catch (e) {}
+      } catch (e) {
+        localStorage.removeItem('crosswordPuzzleCache');
+      }
+    } else {
+      // Stale or missing version → purge
+      localStorage.removeItem('crosswordPuzzleCache');
+      localStorage.setItem('crosswordPuzzleCacheVersion', CACHE_VERSION);
     }
-    
+
     return () => {
       if (workerRef.current) workerRef.current.terminate();
     };
@@ -91,20 +102,21 @@ export default function CrosswordGame({ onQuit }) {
 
   const generateInBackground = () => {
     if (!workerRef.current || isGeneratingRef.current) return;
-    
+
     setPuzzleQueue(prev => {
       if (prev.length >= 2) return prev;
-      
+
       isGeneratingRef.current = true;
       (async () => {
         try {
           const words = await fetchWordSet();
-          const result = await generateWithTimeout(workerRef.current, words, 10000);
-          
+          const result = await generateWithTimeout(workerRef.current, words, 12000);
+
           setPuzzleQueue(q => {
             const newQ = [...q, result];
             if (newQ.length > 3) newQ.shift();
             localStorage.setItem('crosswordPuzzleCache', JSON.stringify(newQ));
+            localStorage.setItem('crosswordPuzzleCacheVersion', CACHE_VERSION);
             return newQ;
           });
         } catch (err) {
@@ -113,7 +125,7 @@ export default function CrosswordGame({ onQuit }) {
           isGeneratingRef.current = false;
         }
       })();
-      
+
       return prev;
     });
   };
@@ -168,17 +180,24 @@ export default function CrosswordGame({ onQuit }) {
       const remaining = puzzleQueue.slice(1);
       setPuzzleQueue(remaining);
       localStorage.setItem('crosswordPuzzleCache', JSON.stringify(remaining));
-      
+      localStorage.setItem('crosswordPuzzleCacheVersion', CACHE_VERSION);
       setTimeout(() => applyPuzzle(nextPuzzle), 50);
     } else {
-      try {
-        const words = await fetchWordSet();
-        const result = await generateWithTimeout(workerRef.current, words, 10000);
-        applyPuzzle(result);
-      } catch (err) {
-        console.error("Sync generation failed:", getErrorMessage(err));
-        setGameState('error');
+      // Retry up to 3 times before showing error
+      let lastErr = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const words = await fetchWordSet();
+          const result = await generateWithTimeout(workerRef.current, words, 12000);
+          applyPuzzle(result);
+          return;
+        } catch (err) {
+          lastErr = err;
+          console.error(`Sync generation attempt ${attempt + 1} failed:`, getErrorMessage(err));
+        }
       }
+      console.error('All sync attempts failed:', getErrorMessage(lastErr));
+      setGameState('error');
     }
   };
 
@@ -531,7 +550,10 @@ export default function CrosswordGame({ onQuit }) {
                   <div>
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Across</h3>
                     <ul className="space-y-3">
-                      {puzzleData.words.filter(w => w.dir === 'across').map(w => (
+                      {[...puzzleData.words]
+                        .filter(w => w.dir === 'across')
+                        .sort((a, b) => a.num - b.num)
+                        .map(w => (
                         <li
                           key={w.id}
                           onClick={() => {
@@ -555,7 +577,10 @@ export default function CrosswordGame({ onQuit }) {
                   <div>
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Down</h3>
                     <ul className="space-y-3">
-                      {puzzleData.words.filter(w => w.dir === 'down').map(w => (
+                      {[...puzzleData.words]
+                        .filter(w => w.dir === 'down')
+                        .sort((a, b) => a.num - b.num)
+                        .map(w => (
                         <li
                           key={w.id}
                           onClick={() => {
