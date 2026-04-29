@@ -6,10 +6,10 @@ const JigsawSchema = new mongoose.Schema({
     required: true,
     default: 'Untitled Jigsaw'
   },
-  difficulty: {
+  level: {
     type: String,
-    enum: ['easy', 'medium', 'hard'],
-    default: 'medium'
+    enum: ['easy', 'medium', 'hard', 'pro'],
+    default: 'easy'
   },
   imageUrl: {
     type: String,

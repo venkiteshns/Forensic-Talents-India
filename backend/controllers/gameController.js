@@ -1,12 +1,21 @@
 import * as gameService from '../services/gameService.js';
+import * as fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getGame = async (req, res, next) => {
   try {
     const { type } = req.params;
-    const playedIds = req.query.playedIds ? req.query.playedIds.split(',') : [];
-    const gameData = await gameService.getGameData(type, playedIds);
+    const level = req.query.level || 'easy';
+    const gameData = await gameService.getGameData(type, level);
     res.json(gameData);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error("GAME CONTROLLER ERROR:", err.stack);
+    next(err);
+  }
 };
 
 export const getAllGameSets = async (req, res, next) => {
@@ -14,7 +23,7 @@ export const getAllGameSets = async (req, res, next) => {
     const { type } = req.params;
     const sets = await gameService.getAllSets(type);
     res.json(sets);
-  } catch (err) { next(err); }
+  } catch (err) { console.error("GAME CONTROLLER ERROR:", err.stack); next(err); }
 };
 
 export const createGameSet = async (req, res, next) => {
@@ -22,7 +31,7 @@ export const createGameSet = async (req, res, next) => {
     const { type } = req.params;
     const newSet = await gameService.createSet(type, req.body);
     res.status(201).json(newSet);
-  } catch (err) { next(err); }
+  } catch (err) { console.error("GAME CONTROLLER ERROR:", err.stack); next(err); }
 };
 
 export const updateGameSet = async (req, res, next) => {
@@ -30,7 +39,12 @@ export const updateGameSet = async (req, res, next) => {
     const { type, id } = req.params;
     const updatedSet = await gameService.updateSet(type, id, req.body);
     res.json(updatedSet);
-  } catch (err) { next(err); }
+  } catch (err) { 
+    fs.writeFileSync(path.join(__dirname, '..', 'error.log'), err.stack || err.message);
+    if (err.message && err.message.startsWith('Cannot change level')) res.status(400);
+    console.error("GAME CONTROLLER ERROR:", err.stack); 
+    next(err); 
+  }
 };
 
 export const deleteGameSet = async (req, res, next) => {
@@ -38,5 +52,9 @@ export const deleteGameSet = async (req, res, next) => {
     const { type, id } = req.params;
     await gameService.deleteSet(type, id);
     res.json({ message: 'Deleted successfully' });
-  } catch (err) { next(err); }
+  } catch (err) { 
+    if (err.message && err.message.startsWith('Cannot delete')) res.status(400);
+    console.error("GAME CONTROLLER ERROR:", err.stack); 
+    next(err); 
+  }
 };

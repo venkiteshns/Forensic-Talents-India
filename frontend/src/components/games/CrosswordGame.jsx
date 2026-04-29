@@ -17,39 +17,21 @@ const CROSSWORD_LEVELS = {
   pro:     { words: 12 }
 };
 
-const fetchWordSet = async () => {
-  try {
-    const storedPlayedIds = JSON.parse(localStorage.getItem('playedCrosswordIds') || '[]');
-    const res = await api.get(`/game/crossword?playedIds=${storedPlayedIds.join(',')}`);
-
-    if (res.data && res.data.words && res.data.words.length > 0) {
-      if (res.data.resetOccurred) {
-        localStorage.setItem('playedCrosswordIds', JSON.stringify([res.data._id]));
-      } else {
-        localStorage.setItem('playedCrosswordIds', JSON.stringify([...storedPlayedIds, res.data._id]));
-      }
-      return res.data.words;
-    }
-  } catch (err) {
-    console.error("Failed to fetch crossword words:", getErrorMessage(err));
-  }
-  
-  return [
-    { word: 'FORENSIC', clue: 'Scientific analysis for crime' },
-    { word: 'CRIME', clue: 'Unlawful act' },
-    { word: 'SCENE', clue: 'Location of the crime' },
-    { word: 'EVIDENCE', clue: 'Material proof' },
-    { word: 'CLUE', clue: 'Lead for investigation' },
-    { word: 'AUTOPSY', clue: 'Post-mortem examination' },
-    { word: 'BLOOD', clue: 'Red fluid in body' },
-    { word: 'WEAPON', clue: 'Instrument used in crime' },
-    { word: 'SUSPECT', clue: 'Person thought to be guilty' },
-    { word: 'VICTIM', clue: 'Person harmed in crime' },
-    { word: 'WITNESS', clue: 'Person who saw the event' },
-    { word: 'DETECTIVE', clue: 'Investigator of crimes' },
-    { word: 'TRIAL', clue: 'Court hearing' },
-    { word: 'GUILTY', clue: 'Culpable of a crime' }
-  ];
+const FALLBACK_PUZZLE = {
+  puzzleData: {
+    gridSizeR: 5, gridSizeC: 5,
+    words: [
+      { id: "1A", word: "CASE", clue: "Investigation matter", dir: "across", r: 0, c: 0, num: 1, ans: "CASE" },
+      { id: "1D", word: "CELL", clue: "Prison room", dir: "down", r: 0, c: 0, num: 1, ans: "CELL" }
+    ]
+  },
+  gridData: [
+    [{ isActive: true, correctChar: "C", num: 1, words: ["1A", "1D"] }, { isActive: true, correctChar: "A", num: null, words: ["1A"] }, { isActive: true, correctChar: "S", num: null, words: ["1A"] }, { isActive: true, correctChar: "E", num: null, words: ["1A"] }, { isActive: false, correctChar: "", num: null, words: [] }],
+    [{ isActive: true, correctChar: "E", num: null, words: ["1D"] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }],
+    [{ isActive: true, correctChar: "L", num: null, words: ["1D"] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }],
+    [{ isActive: true, correctChar: "L", num: null, words: ["1D"] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }],
+    [{ isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }, { isActive: false, correctChar: "", num: null, words: [] }]
+  ]
 };
 
 const generatePuzzleWithWorker = (worker, words) => {
@@ -94,18 +76,73 @@ export default function CrosswordGame({ onQuit }) {
   const gameSectionRef = useRef(null);
   const inputRefs = useRef({});
 
+
+  const loadLevel = async (lvl) => {
+    const cacheKey = `crossword-${lvl}`;
+    const cached = localStorage.getItem(cacheKey);
+    let data;
+    const fallbackWords = [
+      { word: "FORENSIC", clue: "Scientific analysis for crime" },
+      { word: "CRIME", clue: "Unlawful act" },
+      { word: "SCENE", clue: "Location of the crime" },
+      { word: "EVIDENCE", clue: "Material proof" },
+      { word: "CLUE", clue: "Lead for investigation" },
+      { word: "AUTOPSY", clue: "Post-mortem examination" },
+      { word: "BLOOD", clue: "Red fluid in body" },
+      { word: "WEAPON", clue: "Instrument used in crime" },
+      { word: "SUSPECT", clue: "Person thought to be guilty" },
+      { word: "VICTIM", clue: "Person harmed in crime" },
+      { word: "WITNESS", clue: "Person who saw the event" },
+      { word: "DETECTIVE", clue: "Investigator of crimes" },
+      { word: "TRIAL", clue: "Court hearing" },
+      { word: "GUILTY", clue: "Culpable of a crime" }
+    ];
+    if (cached) {
+      data = JSON.parse(cached);
+      setWordsPool(data.words);
+    } else {
+      try {
+        const res = await api.get(`/game/crossword?level=${lvl}`);
+        if (res.data && res.data.words && res.data.words.length > 0) {
+          data = res.data;
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          setWordsPool(data.words);
+        } else {
+          setWordsPool(fallbackWords);
+        }
+      } catch (err) {
+        setWordsPool(fallbackWords);
+      }
+    }
+  };
+
   useEffect(() => {
     workerRef.current = new CrosswordWorker();
     
-    // Fetch initial words pool
-    fetchWordSet().then(words => {
-      setWordsPool(words);
-    });
+    loadLevel(level);
 
     return () => {
       if (workerRef.current) workerRef.current.terminate();
     };
-  }, []);
+  }, [level]);
+
+  useEffect(() => {
+    const levels = ["easy", "medium", "hard", "pro"];
+    const idx = levels.indexOf(level);
+    if (idx >= 0 && idx < levels.length - 1) {
+       const nextLvl = levels[idx+1];
+       const preloadLevel = async (lvl) => {
+         const cacheKey = `crossword-${lvl}`;
+         if (!localStorage.getItem(cacheKey)) {
+           try {
+             const res = await api.get(`/game/crossword?level=${lvl}`);
+             if (res.data && res.data.words) localStorage.setItem(cacheKey, JSON.stringify(res.data));
+           } catch {}
+         }
+       };
+       preloadLevel(nextLvl);
+    }
+  }, [level]);
 
   const generatePuzzle = useCallback(async (words, lvl) => {
     if (!workerRef.current || !words || words.length === 0) return null;
@@ -171,6 +208,11 @@ export default function CrosswordGame({ onQuit }) {
     let gameToPlay = nextGameData;
     if (!gameToPlay) {
       gameToPlay = await generatePuzzle(wordsPool, level);
+    }
+
+    if (!gameToPlay) {
+      console.warn("Using fallback crossword data due to generation failure.");
+      gameToPlay = FALLBACK_PUZZLE;
     }
 
     if (gameToPlay) {
@@ -334,14 +376,19 @@ export default function CrosswordGame({ onQuit }) {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
-            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all mt-6">
-              <Play size={20} /> Start Game
-            </Button>
+            <div className="mt-8 flex justify-center px-3">
+              <button 
+                onClick={handleStartGameClick} 
+                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
+              </button>
+            </div>
           </div>
         </Container>
       )}
 
-      <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">

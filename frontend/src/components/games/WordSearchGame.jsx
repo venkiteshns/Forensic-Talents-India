@@ -144,7 +144,8 @@ export default function WordSearchGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('wordsearch');
   const [level, setLevel] = useState('easy');
   
-  const [wordsPool, setWordsPool] = useState([]);
+  const [wordsPool, setWordsPool] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGame, setNextGame] = useState(null);
 
@@ -159,22 +160,53 @@ export default function WordSearchGame({ onQuit }) {
 
   const gameSectionRef = useRef(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchWords();
-  }, []);
+  const loadLevel = async (lvl) => {
+    setIsLoading(true);
+    const cacheKey = `wordsearch-${lvl}`;
+    const cached = localStorage.getItem(cacheKey);
+    let data;
 
-  const fetchWords = async () => {
     try {
-      const storedPlayedIds = JSON.parse(localStorage.getItem('playedWordSearchIds') || '[]');
-      const res = await api.get(`/game/word-search?playedIds=${storedPlayedIds.join(',')}`);
-      if (res.data && res.data.words && res.data.words.length >= 5) {
-        setWordsPool(res.data.words);
+      if (cached) {
+        data = JSON.parse(cached);
+      } else {
+        const res = await api.get(`/game/word-search?level=${lvl}`);
+        if (!res.data || !res.data.words || res.data.words.length === 0) throw new Error("Empty dataset");
+        data = res.data;
+        localStorage.setItem(cacheKey, JSON.stringify(data));
       }
+      setWordsPool(data.words);
     } catch (err) {
-      console.warn("Using fallback words. Background fetch failed.");
+      console.error("Data load failed:", err);
+      // Fallback ONLY here
+      setWordsPool(FALLBACK_LEVEL_WORDS[lvl]);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    loadLevel(level);
+  }, [level]);
+
+  useEffect(() => {
+    const levels = ["easy", "medium", "hard", "pro"];
+    const idx = levels.indexOf(level);
+    if (idx >= 0 && idx < levels.length - 1) {
+       const nextLvl = levels[idx+1];
+       const preloadLevel = async (lvl) => {
+         const cacheKey = `wordsearch-${lvl}`;
+         if (!localStorage.getItem(cacheKey)) {
+           try {
+             const res = await api.get(`/game/word-search?level=${lvl}`);
+             if (res.data && res.data.words) localStorage.setItem(cacheKey, JSON.stringify(res.data));
+           } catch {}
+         }
+       };
+       preloadLevel(nextLvl);
+    }
+  }, [level]);
 
   const generateGameData = useCallback((pool, lvl) => {
     let attempts = 0;
@@ -196,9 +228,8 @@ export default function WordSearchGame({ onQuit }) {
     return null;
   }, []);
 
-  // Preload next game when playing starts or level changes
   useEffect(() => {
-    if (gameState === 'idle' || gameState === 'playing') {
+    if ((gameState === 'idle' || gameState === 'playing') && wordsPool) {
       const next = generateGameData(wordsPool, level);
       setNextGame(next);
     }
@@ -343,14 +374,29 @@ export default function WordSearchGame({ onQuit }) {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
-            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all mt-6">
-              <Play size={20} /> Start Game
-            </Button>
+            <div className="mt-8 flex justify-center px-3">
+              <button 
+                onClick={handleStartGameClick} 
+                disabled={isLoading || !nextGame}
+                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </Container>
       )}
 
-      <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">

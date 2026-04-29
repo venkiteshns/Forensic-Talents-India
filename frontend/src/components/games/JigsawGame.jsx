@@ -100,7 +100,8 @@ export default function JigsawGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('jigsaw');
   const [level, setLevel] = useState('easy');
   
-  const [imageUrl, setImageUrl] = useState(FALLBACK_IMAGE_URL);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGame, setNextGame] = useState(null);
 
@@ -112,22 +113,53 @@ export default function JigsawGame({ onQuit }) {
   const gameSectionRef = useRef(null);
   const isGeneratingRef = useRef(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchConfig();
-  }, []);
+  const loadLevel = async (lvl) => {
+    setIsLoading(true);
+    const cacheKey = `jigsaw-${lvl}`;
+    const cached = localStorage.getItem(cacheKey);
+    let data;
 
-  const fetchConfig = async () => {
     try {
-      const storedPlayedIds = JSON.parse(localStorage.getItem('playedJigsawIds') || '[]');
-      const res = await api.get(`/game/jigsaw?playedIds=${storedPlayedIds.join(',')}`);
-      if (res.data && res.data.imageUrl) {
-        setImageUrl(res.data.imageUrl);
+      if (cached) {
+        data = JSON.parse(cached);
+      } else {
+        const res = await api.get(`/game/jigsaw?level=${lvl}`);
+        if (!res.data || !res.data.imageUrl) throw new Error("Empty dataset");
+        data = res.data;
+        localStorage.setItem(cacheKey, JSON.stringify(data));
       }
+      setImageUrl(data.imageUrl);
     } catch (err) {
-      console.error("Using fallback jigsaw image.");
+      console.error("Data load failed:", err);
+      // Fallback ONLY here
+      setImageUrl(FALLBACK_IMAGE_URL);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    loadLevel(level);
+  }, [level]);
+
+  useEffect(() => {
+    const levels = ["easy", "medium", "hard", "pro"];
+    const idx = levels.indexOf(level);
+    if (idx >= 0 && idx < levels.length - 1) {
+       const nextLvl = levels[idx+1];
+       const preloadLevel = async (lvl) => {
+         const cacheKey = `jigsaw-${lvl}`;
+         if (!localStorage.getItem(cacheKey)) {
+           try {
+             const res = await api.get(`/game/jigsaw?level=${lvl}`);
+             if (res.data && res.data.imageUrl) localStorage.setItem(cacheKey, JSON.stringify(res.data));
+           } catch {}
+         }
+       };
+       preloadLevel(nextLvl);
+    }
+  }, [level]);
 
   const generateGameData = useCallback(async (url, lvl) => {
     const config = JIGSAW_LEVELS[lvl];
@@ -137,7 +169,7 @@ export default function JigsawGame({ onQuit }) {
   }, []);
 
   useEffect(() => {
-    if ((gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current) {
+    if ((gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current && imageUrl) {
       isGeneratingRef.current = true;
       generateGameData(imageUrl, level).then(next => {
         setNextGame(next);
@@ -267,14 +299,29 @@ export default function JigsawGame({ onQuit }) {
                 Pro Level: Moves are limited. Complete the puzzle efficiently.
               </div>
             )}
-            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all mt-6">
-              <Play size={20} /> Start Game
-            </Button>
+            <div className="mt-8 flex justify-center px-3">
+              <button 
+                onClick={initGame} 
+                disabled={isLoading || !nextGame}
+                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </Container>
       )}
 
-      <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col items-center">

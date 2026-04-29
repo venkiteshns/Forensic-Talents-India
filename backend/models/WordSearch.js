@@ -6,10 +6,10 @@ const wordSearchSchema = new mongoose.Schema({
     required: true,
     default: 'Untitled Word Search'
   },
-  difficulty: {
+  level: {
     type: String,
-    enum: ['easy', 'medium', 'hard'],
-    default: 'medium'
+    enum: ['easy', 'medium', 'hard', 'pro'],
+    default: 'easy'
   },
   words: {
     type: [String],

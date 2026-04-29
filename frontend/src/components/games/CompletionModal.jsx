@@ -15,6 +15,11 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
   }, [isPro]);
 
   useEffect(() => {
+    const headerHeight = document.querySelector("header")?.offsetHeight || 72;
+    document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "auto";
@@ -22,25 +27,28 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
   }, []);
 
   const handleNextLevel = () => {
-    // Scroll to top first for a smooth visual transition
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     // Slight delay allows modal to disappear cleanly before the DOM heavily shifts
     setTimeout(() => {
       onNextLevel();
-    }, 150);
+      document.getElementById("gameStart")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
   };
 
   const handlePlayAgain = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     setTimeout(() => {
       onPlayAgain();
-    }, 150);
+      document.getElementById("gameStart")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 120);
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="modal-overlay animate-in fade-in duration-300">
       
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -60,7 +68,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
         </div>
       )}
 
-      <div className="w-[min(92%,420px)] max-h-[85vh] sm:max-h-[90vh] overflow-y-auto bg-[#0f172a] rounded-[16px] shadow-2xl p-6 md:p-8 text-center flex flex-col items-center justify-center relative z-10 border border-slate-800 animate-in zoom-in-95 duration-250" style={{ scrollbarWidth: 'none' }}>
+      <div className="modal-box shadow-2xl text-center flex flex-col items-center justify-center relative z-10 border border-slate-800 animate-in zoom-in-95 duration-250" style={{ scrollbarWidth: 'none' }}>
         
         <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-5 border border-emerald-500/20">
           {isPro ? <Award className="w-7 h-7" strokeWidth={2} /> : <CheckCircle2 className="w-7 h-7" strokeWidth={2} />}
@@ -118,6 +126,35 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
       </div>
       
       <style dangerouslySetInnerHTML={{__html: `
+        :root {
+          --header-height: 72px;
+        }
+        .modal-overlay {
+          position: fixed;
+          top: var(--header-height);
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          background: rgba(0, 0, 0, 0.6);
+          z-index: 9999;
+        }
+        .modal-box {
+          width: min(92%, 420px);
+          max-height: calc(100vh - var(--header-height) - 32px);
+          overflow-y: auto;
+          border-radius: 16px;
+          padding: 20px;
+          background: #0f172a;
+        }
+        @media (max-height: 600px) {
+          .modal-box {
+            max-height: calc(100vh - var(--header-height) - 16px);
+          }
+        }
         @keyframes confetti-drop {
           0% { transform: translateY(0) rotate(0deg); opacity: 1; }
           80% { opacity: 1; }

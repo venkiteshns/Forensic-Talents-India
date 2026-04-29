@@ -9,47 +9,30 @@ import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
 
-const ICONS = [
-  { id: 'fingerprint', component: Fingerprint, color: 'text-blue-500' },
-  { id: 'dna', component: Dna, color: 'text-green-500' },
-  { id: 'microscope', component: Microscope, color: 'text-purple-500' },
-  { id: 'badge', component: BadgeAlert, color: 'text-amber-500' },
-  { id: 'camera', component: Camera, color: 'text-slate-500' },
-  { id: 'search', component: Search, color: 'text-rose-500' },
-  { id: 'pipette', component: Pipette, color: 'text-teal-500' },
-  { id: 'briefcase', component: Briefcase, color: 'text-indigo-500' },
-  { id: 'signature', component: FileSignature, color: 'text-cyan-500' },
-  { id: 'gavel', component: Gavel, color: 'text-yellow-600' },
-  { id: 'shield', component: Shield, color: 'text-red-600' },
-  { id: 'flask', component: FlaskConical, color: 'text-emerald-500' }
-];
+
 
 const MEMORY_LEVELS = {
   easy:    { pairs: 2 },
-  medium:  { pairs: 6 },
-  hard:    { pairs: 9 },
-  pro:     { pairs: 12, maxMoves: 18 }
+  medium:  { pairs: 4 },
+  hard:    { pairs: 8 },
+  pro:     { pairs: 12, maxMoves: 35 }
 };
 
-const generateDeck = (useIcons, customImages, numPairs) => {
-  let baseItems = [];
-
-  if (!useIcons && customImages && customImages.length >= numPairs) {
-    const imagesToUse = customImages.slice(0, numPairs);
-    // Preload images to prevent lag during gameplay
-    imagesToUse.forEach(url => {
-      const img = new Image();
-      img.src = url;
-    });
-    baseItems = imagesToUse.map((img, index) => ({
-      id: `img-${index}`,
-      imageUrl: img,
-      isImage: true
-    }));
-  } else {
-    // Duplicate some icons if we don't have enough (unlikely since we have 12 and max pairs is 12)
-    baseItems = [...ICONS].slice(0, numPairs);
-  }
+const generateDeck = (customImages, numPairs) => {
+  if (!customImages || customImages.length < numPairs) return [];
+  
+  const imagesToUse = customImages.slice(0, numPairs);
+  // Preload images to prevent lag during gameplay
+  imagesToUse.forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
+  
+  const baseItems = imagesToUse.map((img, index) => ({
+    id: `img-${index}`,
+    imageUrl: img,
+    isImage: true
+  }));
 
   const deck = [...baseItems, ...baseItems].map((item, index) => ({
     ...item,
@@ -67,7 +50,8 @@ export default function MatchingGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('matching');
   const [level, setLevel] = useState('easy');
   
-  const [gameConfig, setGameConfig] = useState({ useIcons: true, images: [] });
+  const [gameConfig, setGameConfig] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGame, setNextGame] = useState(null);
 
@@ -78,33 +62,109 @@ export default function MatchingGame({ onQuit }) {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const gameSectionRef = useRef(null);
+  const [cardSize, setCardSize] = useState(0);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchConfig();
-  }, []);
+    const calculateLayout = () => {
+      const COLS = 4;
+      const GAP = 8;
+      const cardsCount = currentGame ? currentGame.deck.length : (gameState === 'loading' ? 16 : 0);
+      if (cardsCount === 0) return;
 
-  const fetchConfig = async () => {
+      const rows = Math.ceil(cardsCount / COLS);
+      
+      // HEIGHT constraint
+      const maxHeight = window.innerHeight * 0.9 - 140; // account for header and controls
+      const totalGapHeight = GAP * (rows - 1);
+      const heightBased = Math.floor((maxHeight - totalGapHeight) / rows);
+
+      // WIDTH constraint (REAL FIX)
+      const containerWidth = containerRef.current?.clientWidth || window.innerWidth;
+      const totalGapWidth = GAP * (COLS - 1);
+      const widthBased = Math.floor((containerWidth - totalGapWidth) / COLS);
+
+      // FINAL SIZE
+      const calculatedSize = Math.min(heightBased, widthBased);
+      
+      const MIN = 32;
+      const finalSize = Math.max(calculatedSize, MIN);
+      
+      setCardSize(finalSize);
+    };
+
+    calculateLayout();
+    setTimeout(calculateLayout, 0); // ensure DOM is measured after initial render
+
+    window.addEventListener("resize", calculateLayout);
+    return () => window.removeEventListener("resize", calculateLayout);
+  }, [currentGame?.deck?.length, gameState]);
+
+  const gameSectionRef = useRef(null);
+
+  const loadLevel = async (lvl) => {
+    setIsLoading(true);
+    setGameConfig(null); // clear previous
+    const cacheKey = `matching-${lvl}`;
+    const cached = localStorage.getItem(cacheKey);
+
     try {
-      const storedPlayedIds = JSON.parse(localStorage.getItem('playedMatchingGameIds') || '[]');
-      const res = await api.get(`/game/matching?playedIds=${storedPlayedIds.join(',')}`);
-      if (res.data) {
-        setGameConfig({ useIcons: res.data.useIcons, images: res.data.images || [] });
+      if (cached) {
+        const data = JSON.parse(cached);
+        if (data.images && data.images.length > 0) {
+          setGameConfig({ images: data.images });
+          return;
+        }
       }
+      
+      const res = await api.get(`/game/matching?level=${lvl}`);
+      if (!res.data || !res.data.images?.length) {
+        throw new Error("Empty dataset");
+      }
+      localStorage.setItem(cacheKey, JSON.stringify(res.data));
+      setGameConfig({ images: res.data.images });
+      
     } catch (err) {
-      console.error("Using fallback icons.");
+      console.error("Data load failed:", err);
+      setGameConfig(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadLevel(level);
+  }, [level]);
+
+  useEffect(() => {
+    const levels = ["easy", "medium", "hard", "pro"];
+    const idx = levels.indexOf(level);
+    if (idx >= 0 && idx < levels.length - 1) {
+       const nextLvl = levels[idx+1];
+       const preloadLevel = async (lvl) => {
+         const cacheKey = `matching-${lvl}`;
+         if (!localStorage.getItem(cacheKey)) {
+           try {
+             const res = await api.get(`/game/matching?level=${lvl}`);
+             if (res.data) localStorage.setItem(cacheKey, JSON.stringify(res.data));
+           } catch {}
+         }
+       };
+       preloadLevel(nextLvl);
+    }
+  }, [level]);
+
   const generateGameData = useCallback((config, lvl) => {
-    const deck = generateDeck(config.useIcons, config.images, MEMORY_LEVELS[lvl].pairs);
+    if (!config || !config.images || config.images.length < MEMORY_LEVELS[lvl].pairs) return null;
+    const deck = generateDeck(config.images, MEMORY_LEVELS[lvl].pairs);
     return { deck, config: MEMORY_LEVELS[lvl] };
   }, []);
 
   useEffect(() => {
-    if (gameState === 'idle' || gameState === 'playing') {
+    if ((gameState === 'idle' || gameState === 'playing') && gameConfig) {
       setNextGame(generateGameData(gameConfig, level));
+    } else if (!gameConfig) {
+      setNextGame(null);
     }
   }, [gameConfig, level, gameState, generateGameData]);
 
@@ -192,6 +252,39 @@ export default function MatchingGame({ onQuit }) {
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans animate-in fade-in duration-500">
+      <style dangerouslySetInnerHTML={{__html: `
+        .game-layout {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          gap: 10px;
+        }
+        .header-section {
+          width: 100%;
+        }
+        .controls-section {
+          align-self: center;
+        }
+        .game-wrapper {
+          width: 100%;
+          max-width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          padding: 0 12px;
+          box-sizing: border-box;
+        }
+        .card {
+          width: 100%;
+          height: 100%;
+        }
+        @media (max-width: 640px) {
+          .game-layout {
+            gap: 6px;
+          }
+        }
+      `}} />
       <section className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12 min-h-[340px]">
         <div className="absolute top-8 left-4 md:left-8 z-20">
           <button onClick={onQuit} className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium backdrop-blur-md shadow-sm">
@@ -216,29 +309,70 @@ export default function MatchingGame({ onQuit }) {
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
             {level === 'pro' && (
               <div className="bg-red-50 text-red-700 text-sm font-bold p-3 rounded-xl mt-4 max-w-md mx-auto border border-red-100">
-                Pro Level: You have a maximum of 18 moves. Plan carefully and play strategically.
+                Pro Level: You have a maximum of 35 moves. Plan carefully and play strategically.
               </div>
             )}
-            <Button onClick={handleStartGameClick} variant="primary" className="px-8 py-3 text-lg flex items-center justify-center gap-2 mx-auto shadow-md hover:shadow-lg transition-all mt-6">
-              <Play size={20} /> Start Game
-            </Button>
+            <div className="mt-8 flex flex-col justify-center items-center px-3 gap-3">
+              <button 
+                onClick={initGame} 
+                disabled={isLoading || !nextGame}
+                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
+                  </>
+                )}
+              </button>
+              {!isLoading && !nextGame && (
+                <p className="text-red-500 text-sm font-semibold max-w-sm mx-auto text-center">
+                  No dataset available for this level. Please ask an admin to add one.
+                </p>
+              )}
+            </div>
           </div>
         </Container>
       )}
 
-      <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
         {gameState === 'loading' && (
           <Container>
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative game-layout">
+              <div className="header-section flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100">
                 <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
                 <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
               </div>
-              <div className="grid grid-cols-4 gap-2.5 max-w-[65vh] mx-auto p-1 match-grid">
-                {[...Array(16)].map((_, i) => (
-                  <div key={i} className="aspect-square w-full rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:400%_100%] animate-[shimmer_1.2s_infinite] match-card" />
-                ))}
-              </div>
+              {(() => {
+                const COLS = 4;
+                const GAP = 8;
+                const rows = 4;
+                const maxWidth = COLS * cardSize + GAP * (COLS - 1);
+                return (
+                  <div ref={containerRef} className="game-wrapper">
+                    <div 
+                      className="game-board" 
+                      style={{ 
+                        display: "grid",
+                        gridTemplateColumns: `repeat(${COLS}, ${cardSize}px)`,
+                        gridTemplateRows: `repeat(${rows}, ${cardSize}px)`,
+                        gap: `${GAP}px`,
+                        justifyContent: "center",
+                        maxWidth: `${maxWidth}px`,
+                        margin: "0 auto"
+                      }}
+                    >
+                      {[...Array(16)].map((_, i) => (
+                        <div key={i} className="card rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:400%_100%] animate-[shimmer_1.2s_infinite]" />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes shimmer {
                   0% { background-position: 100% 0; }
@@ -251,8 +385,8 @@ export default function MatchingGame({ onQuit }) {
 
         {(gameState === 'playing' || gameState === 'completed' || gameState === 'failed') && currentGame && (
           <Container>
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative game-layout">
+              <div className="header-section flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-100">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                     <Search className="text-primary" size={24} /> Memory Grid <span className="text-sm font-normal text-slate-500 uppercase ml-2 bg-slate-100 px-2 py-1 rounded">{level}</span>
@@ -275,32 +409,47 @@ export default function MatchingGame({ onQuit }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 sm:gap-3 max-w-[65vh] mx-auto overflow-hidden p-1 match-container" style={{ maxHeight: '75vh' }}>
-                {currentGame.deck.map((card, index) => {
-                  const isFlipped = flippedIndices.includes(index) || matchedIds.has(card.id);
-                  const isMatched = matchedIds.has(card.id);
-                  const Icon = card.component;
-
-                  return (
-                    <div key={card.uniqueId} className="aspect-square relative cursor-pointer w-full mx-auto match-card" style={{ perspective: '1000px' }} onClick={() => handleCardClick(index)}>
-                      <div className={cn("w-full h-full relative transition-transform duration-500 shadow-sm hover:shadow-md rounded-xl", isFlipped && "[transform:rotateY(180deg)]")} style={{ transformStyle: 'preserve-3d' }}>
-                        <div className="absolute inset-0 bg-slate-100 border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
-                          <Fingerprint className="absolute text-slate-300 w-1/3 h-1/3" />
-                        </div>
-                        <div className={cn("absolute inset-0 bg-white border-2 rounded-xl flex items-center justify-center overflow-hidden p-1.5", isMatched ? "border-green-400 bg-green-50" : "border-primary")} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                          {card.isImage ? (
-                            <img src={card.imageUrl} alt="Card Match" className="w-full h-full object-cover opacity-90 rounded-md" />
-                          ) : (
-                            <Icon className={cn("w-3/5 h-3/5", isMatched ? "text-green-500" : card.color)} />
-                          )}
-                        </div>
-                      </div>
+              {(() => {
+                const COLS = 4;
+                const GAP = 8;
+                const rows = Math.ceil(currentGame.deck.length / COLS);
+                const maxWidth = COLS * cardSize + GAP * (COLS - 1);
+                return (
+                  <div ref={containerRef} className="game-wrapper">
+                    <div 
+                      className="game-board" 
+                      style={{ 
+                        display: "grid",
+                        gridTemplateColumns: `repeat(${COLS}, ${cardSize}px)`,
+                        gridTemplateRows: `repeat(${rows}, ${cardSize}px)`,
+                        gap: `${GAP}px`,
+                        justifyContent: "center",
+                        maxWidth: `${maxWidth}px`,
+                        margin: "0 auto"
+                      }}
+                    >
+                      {currentGame.deck.map((card, index) => {
+                        const isFlipped = flippedIndices.includes(index) || matchedIds.has(card.id);
+                        const isMatched = matchedIds.has(card.id);
+                        return (
+                          <div key={card.uniqueId} className="card relative cursor-pointer mx-auto" style={{ perspective: '1000px' }} onClick={() => handleCardClick(index)}>
+                          <div className={cn("w-full h-full relative transition-transform duration-500 shadow-sm hover:shadow-md rounded-xl", isFlipped && "[transform:rotateY(180deg)]")} style={{ transformStyle: 'preserve-3d' }}>
+                            <div className="absolute inset-0 bg-slate-100 border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
+                              <Fingerprint className="absolute text-slate-300 w-1/3 h-1/3" />
+                            </div>
+                            <div className={cn("absolute inset-0 bg-white border-2 rounded-xl flex items-center justify-center overflow-hidden p-1.5", isMatched ? "border-green-400 bg-green-50" : "border-primary")} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                              <img src={card.imageUrl} alt="Card Match" className="w-full h-full object-cover opacity-90 rounded-md" />
+                            </div>
+                          </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })()}
 
-              <div className="flex justify-center gap-4 mt-8">
+              <div className="controls-section flex justify-center gap-4">
                 <Button onClick={initGame} variant="outline" className="flex items-center gap-2 font-bold text-slate-600">
                   <RefreshCw size={18} /> Restart
                 </Button>
