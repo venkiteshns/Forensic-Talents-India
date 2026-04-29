@@ -1,35 +1,20 @@
 import nodemailer from "nodemailer";
-import dns from "dns";
-
-// Manually resolve the IPv4 address for smtp.gmail.com.
-// This completely bypasses Node's faulty IPv6 resolution on Render.
-const resolveIPv4 = (hostname) => {
-  return new Promise((resolve, reject) => {
-    dns.lookup(hostname, { family: 4 }, (err, address) => {
-      if (err) reject(err);
-      else resolve(address);
-    });
-  });
-};
-
-const hostIp = await resolveIPv4("smtp.gmail.com");
 
 export const transporter = nodemailer.createTransport({
-  host: hostIp,
-  port: 465,
-  secure: true, // MUST be true for 465
+  host: "smtp.gmail.com",
+  port: 587,           // Use 587 (TLS) instead of 465 (SSL)
+  secure: false,       // true for 465, false for 587
+  family: 4,           // Force IPv4 specifically for Render
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS // MUST be App Password
-  },
-  tls: {
-    servername: "smtp.gmail.com" // Important so TLS doesn't fail when connecting via IP
   },
   // Stability settings
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 15000,
 });
+
 
 
 transporter.verify((error, success) => {
