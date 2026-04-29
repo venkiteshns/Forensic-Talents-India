@@ -9,17 +9,18 @@ import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
 
-const FALLBACK_WORDS = [
-  'FORENSIC', 'EVIDENCE', 'DNA', 'CRIME', 'ANALYSIS', 'FINGERPRINT',
-  'AUTOPSY', 'BLOOD', 'WEAPON', 'SUSPECT', 'VICTIM', 'WITNESS',
-  'DETECTIVE', 'TRIAL', 'GUILTY', 'LAW', 'POLICE', 'COURT', 'TRACE'
-];
+const FALLBACK_LEVEL_WORDS = {
+  easy: ["DNA", "BLOOD", "FIBER", "TRACE"],
+  medium: ["FORENSIC", "EVIDENCE", "AUTOPSY", "TOXIC", "POISON", "CRIME"],
+  hard: ["FINGERPRINT", "BALLISTICS", "PATHOLOGY", "CYBERCRIME", "WEAPON", "SUSPECT", "VICTIM", "WITNESS", "DETECTIVE"],
+  pro: ["CHROMATOGRAPHY", "ENTOMOLOGY", "SEROLOGY", "CRIMINOLOGY", "TOXICOLOGY", "DNA", "BLOOD", "FIBER", "TRACE", "FORENSIC", "EVIDENCE", "AUTOPSY"]
+};
 
 const WORD_SEARCH_LEVELS = {
   easy:    { words: 4, grid: 6 },
   medium:  { words: 6, grid: 8 },
-  hard:    { words: 9, grid: 10 },
-  pro:     { words: 12, grid: 12 }
+  hard:    { words: 9, grid: 12 },
+  pro:     { words: 12, grid: 15 }
 };
 
 const DIRECTIONS = [
@@ -143,7 +144,7 @@ export default function WordSearchGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('wordsearch');
   const [level, setLevel] = useState('easy');
   
-  const [wordsPool, setWordsPool] = useState(FALLBACK_WORDS);
+  const [wordsPool, setWordsPool] = useState([]);
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGame, setNextGame] = useState(null);
 
@@ -171,15 +172,25 @@ export default function WordSearchGame({ onQuit }) {
         setWordsPool(res.data.words);
       }
     } catch (err) {
-      console.error("Using fallback words. Error:", getErrorMessage(err));
+      console.warn("Using fallback words. Background fetch failed.");
     }
   };
 
   const generateGameData = useCallback((pool, lvl) => {
     let attempts = 0;
+    if (pool && pool.length > 0) {
+      while (attempts < 50) {
+        const game = generateGrid(pool, WORD_SEARCH_LEVELS[lvl]);
+        if (game) return game;
+        attempts++;
+      }
+    }
+    
+    // Fallback if pool is empty or if it failed to generate 50 times
+    attempts = 0;
     while (attempts < 50) {
-      const game = generateGrid(pool, WORD_SEARCH_LEVELS[lvl]);
-      if (game) return game;
+      const fallbackGame = generateGrid(FALLBACK_LEVEL_WORDS[lvl], WORD_SEARCH_LEVELS[lvl]);
+      if (fallbackGame) return fallbackGame;
       attempts++;
     }
     return null;
@@ -187,7 +198,7 @@ export default function WordSearchGame({ onQuit }) {
 
   // Preload next game when playing starts or level changes
   useEffect(() => {
-    if (wordsPool && (gameState === 'idle' || gameState === 'playing')) {
+    if (gameState === 'idle' || gameState === 'playing') {
       const next = generateGameData(wordsPool, level);
       setNextGame(next);
     }
@@ -211,23 +222,25 @@ export default function WordSearchGame({ onQuit }) {
     setGameState('loading');
     setTimeout(() => gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     
-    const gameToPlay = nextGame || generateGameData(wordsPool, level);
-    if (!gameToPlay) {
-      console.error("Failed to generate game grid");
-      return;
-    }
-    
-    setCurrentGame(gameToPlay);
-    setFoundWords([]);
-    setFoundCells(new Set());
-    setTimeElapsed(0);
-    setGameState('playing');
-    setIsDragging(false);
-    setStartCell(null);
-    setCurrentPath([]);
+    // Yield to the main thread so the loading skeleton renders
+    setTimeout(() => {
+      const gameToPlay = nextGame || generateGameData(wordsPool, level);
+      
+      setCurrentGame(gameToPlay);
+      setFoundWords([]);
+      setFoundCells(new Set());
+      setTimeElapsed(0);
+      setGameState('playing');
+      setIsDragging(false);
+      setStartCell(null);
+      setCurrentPath([]);
+    }, 50);
   };
 
-  const initGame = () => handleStartGameClick();
+  const initGame = () => {
+    setGameState('idle');
+    setTimeout(() => handleStartGameClick(), 50);
+  };
 
   const handleLevelChange = (newLevel) => {
     if (!isUnlocked(newLevel)) return;
@@ -338,6 +351,31 @@ export default function WordSearchGame({ onQuit }) {
       )}
 
       <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+        {gameState === 'loading' && (
+          <Container>
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
+                <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+                <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="flex flex-col lg:flex-row gap-10">
+                <div className="lg:w-2/3 flex-shrink-0 relative w-full flex justify-center items-center overflow-hidden pb-4 px-2 box-border">
+                  <div className="w-full aspect-square max-w-[80vh] rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:400%_100%] animate-[shimmer_1.2s_infinite]"></div>
+                </div>
+                <div className="lg:w-1/3 flex flex-col">
+                  <div className="h-64 bg-slate-100 animate-pulse rounded-xl"></div>
+                </div>
+              </div>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes shimmer {
+                  0% { background-position: 100% 0; }
+                  100% { background-position: -100% 0; }
+                }
+              `}} />
+            </div>
+          </Container>
+        )}
+
         {(gameState === 'playing' || gameState === 'completed') && currentGame && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">

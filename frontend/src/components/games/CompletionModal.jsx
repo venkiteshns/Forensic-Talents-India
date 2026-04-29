@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckCircle2, Award, ChevronRight, RefreshCw, Grid } from 'lucide-react';
 
 export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain, onNextLevel, onQuit }) {
@@ -13,8 +14,33 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
     }
   }, [isPro]);
 
-  return (
-    <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-300">
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  const handleNextLevel = () => {
+    // Scroll to top first for a smooth visual transition
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Slight delay allows modal to disappear cleanly before the DOM heavily shifts
+    setTimeout(() => {
+      onNextLevel();
+    }, 150);
+  };
+
+  const handlePlayAgain = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    setTimeout(() => {
+      onPlayAgain();
+    }, 150);
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4 animate-in fade-in duration-300">
       
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -34,7 +60,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
         </div>
       )}
 
-      <div className="w-full max-w-[420px] bg-[#111827] rounded-xl shadow-2xl p-6 md:p-8 text-center flex flex-col items-center justify-center relative z-10 border border-slate-800 animate-in zoom-in-95 duration-200">
+      <div className="w-[min(92%,420px)] max-h-[85vh] sm:max-h-[90vh] overflow-y-auto bg-[#0f172a] rounded-[16px] shadow-2xl p-6 md:p-8 text-center flex flex-col items-center justify-center relative z-10 border border-slate-800 animate-in zoom-in-95 duration-250" style={{ scrollbarWidth: 'none' }}>
         
         <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-5 border border-emerald-500/20">
           {isPro ? <Award className="w-7 h-7" strokeWidth={2} /> : <CheckCircle2 className="w-7 h-7" strokeWidth={2} />}
@@ -66,7 +92,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
         <div className="flex flex-col gap-3 w-full">
           {!isPro && (
             <button 
-              onClick={onNextLevel} 
+              onClick={handleNextLevel} 
               className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm font-semibold rounded-lg flex items-center justify-center gap-2 text-sm transition-colors"
             >
               Continue to Next Level <ChevronRight className="w-4 h-4" />
@@ -74,7 +100,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
           )}
           
           <button 
-            onClick={onPlayAgain} 
+            onClick={handlePlayAgain} 
             className="w-full h-12 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 text-sm transition-colors border border-slate-700"
           >
             <RefreshCw className="w-4 h-4" /> Play Again
@@ -98,6 +124,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
           100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
         }
       `}} />
-    </div>
+    </div>,
+    document.body
   );
 }

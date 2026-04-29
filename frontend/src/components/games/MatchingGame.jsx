@@ -35,7 +35,13 @@ const generateDeck = (useIcons, customImages, numPairs) => {
   let baseItems = [];
 
   if (!useIcons && customImages && customImages.length >= numPairs) {
-    baseItems = customImages.slice(0, numPairs).map((img, index) => ({
+    const imagesToUse = customImages.slice(0, numPairs);
+    // Preload images to prevent lag during gameplay
+    imagesToUse.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+    baseItems = imagesToUse.map((img, index) => ({
       id: `img-${index}`,
       imageUrl: img,
       isImage: true
@@ -221,6 +227,28 @@ export default function MatchingGame({ onQuit }) {
       )}
 
       <div ref={gameSectionRef} className="scroll-mt-32 relative z-10">
+        {gameState === 'loading' && (
+          <Container>
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
+                <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+                <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
+              </div>
+              <div className="grid grid-cols-4 gap-2.5 max-w-[65vh] mx-auto p-1 match-grid">
+                {[...Array(16)].map((_, i) => (
+                  <div key={i} className="aspect-square w-full rounded-xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 bg-[length:400%_100%] animate-[shimmer_1.2s_infinite] match-card" />
+                ))}
+              </div>
+              <style dangerouslySetInnerHTML={{__html: `
+                @keyframes shimmer {
+                  0% { background-position: 100% 0; }
+                  100% { background-position: -100% 0; }
+                }
+              `}} />
+            </div>
+          </Container>
+        )}
+
         {(gameState === 'playing' || gameState === 'completed' || gameState === 'failed') && currentGame && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
@@ -247,23 +275,23 @@ export default function MatchingGame({ onQuit }) {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:gap-4 max-w-[80vh] mx-auto overflow-hidden" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))', maxHeight: '80vh' }}>
+              <div className="grid grid-cols-4 gap-2 sm:gap-3 max-w-[65vh] mx-auto overflow-hidden p-1 match-container" style={{ maxHeight: '75vh' }}>
                 {currentGame.deck.map((card, index) => {
                   const isFlipped = flippedIndices.includes(index) || matchedIds.has(card.id);
                   const isMatched = matchedIds.has(card.id);
                   const Icon = card.component;
 
                   return (
-                    <div key={card.uniqueId} className="aspect-square relative cursor-pointer w-full max-w-[120px] mx-auto" style={{ perspective: '1000px' }} onClick={() => handleCardClick(index)}>
+                    <div key={card.uniqueId} className="aspect-square relative cursor-pointer w-full mx-auto match-card" style={{ perspective: '1000px' }} onClick={() => handleCardClick(index)}>
                       <div className={cn("w-full h-full relative transition-transform duration-500 shadow-sm hover:shadow-md rounded-xl", isFlipped && "[transform:rotateY(180deg)]")} style={{ transformStyle: 'preserve-3d' }}>
                         <div className="absolute inset-0 bg-slate-100 border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
                           <Fingerprint className="absolute text-slate-300 w-1/3 h-1/3" />
                         </div>
-                        <div className={cn("absolute inset-0 bg-white border-2 rounded-xl flex items-center justify-center overflow-hidden", isMatched ? "border-green-400 bg-green-50" : "border-primary")} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                        <div className={cn("absolute inset-0 bg-white border-2 rounded-xl flex items-center justify-center overflow-hidden p-1.5", isMatched ? "border-green-400 bg-green-50" : "border-primary")} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
                           {card.isImage ? (
-                            <img src={card.imageUrl} alt="Card Match" className="w-full h-full object-cover opacity-90" />
+                            <img src={card.imageUrl} alt="Card Match" className="w-full h-full object-cover opacity-90 rounded-md" />
                           ) : (
-                            <Icon className={cn("w-1/2 h-1/2", isMatched ? "text-green-500" : card.color)} />
+                            <Icon className={cn("w-3/5 h-3/5", isMatched ? "text-green-500" : card.color)} />
                           )}
                         </div>
                       </div>
