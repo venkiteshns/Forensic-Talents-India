@@ -30,7 +30,7 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
     // Slight delay allows modal to disappear cleanly before the DOM heavily shifts
     setTimeout(() => {
       onNextLevel();
-      document.getElementById("gameStart")?.scrollIntoView({
+      document.getElementById("levelSelectionArea")?.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
