@@ -37,3 +37,10 @@
     transform: translateY(0);
   }
 }
+
+/* Scroll to Start Highlight */
+.highlight-scroll {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.3) !important;
+}

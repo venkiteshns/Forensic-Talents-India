@@ -8,6 +8,7 @@ import { getErrorMessage } from '../../utils/errorHandler';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
+import { useScrollToRef } from '../../hooks/useScrollToRef';
 
 
 
@@ -64,6 +65,7 @@ export default function MatchingGame({ onQuit }) {
 
   const [cardSize, setCardSize] = useState(0);
   const containerRef = useRef(null);
+  const [startRef, scrollToStart] = useScrollToRef();
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -99,8 +101,6 @@ export default function MatchingGame({ onQuit }) {
     window.addEventListener("resize", calculateLayout);
     return () => window.removeEventListener("resize", calculateLayout);
   }, [currentGame?.deck?.length, gameState]);
-
-  const gameSectionRef = useRef(null);
 
   const loadLevel = async (lvl) => {
     setIsLoading(true);
@@ -184,7 +184,6 @@ export default function MatchingGame({ onQuit }) {
 
   const handleStartGameClick = () => {
     setGameState('loading');
-    setTimeout(() => gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 
     const gameToPlay = nextGame || generateGameData(gameConfig, level);
     setCurrentGame(gameToPlay);
@@ -314,9 +313,10 @@ export default function MatchingGame({ onQuit }) {
             )}
             <div className="mt-8 flex flex-col justify-center items-center px-3 gap-3">
               <button 
+                ref={startRef}
                 onClick={initGame} 
                 disabled={isLoading || !nextGame}
-                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
                   <>
@@ -338,8 +338,7 @@ export default function MatchingGame({ onQuit }) {
           </div>
         </Container>
       )}
-
-      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
+      <div id="gameStart" className="relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative game-layout">
@@ -472,6 +471,9 @@ export default function MatchingGame({ onQuit }) {
               setLevel(next);
               setGameState('idle');
               setCurrentGame(null);
+              requestAnimationFrame(() => {
+                setTimeout(scrollToStart, 120);
+              });
             }}
             onQuit={onQuit}
           />

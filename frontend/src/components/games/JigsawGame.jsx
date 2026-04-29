@@ -8,8 +8,7 @@ import { getErrorMessage } from '../../utils/errorHandler';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
-
-const FALLBACK_IMAGE_URL = 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=800&auto=format&fit=crop';
+import { useScrollToRef } from '../../hooks/useScrollToRef';
 
 const JIGSAW_LEVELS = {
   easy:    { grid: 2 },
@@ -100,8 +99,7 @@ export default function JigsawGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('jigsaw');
   const [level, setLevel] = useState('easy');
   
-  const [imageUrl, setImageUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [imageState, setImageState] = useState({ status: "loading", data: null });
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGame, setNextGame] = useState(null);
 
@@ -110,31 +108,40 @@ export default function JigsawGame({ onQuit }) {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [selectedPieceId, setSelectedPieceId] = useState(null);
 
-  const gameSectionRef = useRef(null);
+  const [startRef, scrollToStart] = useScrollToRef();
   const isGeneratingRef = useRef(false);
 
-  const loadLevel = async (lvl) => {
-    setIsLoading(true);
-    const cacheKey = `jigsaw-${lvl}`;
-    const cached = localStorage.getItem(cacheKey);
-    let data;
+  const handleFallback = () => {
+    setTimeout(() => {
+      setImageState({
+        status: "fallback",
+        data: { imageUrl: "/fallback.jpg" }
+      });
+    }, 2000);
+  };
 
+  const loadJigsaw = async (lvl) => {
+    setImageState({ status: "loading", data: null });
     try {
-      if (cached) {
-        data = JSON.parse(cached);
+      const res = await api.get(`/game/jigsaw?level=${lvl}`);
+      if (res.data && res.data.imageUrl) {
+        localStorage.setItem(`jigsaw-${lvl}`, JSON.stringify(res.data));
+        setImageState({ status: "success", data: res.data });
       } else {
-        const res = await api.get(`/game/jigsaw?level=${lvl}`);
-        if (!res.data || !res.data.imageUrl) throw new Error("Empty dataset");
-        data = res.data;
-        localStorage.setItem(cacheKey, JSON.stringify(data));
+        throw new Error("No dataset");
       }
-      setImageUrl(data.imageUrl);
     } catch (err) {
       console.error("Data load failed:", err);
-      // Fallback ONLY here
-      setImageUrl(FALLBACK_IMAGE_URL);
-    } finally {
-      setIsLoading(false);
+      handleFallback();
+    }
+  };
+
+  const loadLevel = (lvl) => {
+    const cached = localStorage.getItem(`jigsaw-${lvl}`);
+    if (cached) {
+      setImageState({ status: "success", data: JSON.parse(cached) });
+    } else {
+      loadJigsaw(lvl);
     }
   };
 
@@ -143,22 +150,23 @@ export default function JigsawGame({ onQuit }) {
   }, [level]);
 
   useEffect(() => {
-    const levels = ["easy", "medium", "hard", "pro"];
-    const idx = levels.indexOf(level);
-    if (idx >= 0 && idx < levels.length - 1) {
-       const nextLvl = levels[idx+1];
-       const preloadLevel = async (lvl) => {
-         const cacheKey = `jigsaw-${lvl}`;
-         if (!localStorage.getItem(cacheKey)) {
-           try {
-             const res = await api.get(`/game/jigsaw?level=${lvl}`);
-             if (res.data && res.data.imageUrl) localStorage.setItem(cacheKey, JSON.stringify(res.data));
-           } catch {}
-         }
-       };
-       preloadLevel(nextLvl);
+    if (imageState.status === "success") {
+      const levels = ["easy", "medium", "hard", "pro"];
+      const idx = levels.indexOf(level);
+      if (idx >= 0 && idx < levels.length - 1) {
+        const nextLvl = levels[idx+1];
+        if (!localStorage.getItem(`jigsaw-${nextLvl}`)) {
+          api.get(`/game/jigsaw?level=${nextLvl}`)
+            .then(res => {
+              if (res.data && res.data.imageUrl) {
+                localStorage.setItem(`jigsaw-${nextLvl}`, JSON.stringify(res.data));
+              }
+            })
+            .catch(() => {});
+        }
+      }
     }
-  }, [level]);
+  }, [imageState.status, level]);
 
   const generateGameData = useCallback(async (url, lvl) => {
     const config = JIGSAW_LEVELS[lvl];
@@ -168,14 +176,15 @@ export default function JigsawGame({ onQuit }) {
   }, []);
 
   useEffect(() => {
-    if ((gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current && imageUrl) {
+    const currentImageUrl = imageState.data?.imageUrl;
+    if ((gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current && currentImageUrl) {
       isGeneratingRef.current = true;
-      generateGameData(imageUrl, level).then(next => {
+      generateGameData(currentImageUrl, level).then(next => {
         setNextGame(next);
         isGeneratingRef.current = false;
       });
     }
-  }, [imageUrl, level, gameState, generateGameData]);
+  }, [imageState.data?.imageUrl, level, gameState, generateGameData]);
 
   useEffect(() => {
     let interval;
@@ -193,12 +202,11 @@ export default function JigsawGame({ onQuit }) {
 
   const handleStartGameClick = async () => {
     setGameState('loading');
-    setTimeout(() => gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 
     try {
       let gameToPlay = nextGame;
       if (!gameToPlay) {
-        gameToPlay = await generateGameData(imageUrl, level);
+        gameToPlay = await generateGameData(imageState.data?.imageUrl, level);
       }
       
       if (!gameToPlay || !gameToPlay.pieces) throw new Error("Invalid game data");
@@ -300,14 +308,15 @@ export default function JigsawGame({ onQuit }) {
             )}
             <div className="mt-8 flex justify-center px-3">
               <button 
+                ref={startRef}
                 onClick={initGame} 
-                disabled={isLoading || !nextGame}
-                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                disabled={imageState.status === "loading" || !nextGame}
+                className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {isLoading ? (
+                {imageState.status === "loading" ? (
                   <>
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
-                    Loading...
+                    Loading Dataset...
                   </>
                 ) : (
                   <>
@@ -315,12 +324,16 @@ export default function JigsawGame({ onQuit }) {
                   </>
                 )}
               </button>
+              {imageState.status === "fallback" && (
+                <p className="text-amber-600 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200 text-sm font-semibold max-w-sm mx-auto text-center mt-4">
+                  Using offline fallback dataset. Check network or ask admin to add level data.
+                </p>
+              )}
             </div>
           </div>
         </Container>
       )}
-
-      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
+      <div id="gameStart" className="relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col items-center">
@@ -441,6 +454,9 @@ export default function JigsawGame({ onQuit }) {
               setLevel(next);
               setGameState('idle');
               setCurrentGame(null);
+              requestAnimationFrame(() => {
+                setTimeout(scrollToStart, 120);
+              });
             }}
             onQuit={onQuit}
           />

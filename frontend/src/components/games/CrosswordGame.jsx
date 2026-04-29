@@ -9,6 +9,7 @@ import CrosswordWorker from './crosswordWorker?worker';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
+import { useScrollToRef } from '../../hooks/useScrollToRef';
 
 const CROSSWORD_LEVELS = {
   easy:    { words: 4 },
@@ -73,7 +74,7 @@ export default function CrosswordGame({ onQuit }) {
   const isGeneratingRef = useRef(false);
   const workerRef = useRef(null);
 
-  const gameSectionRef = useRef(null);
+  const [startRef, scrollToStart] = useScrollToRef();
   const inputRefs = useRef({});
 
 
@@ -203,7 +204,6 @@ export default function CrosswordGame({ onQuit }) {
 
   const handleStartGameClick = async () => {
     setGameState('loading');
-    setTimeout(() => gameSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 
     let gameToPlay = nextGameData;
     if (!gameToPlay) {
@@ -378,8 +378,9 @@ export default function CrosswordGame({ onQuit }) {
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
             <div className="mt-8 flex justify-center px-3">
               <button 
+                ref={startRef}
                 onClick={handleStartGameClick} 
-                className="w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
               </button>
@@ -387,8 +388,7 @@ export default function CrosswordGame({ onQuit }) {
           </div>
         </Container>
       )}
-
-      <div ref={gameSectionRef} id="gameStart" className="scroll-mt-32 relative z-10">
+      <div id="gameStart" className="relative z-10">
         {gameState === 'loading' && (
           <Container>
             <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
@@ -534,6 +534,9 @@ export default function CrosswordGame({ onQuit }) {
               setLevel(next);
               setGameState('idle');
               setNextGameData(null);
+              requestAnimationFrame(() => {
+                setTimeout(scrollToStart, 120);
+              });
             }}
             onQuit={onQuit}
           />
