@@ -22,6 +22,15 @@ transporter.verify((err) => {
   }
 });
 
+import dns from "dns";
+dns.lookup("smtp.gmail.com", { all: true }, (err, addrs) => {
+  if (err) {
+    console.error("DNS Lookup error:", err);
+  } else {
+    console.log("Resolved smtp.gmail.com to:", addrs);
+  }
+});
+
 export const sendMailWithRetry = async (mail, retries = 2) => {
   for (let i = 0; i <= retries; i++) {
     try {
