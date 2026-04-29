@@ -1,4 +1,9 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+// Force Node.js to use IPv4 instead of IPv6 to resolve DNS.
+// This is critical for Render deployments as outbound IPv6 is often unsupported.
+dns.setDefaultResultOrder("ipv4first");
 
 export const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
