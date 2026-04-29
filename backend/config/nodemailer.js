@@ -1,54 +1,71 @@
-import nodemailer from "nodemailer";
-import dns from "dns/promises";
+export const sendMailWithRetry = async (mailOptions, retries = 3) => {
+  // Brevo requires the sender to be a verified email on your Brevo account.
+  // We force the sender to be your env email (which should be your Brevo login email).
+  const senderEmail = process.env.EMAIL_USER || "venkiteshns2001@gmail.com";
+  const senderName = "Forensic Talents";
 
-export const sendMailWithRetry = async (mail, retries = 3) => {
+  // We take the user's input 'from' (e.g. contact form submitter) and set it as the Reply-To.
+  let replyToEmail = senderEmail;
+  let replyToName = senderName;
+
+  if (mailOptions.from) {
+    const match = mailOptions.from.match(/"?([^"]*)"?\s*<([^>]+)>/);
+    if (match) {
+      replyToName = match[1];
+      replyToEmail = match[2];
+    } else {
+      replyToEmail = mailOptions.from;
+    }
+  }
+
+  const payload = {
+    sender: {
+      name: senderName,
+      email: senderEmail
+    },
+    to: [
+      { email: mailOptions.to }
+    ],
+    replyTo: {
+      name: replyToName,
+      email: replyToEmail
+    },
+    subject: mailOptions.subject,
+    htmlContent: mailOptions.html || "<p>No content provided</p>"
+  };
+
+  // Hardcoded as requested, but best practice is to put this in process.env.BREVO_API_KEY
+  const apiKey = process.env.BREVO_API_KEY;
+
   for (let i = 0; i <= retries; i++) {
     try {
-      // 1. Get all raw IPv4 addresses for Gmail SMTP
-      const records = await dns.resolve4("smtp.gmail.com");
-      
-      // 2. Pick a random IP to avoid hitting a blocked/throttled node
-      const randomIp = records[Math.floor(Math.random() * records.length)];
-      
-      console.log(`[Email Attempt ${i + 1}] Connecting to IP: ${randomIp}`);
-      
-      // 3. Create a dynamic transporter for this IP
-      const dynamicTransporter = nodemailer.createTransport({
-        host: randomIp,
-        port: 587,
-        secure: false, // TLS via STARTTLS
-        requireTLS: true,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
+      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "api-key": apiKey,
+          "content-type": "application/json"
         },
-        tls: {
-          // MUST provide servername when connecting via raw IP for SSL cert validation
-          servername: "smtp.gmail.com"
-        },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000
+        body: JSON.stringify(payload)
       });
 
-      // 4. Send the email
-      const result = await dynamicTransporter.sendMail(mail);
-      console.log(`[Email Success] Sent via ${randomIp}`);
-      return result;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Brevo HTTP Error: ${response.status} - ${errorText}`);
+      }
 
+      const data = await response.json();
+      console.log(`[Email Success] Sent to ${mailOptions.to} via Brevo HTTP API`);
+      return data;
     } catch (err) {
       console.error(`[Email Attempt ${i + 1} Failed]`, err.message);
-      if (i === retries) {
-        throw err; // All retries exhausted
-      }
-      // Wait 1.5 seconds before retrying
+      if (i === retries) throw err;
       await new Promise(res => setTimeout(res, 1500));
     }
   }
 };
 
-// Dummy default export to satisfy any files expecting a default transporter
 export default {
-  verify: () => console.log("Transporter verification bypassed for dynamic IP routing")
+  verify: () => console.log("Verification bypassed. Using Brevo HTTP API.")
 };
 
