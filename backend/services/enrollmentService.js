@@ -1,7 +1,7 @@
 import Enrollment from '../models/Enrollment.js';
 import Internship from '../models/Internship.js';
 import cloudinary from '../config/cloudinary.js';
-import transporter from '../config/nodemailer.js';
+import transporter, { sendMailWithRetry } from '../config/nodemailer.js';
 
 export const processEnrollment = async (data, file) => {
   const {
@@ -73,7 +73,11 @@ export const processEnrollment = async (data, file) => {
     `
   };
 
-  transporter.sendMail(mailOptions).catch(err => console.error("Admin enrollment email failed", err));
+  try {
+    sendMailWithRetry(mailOptions).catch(err => console.error("Admin enrollment email failed", err.message));
+  } catch (err) {
+    console.error("Email system error:", err.message);
+  }
 
   return newEnrollment;
 };
@@ -110,7 +114,11 @@ export const approveEnrollment = async (id) => {
     `
   };
 
-  transporter.sendMail(mailOptions).catch(err => console.error("User approval email failed", err));
+  try {
+    sendMailWithRetry(mailOptions).catch(err => console.error("User approval email failed", err.message));
+  } catch (err) {
+    console.error("Email system error:", err.message);
+  }
 
   return enrollment;
 };
@@ -145,7 +153,11 @@ export const rejectEnrollment = async (id, reason) => {
     `
   };
 
-  transporter.sendMail(mailOptions).catch(err => console.error("User rejection email failed", err));
+  try {
+    sendMailWithRetry(mailOptions).catch(err => console.error("User rejection email failed", err.message));
+  } catch (err) {
+    console.error("Email system error:", err.message);
+  }
 
   return enrollment;
 };

@@ -1,4 +1,4 @@
-import transporter from '../config/nodemailer.js';
+import transporter, { sendMailWithRetry } from '../config/nodemailer.js';
 
 export const submitContactForm = async (req, res, next) => {
   try {
@@ -59,8 +59,16 @@ export const submitContactForm = async (req, res, next) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: 'Message sent successfully' });
+    // Non-blocking fire-and-forget with retry
+    try {
+      sendMailWithRetry(mailOptions).catch(err => {
+        console.error("Contact form email failed:", err.message);
+      });
+    } catch (err) {
+      console.error("Email system error:", err.message);
+    }
+
+    res.status(200).json({ success: 'Message sent successfully. Email will be sent shortly.' });
   } catch (error) {
     next(error);
   }
