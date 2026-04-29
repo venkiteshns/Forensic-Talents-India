@@ -21,12 +21,20 @@ export const submitContactForm = async (req, res, next) => {
 
     const finalNationality = nationality || 'India';
 
+    // Strip spaces, dashes, parentheses to get clean digits
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+
     if (finalNationality === 'India') {
-      if (!/^[6-9][0-9]{9}$/.test(phone)) {
+      // Remove all non-digits (like '+') to handle +91
+      const phoneDigits = cleanPhone.replace(/\D/g, '');
+      // If it starts with country code '91' and has 12 digits, strip '91'
+      const nationalPhone = phoneDigits.startsWith('91') && phoneDigits.length === 12 ? phoneDigits.slice(2) : phoneDigits;
+
+      if (!/^[6-9][0-9]{9}$/.test(nationalPhone)) {
         return res.status(400).json({ error: 'Please enter a valid 10-digit Indian phone number.' });
       }
     } else {
-      if (!/^\+?[0-9]{8,15}$/.test(phone)) {
+      if (!/^\+?[0-9]{8,15}$/.test(cleanPhone)) {
         return res.status(400).json({ error: 'Please enter a valid international phone number.' });
       }
     }

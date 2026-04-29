@@ -38,14 +38,14 @@ export const validatePhoneNumber = (phone, countryName) => {
       return { isValid: false, error: "Indian phone numbers must be exactly 10 digits." };
     }
 
-    if (!phoneNumber.isValid()) {
+    if (!phoneNumber.isPossible()) {
       return { isValid: false, error: "Invalid Indian phone number format." };
     }
   } else {
     // General validation for other countries
     const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
     
-    if (!phoneNumber || !phoneNumber.isValid()) {
+    if (!phoneNumber || !phoneNumber.isPossible()) {
       return { 
         isValid: false, 
         error: `Please enter a valid phone number for ${country?.name || 'the selected country'}.` 
