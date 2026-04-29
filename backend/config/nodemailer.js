@@ -1,46 +1,54 @@
 import nodemailer from "nodemailer";
+import dns from "dns/promises";
 
-export const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // upgrade later with STARTTLS
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-  family: 4 // force IPv4 (important for Render)
-});
-
-transporter.verify((err) => {
-  if (err) {
-    console.error("SMTP error:", err.message);
-  } else {
-    console.log("SMTP ready");
-  }
-});
-
-import dns from "dns";
-dns.lookup("smtp.gmail.com", { all: true }, (err, addrs) => {
-  if (err) {
-    console.error("DNS Lookup error:", err);
-  } else {
-    console.log("Resolved smtp.gmail.com to:", addrs);
-  }
-});
-
-export const sendMailWithRetry = async (mail, retries = 2) => {
+export const sendMailWithRetry = async (mail, retries = 3) => {
   for (let i = 0; i <= retries; i++) {
     try {
-      return await transporter.sendMail(mail);
+      // 1. Get all raw IPv4 addresses for Gmail SMTP
+      const records = await dns.resolve4("smtp.gmail.com");
+      
+      // 2. Pick a random IP to avoid hitting a blocked/throttled node
+      const randomIp = records[Math.floor(Math.random() * records.length)];
+      
+      console.log(`[Email Attempt ${i + 1}] Connecting to IP: ${randomIp}`);
+      
+      // 3. Create a dynamic transporter for this IP
+      const dynamicTransporter = nodemailer.createTransport({
+        host: randomIp,
+        port: 587,
+        secure: false, // TLS via STARTTLS
+        requireTLS: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        },
+        tls: {
+          // MUST provide servername when connecting via raw IP for SSL cert validation
+          servername: "smtp.gmail.com"
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
+      });
+
+      // 4. Send the email
+      const result = await dynamicTransporter.sendMail(mail);
+      console.log(`[Email Success] Sent via ${randomIp}`);
+      return result;
+
     } catch (err) {
-      if (i === retries) throw err;
+      console.error(`[Email Attempt ${i + 1} Failed]`, err.message);
+      if (i === retries) {
+        throw err; // All retries exhausted
+      }
+      // Wait 1.5 seconds before retrying
+      await new Promise(res => setTimeout(res, 1500));
     }
   }
 };
 
-export default transporter;
+// Dummy default export to satisfy any files expecting a default transporter
+export default {
+  verify: () => console.log("Transporter verification bypassed for dynamic IP routing")
+};
 
