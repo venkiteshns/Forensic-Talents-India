@@ -138,14 +138,18 @@ export default function Internships() {
 
                     <div className="mb-6 flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
                       <div className="flex items-baseline">
-                        <span className={`text-4xl font-extrabold tracking-tight ${isOffline ? 'text-white' : 'text-slate-900'}`}>₹{internship.priceINR}</span>
+                        <span className={`text-4xl font-extrabold tracking-tight ${isOffline ? 'text-white' : 'text-slate-900'}`}>₹{Number(internship.priceINR).toLocaleString("en-IN")}</span>
                         <span className={`ml-1 font-medium ${isOffline ? 'text-slate-300' : 'text-slate-500'}`}>/ {internship.duration}</span>
                       </div>
-                      <div className={`hidden md:block ${isOffline ? 'text-white/50' : 'text-slate-400'}`}>•</div>
-                      <div className="flex items-baseline">
-                        <span className={`text-2xl font-bold tracking-tight ${isOffline ? 'text-white/80' : 'text-slate-500'}`}>${internship.priceUSD}</span>
-                        <span className={`ml-1 font-medium text-sm ${isOffline ? 'text-slate-300/80' : 'text-slate-400'}`}>/ {internship.duration}</span>
-                      </div>
+                      {!isOffline && internship.priceUSD && (
+                        <>
+                          <div className="hidden md:block text-slate-400">•</div>
+                          <div className="flex items-baseline">
+                            <span className="text-2xl font-bold tracking-tight text-slate-500">${internship.priceUSD}</span>
+                            <span className="ml-1 font-medium text-sm text-slate-400">/ {internship.duration}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     <div className={`border-t pt-6 flex-grow ${isOffline ? 'border-white/10' : 'border-slate-100'}`}>

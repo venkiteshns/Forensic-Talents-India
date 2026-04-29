@@ -2,7 +2,7 @@ export const sendMailWithRetry = async (mailOptions, retries = 3) => {
   // Brevo requires the sender to be a verified email on your Brevo account.
   // We force the sender to be your env email (which should be your Brevo login email).
   const senderEmail = process.env.EMAIL_USER || "venkiteshns2001@gmail.com";
-  const senderName = "Forensic Talents";
+  const senderName = "Forensic Talents India LLP";
 
   // We take the user's input 'from' (e.g. contact form submitter) and set it as the Reply-To.
   let replyToEmail = senderEmail;
@@ -34,7 +34,7 @@ export const sendMailWithRetry = async (mailOptions, retries = 3) => {
     htmlContent: mailOptions.html || "<p>No content provided</p>"
   };
 
-  // Hardcoded as requested, but best practice is to put this in process.env.BREVO_API_KEY
+  // Hardcoded as requested
   const apiKey = process.env.BREVO_API_KEY;
 
   for (let i = 0; i <= retries; i++) {

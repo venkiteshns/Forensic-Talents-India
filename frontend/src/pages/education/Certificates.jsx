@@ -163,10 +163,8 @@ export default function Certificates() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-lg flex flex-col md:flex-row items-center justify-center gap-0 md:gap-2 border border-green-200 w-max md:ml-auto shadow-sm leading-tight">
-                              <span className="font-bold flex items-center"><IndianRupee size={18} /> {prog.priceINR}</span>
-                              <span className="hidden md:inline text-green-500/50">•</span>
-                              <span className="text-green-600/80 font-semibold text-base">${prog.priceUSD}</span>
+                            <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-lg flex items-center justify-center border border-green-200 w-max md:ml-auto shadow-sm leading-tight">
+                              <span className="font-bold flex items-center">₹{Number(prog.priceINR).toLocaleString("en-IN")}</span>
                             </div>
                           </div>
                         </div>

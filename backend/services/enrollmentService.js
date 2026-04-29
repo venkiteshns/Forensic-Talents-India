@@ -166,6 +166,10 @@ export const deleteEnrollment = async (id) => {
   const enrollment = await Enrollment.findById(id);
   if (!enrollment) throw new Error('Enrollment not found');
 
+  if (enrollment.statusApproval !== 'rejected') {
+    throw new Error('Only rejected enrollments can be deleted');
+  }
+
   if (enrollment.paymentScreenshotPublicId) {
     try {
       await cloudinary.uploader.destroy(enrollment.paymentScreenshotPublicId);

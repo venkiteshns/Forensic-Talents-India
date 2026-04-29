@@ -33,6 +33,11 @@ export const rejectEnrollment = async (req, res, next) => {
 export const deleteEnrollment = async (req, res, next) => {
   try {
     await enrollmentService.deleteEnrollment(req.params.id);
-    res.json({ success: true });
-  } catch (err) { next(err); }
+    res.json({ message: "Enquiry deleted successfully" });
+  } catch (err) { 
+    if (err.message === 'Only rejected enrollments can be deleted') {
+      return res.status(403).json({ message: err.message });
+    }
+    next(err); 
+  }
 };

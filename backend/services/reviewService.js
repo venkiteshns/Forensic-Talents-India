@@ -10,15 +10,8 @@ export const getApprovedReviews = async (type) => {
   return await Review.find(query).sort({ createdAt: -1 });
 };
 
-export const getAllReviewsAdmin = async (type, status) => {
-  const query = {};
-  if (type && type !== 'all') {
-    query.type = type;
-  }
-  if (status && status !== 'all') {
-    query.isApproved = status === 'approved';
-  }
-  return await Review.find(query).sort({ createdAt: -1 });
+export const getAllReviewsAdmin = async () => {
+  return await Review.find({ isApproved: false }).sort({ createdAt: -1 });
 };
 
 export const createReview = async (data, file) => {
@@ -39,11 +32,11 @@ export const createReview = async (data, file) => {
   return await newReview.save();
 };
 
-export const toggleReviewApproval = async (id) => {
+export const approveReview = async (id) => {
   const review = await Review.findById(id);
   if (!review) throw new Error("Review not found");
 
-  review.isApproved = !review.isApproved;
+  review.isApproved = true;
   return await review.save();
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../components/ui/Container';
-import { Search, Image as ImageIcon, CheckSquare, PenTool, Play } from 'lucide-react';
+import { Search, Image as ImageIcon, CheckSquare, PenTool, Play, Info } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 // Import Games
@@ -80,13 +80,30 @@ export default function Games() {
         </Container>
       </section>
 
+      {/* Disclaimer Section */}
+      <Container className="mb-10 relative z-10 -mt-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg shadow-slate-200/50">
+            <div className="bg-blue-50 p-2.5 rounded-lg border border-blue-100 flex-shrink-0">
+              <Info className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                <strong className="text-slate-900 font-bold mr-1 tracking-tight">Disclaimer:</strong>
+                These interactive modules are designed strictly for educational engagement and entertainment purposes. Participation in these exercises does not confer any formal certifications, academic credits, or professional rewards.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Container>
+
       {/* Game Selection Grid */}
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {GAMES.map((game, idx) => {
             const Icon = game.icon;
             return (
-              <div 
+              <div
                 key={game.id}
                 className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer"
                 onClick={() => setActiveGame(game.id)}
@@ -103,7 +120,7 @@ export default function Games() {
                     {game.description}
                   </p>
                 </div>
-                
+
                 <div className="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between group-hover:bg-primary/5 transition-colors">
                   <span className="font-bold text-slate-700 group-hover:text-primary transition-colors">
                     Play Now
