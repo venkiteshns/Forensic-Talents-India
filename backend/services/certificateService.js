@@ -1,7 +1,6 @@
 import Certificate from '../models/Certificate.js';
 import Counter from '../models/Counter.js';
 import Quiz from '../models/Quiz.js';
-import transporter from '../config/nodemailer.js';
 
 export const createCertificate = async ({ name, email, marksScored }) => {
   // Fetch the first/only quiz document
