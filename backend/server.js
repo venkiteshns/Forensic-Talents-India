@@ -1,4 +1,9 @@
 import 'dotenv/config';
+import dns from 'dns';
+
+// Force Node to use IPv4 first
+dns.setDefaultResultOrder("ipv4first");
+
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db.js';
