@@ -4,6 +4,7 @@ import { X, Send, Copy, CreditCard, CheckCircle2, Wifi, MapPin } from 'lucide-re
 import { SuccessModal } from '../ui/SuccessModal';
 import CountryPhoneInput from '../ui/CountryPhoneInput';
 import SearchableCountrySelect from '../ui/SearchableCountrySelect';
+import CustomSelect from '../ui/CustomSelect';
 import { validatePhoneNumber } from '../../utils/phoneValidation';
 
 // ── PART 3 & 7: internshipId + internshipMode are passed in; mode is never asked of the user ──
@@ -11,6 +12,14 @@ export function EnrollModal({ isOpen, course, onClose }) {
   // course: { category, prog: { duration }, internshipId, internshipMode }
   const internshipId   = course?.internshipId   ?? null;
   const internshipMode = course?.internshipMode  ?? null;   // 'online' | 'offline' | null
+
+  const targetType = (() => {
+    if (course?.category?.toLowerCase().includes('quiz')) return 'Quiz';
+    if (course?.category?.toLowerCase().includes('internship')) return 'Internship';
+    return 'Course';
+  })();
+
+  const [courseMode, setCourseMode] = useState('');
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', nationality: 'India',
@@ -36,15 +45,19 @@ export function EnrollModal({ isOpen, course, onClose }) {
     }
   }, [isOpen]);
 
-  // ── PART 3: nationality is only relevant for online internships ───────────
-  // Pre-clear nationality when switching away from an online internship
+  // Default nationality to India and handle body scroll lock
   useEffect(() => {
-    if (internshipMode === 'offline') {
-      setFormData(prev => ({ ...prev, nationality: '' }));
-    } else {
+    if (isOpen) {
       setFormData(prev => ({ ...prev, nationality: prev.nationality || 'India' }));
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
     }
-  }, [internshipMode]);
+    
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
 
   const validate = (data = formData) => {
     let newErrors = {};
@@ -60,9 +73,13 @@ export function EnrollModal({ isOpen, course, onClose }) {
     if (!data.transactionId.trim()) newErrors.transactionId = "Transaction ID is required.";
     if (!paymentProof)              newErrors.paymentProof  = "Payment proof is required.";
 
-    // Nationality is required only for online internships
-    if (internshipMode === 'online' && !data.nationality) {
-      newErrors.nationality = "Nationality is required for online learning.";
+    // Nationality is required for Internship and Course
+    if ((targetType === 'Course' || targetType === 'Internship') && !data.nationality) {
+      newErrors.nationality = "Nationality is required.";
+    }
+
+    if (targetType === 'Course' && !courseMode) {
+      newErrors.courseMode = "Please select a mode of study.";
     }
 
     return newErrors;
@@ -115,9 +132,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
 
     setStatus('loading');
 
-    let targetType = 'Course';
-    if (course?.category?.toLowerCase().includes('quiz'))       targetType = 'Quiz';
-    else if (course?.category?.toLowerCase().includes('internship')) targetType = 'Internship';
+    setStatus('loading');
 
     // ── PART 4: Submission payload — mode is sourced from internshipMode, never from user ──
     const payload = new FormData();
@@ -133,8 +148,16 @@ export function EnrollModal({ isOpen, course, onClose }) {
     payload.append('additionalInfo', formData.additionalInfo);
     payload.append('targetType',    targetType);
     payload.append('targetName',    `${course?.category || 'Program'} - ${course?.prog?.duration || ''}`.trim());
+    
     if (internshipId)   payload.append('internshipId', internshipId);
     if (internshipMode) payload.append('mode', internshipMode);   // backend will override from DB anyway
+    
+    if (targetType === 'Course') {
+      if (courseMode) payload.append('mode', courseMode);
+      if (course?.prog?.priceINR) payload.append('priceINR', course.prog.priceINR);
+      if (courseMode === 'Online' && course?.prog?.priceUSD) payload.append('priceUSD', course.prog.priceUSD);
+    }
+    
     payload.append('paymentProof', paymentProof);
 
     try {
@@ -147,6 +170,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
           qualification: '', status: '', institutionName: '', organizationName: '',
           transactionId: '', additionalInfo: ''
         });
+        setCourseMode('');
         setPaymentProof(null);
         setErrors({});
         setTouched({});
@@ -254,13 +278,19 @@ export function EnrollModal({ isOpen, course, onClose }) {
                       {touched.qualification && errors.qualification && <p className="text-red-500 text-sm mt-1">{errors.qualification}</p>}
                     </div>
                     <div className="flex flex-col gap-1 mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Current Status <span className="text-red-500">*</span></label>
-                      <select name="status" value={formData.status} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.status && errors.status ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white`}>
-                        <option value="">Select Status</option>
-                        <option value="Student">Student</option>
-                        <option value="Professional">Professional</option>
-                      </select>
-                      {touched.status && errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
+                      <CustomSelect
+                        label="Current Status"
+                        value={formData.status}
+                        onChange={(val) => {
+                          setFormData(prev => ({ ...prev, status: val }));
+                          if (errors.status) setErrors(prev => ({ ...prev, status: null }));
+                        }}
+                        options={['Student', 'Professional']}
+                        placeholder="Select Status"
+                        error={errors.status}
+                        touched={touched.status}
+                        required={true}
+                      />
                     </div>
                   </div>
 
@@ -279,9 +309,8 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   )}
                 </div>
 
-                {/* ── PART 1: "Program Preferences" section removed — no mode dropdown/radio ── */}
-                {/* ── PART 7: Nationality shown only for online internships ─────────────────── */}
-                {internshipMode === 'online' && (
+                {/* ── Nationality is required for Internship and Course ─────────────────── */}
+                {(targetType === 'Course' || targetType === 'Internship') && (
                   <div className="space-y-4 pt-2">
                     <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Location Details</h4>
                     <div className="flex flex-col gap-1 mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -300,10 +329,56 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   </div>
                 )}
 
+                {/* ── PART 1: Course Mode & Pricing ── */}
+                {targetType === 'Course' && course?.prog?.modes?.length > 0 && (
+                  <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Program Preferences</h4>
+                    <div className="flex flex-col gap-1 mb-4">
+                      <CustomSelect
+                        label="Mode of Study"
+                        value={courseMode}
+                        onChange={(val) => {
+                          setCourseMode(val);
+                          if (errors.courseMode) setErrors(prev => ({...prev, courseMode: null}));
+                        }}
+                        options={course.prog.modes}
+                        placeholder="Select Mode"
+                        error={errors.courseMode}
+                        touched={touched.courseMode}
+                        required={true}
+                      />
+                    </div>
+
+                    {courseMode && (
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm animate-in fade-in zoom-in-95 duration-200">
+                         <div>
+                            <p className="text-sm font-bold text-slate-800">Course Fee ({courseMode})</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Please review the applicable pricing below.</p>
+                         </div>
+                         <div className="flex gap-3">
+                            <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">INR</p>
+                               <p className="text-lg font-bold text-green-600 leading-none">₹{Number(course.prog.priceINR).toLocaleString("en-IN")}</p>
+                            </div>
+                            {courseMode === 'Online' && course.prog.priceUSD && (
+                              <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">USD</p>
+                                 <p className="text-lg font-bold text-blue-600 leading-none">${course.prog.priceUSD}</p>
+                              </div>
+                            )}
+                         </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-4 pt-2">
                   <div className="flex justify-between items-end border-b border-slate-100 pb-2">
-                    <h4 className="text-sm font-bold text-primary uppercase tracking-wider">Payment Details</h4>
-                    <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">
+                    <div>
+                      <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-1">Payment Details</h4>
+                      <p className="text-xs text-slate-500 max-w-[280px]">Please complete your payment using our secure credentials and upload the proof below.</p>
+                    </div>
+                    <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center gap-1.5 transition-colors bg-accent/5 hover:bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
                       <CreditCard size={16} /> View Payment Credentials
                     </button>
                   </div>

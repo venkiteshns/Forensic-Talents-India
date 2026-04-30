@@ -7,7 +7,8 @@ export const processEnrollment = async (data, file) => {
   const {
     name, email, phone, nationality, qualification, status,
     institutionName, organizationName, transactionId,
-    targetType, targetName, internshipId, additionalInfo
+    targetType, targetName, internshipId, additionalInfo,
+    mode, priceINR, priceUSD
   } = data;
 
   if (!file) throw new Error('Payment proof is required');
@@ -28,6 +29,8 @@ export const processEnrollment = async (data, file) => {
     if (data.mode && data.mode !== internship.mode) {
       throw new Error(`Mode mismatch: submitted "${data.mode}" but internship is "${internship.mode}".`);
     }
+  } else if (targetType === 'Course') {
+    resolvedMode = data.mode;
   }
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -43,6 +46,7 @@ export const processEnrollment = async (data, file) => {
     targetType, targetName,
     internshipId: targetType === 'Internship' ? internshipId : undefined,
     mode: resolvedMode,
+    priceINR, priceUSD,
     additionalInfo
   });
 
@@ -66,7 +70,9 @@ export const processEnrollment = async (data, file) => {
       <hr/>
       <h3>Enrollment Details</h3>
       <p><strong>${targetType === 'Internship' ? 'Internship Name' : 'Course Name'}:</strong> ${targetName}</p>
-      ${resolvedMode ? `<p><strong>Mode (system-verified):</strong> ${resolvedMode}</p>` : ''}
+      ${resolvedMode ? `<p><strong>Mode${targetType === 'Internship' ? ' (system-verified)' : ''}:</strong> ${resolvedMode}</p>` : ''}
+      ${targetType === 'Course' && priceINR ? `<p><strong>Price (INR):</strong> ₹${priceINR}</p>` : ''}
+      ${targetType === 'Course' && priceUSD ? `<p><strong>Price (USD):</strong> $${priceUSD}</p>` : ''}
       <p><strong>Transaction ID:</strong> ${transactionId}</p>
       <p><strong>Payment Proof:</strong> <a href="${paymentProofUrl}">View Image</a></p>
       ${additionalInfo ? `<p><strong>Additional Info:</strong> ${additionalInfo}</p>` : ''}

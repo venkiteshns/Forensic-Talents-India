@@ -44,3 +44,19 @@
   transform: scale(1.05) !important;
   box-shadow: 0 0 0 4px rgba(59,130,246,0.3) !important;
 }
+
+html, body {
+  overscroll-behavior: none;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Mobile specific lock if needed */
+@media (max-width: 640px) {
+  body.modal-open {
+    position: fixed;
+    width: 100%;
+  }
+}

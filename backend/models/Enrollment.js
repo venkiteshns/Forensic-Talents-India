@@ -14,7 +14,9 @@ const enrollmentSchema = new mongoose.Schema({
   targetType: { type: String, required: true }, // e.g., 'Course', 'Internship', 'Quiz'
   targetName: { type: String, required: true }, // e.g., 'Online Internship - 2 months'
   internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship' }, // set when targetType = Internship
-  mode: { type: String, enum: ['online', 'offline'] }, // system-derived from internship; not user-controlled
+  mode: { type: String, enum: ['online', 'offline', 'Online', 'Offline'] }, // system-derived from internship; user-controlled for course
+  priceINR: { type: Number },
+  priceUSD: { type: Number },
   additionalInfo: { type: String },
   statusApproval: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', index: true },
   rejectionReason: { type: String },

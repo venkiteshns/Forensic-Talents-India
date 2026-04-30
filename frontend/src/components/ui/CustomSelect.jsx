@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, Search, Check } from 'lucide-react';
-import { countries } from '../../data/countries';
+import { ChevronDown, Check } from 'lucide-react';
 
-export default function SearchableCountrySelect({ 
+export default function CustomSelect({ 
   value, 
   onChange, 
+  options, 
   error, 
   touched, 
-  label = "Country", 
+  label, 
+  placeholder = "Select an option",
   required = false 
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
   const dropdownMenuRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
@@ -60,12 +60,13 @@ export default function SearchableCountrySelect({
     }
   }, [isOpen]);
 
-  const filteredCountries = countries.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.dialCode.includes(searchTerm)
+  const selectedOption = options.find(opt => 
+    typeof opt === 'object' ? opt.value === value : opt === value
   );
 
-  const selectedCountry = countries.find(c => c.name === value || c.code === value) || countries.find(c => c.name === 'India');
+  const displayValue = selectedOption 
+    ? (typeof selectedOption === 'object' ? selectedOption.label : selectedOption) 
+    : placeholder;
 
   return (
     <div className="relative" style={{ zIndex: 1 }}>
@@ -82,7 +83,7 @@ export default function SearchableCountrySelect({
           touched && error ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 hover:border-slate-300'
         } ${isOpen ? 'ring-2 ring-accent border-transparent' : ''}`}
       >
-        <span className="text-slate-700 truncate">{selectedCountry?.name || 'Select a country'}</span>
+        <span className={`truncate ${!value ? 'text-slate-500' : 'text-slate-700'}`}>{displayValue}</span>
         <ChevronDown size={18} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
@@ -94,38 +95,26 @@ export default function SearchableCountrySelect({
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
         >
-          <div className="p-2 border-b border-slate-100 bg-slate-50 sticky top-0 z-10">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text" 
-                autoFocus
-                placeholder="Search country..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-              />
-            </div>
-          </div>
           <div className="max-h-60 overflow-y-auto custom-scrollbar" style={{ overscrollBehavior: 'contain' }}>
-            {filteredCountries.length === 0 ? (
-              <div className="p-4 text-center text-sm text-slate-500">No countries found</div>
-            ) : (
-              filteredCountries.map(country => (
+            {options.map((opt, idx) => {
+              const optValue = typeof opt === 'object' ? opt.value : opt;
+              const optLabel = typeof opt === 'object' ? opt.label : opt;
+              const isSelected = value === optValue;
+              
+              return (
                 <div 
-                  key={country.code}
+                  key={idx}
                   onClick={() => {
-                    onChange(country.name, country);
+                    onChange(optValue);
                     setIsOpen(false);
-                    setSearchTerm('');
                   }}
-                  className={`px-4 py-2.5 text-sm cursor-pointer flex items-center justify-between hover:bg-slate-50 transition-colors ${selectedCountry?.code === country.code ? 'bg-primary/5 text-primary font-medium' : 'text-slate-700'}`}
+                  className={`px-4 py-3 text-sm cursor-pointer flex items-center justify-between hover:bg-slate-50 transition-colors ${isSelected ? 'bg-primary/5 text-primary font-medium' : 'text-slate-700'}`}
                 >
-                  <span className="truncate pr-4">{country.name}</span>
-                  <span className="text-slate-400 text-xs shrink-0">{country.dialCode}</span>
+                  <span className="truncate pr-4">{optLabel}</span>
+                  {isSelected && <Check size={16} className="text-primary shrink-0" />}
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
         </div>,
         document.body
