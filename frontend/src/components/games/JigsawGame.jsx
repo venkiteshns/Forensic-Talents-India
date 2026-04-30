@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
-import { getErrorMessage } from '../../utils/errorHandler';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
@@ -15,6 +15,13 @@ const JIGSAW_LEVELS = {
   medium:  { grid: 3 },
   hard:    { grid: 4 },
   pro:     { grid: 5, moves: 30 }
+};
+
+const jigsawFallbackImages = {
+  easy: "/fallback/jigsaw-easy.webp",
+  medium: "/fallback/jigsaw-medium.webp",
+  hard: "/fallback/jigsaw-hard.webp",
+  pro: "/fallback/jigsaw-pro.webp"
 };
 
 const generatePuzzlePieces = (gridSize) => {
@@ -109,7 +116,7 @@ export default function JigsawGame({ onQuit }) {
   const [selectedPieceId, setSelectedPieceId] = useState(null);
 
   const difficultySectionRef = useRef(null);
-  const [startRef, scrollToStart] = useScrollToRef();
+  const [startRef] = useScrollToRef();
   const isGeneratingRef = useRef(false);
 
   const scrollToDifficultySection = () => {
@@ -131,37 +138,26 @@ export default function JigsawGame({ onQuit }) {
     }, 100);
   };
 
-  const handleFallback = () => {
-    setTimeout(() => {
-      setImageState({
-        status: "fallback",
-        data: { imageUrl: "/fallback.jpg" }
-      });
-    }, 2000);
-  };
-
-  const loadJigsaw = async (lvl) => {
+  const loadLevel = async (lvl) => {
     setImageState({ status: "loading", data: null });
     try {
       const res = await api.get(`/game/jigsaw?level=${lvl}`);
-      if (res.data && res.data.imageUrl) {
-        localStorage.setItem(`jigsaw-${lvl}`, JSON.stringify(res.data));
-        setImageState({ status: "success", data: res.data });
-      } else {
-        throw new Error("No dataset");
+      if (!res.data || !res.data.imageUrl) {
+        throw new Error("Empty dataset");
       }
+      localStorage.setItem(`jigsaw-${lvl}`, JSON.stringify(res.data));
+      setImageState({ status: "success", data: res.data });
     } catch (err) {
-      console.error("Data load failed:", err);
-      handleFallback();
-    }
-  };
-
-  const loadLevel = (lvl) => {
-    const cached = localStorage.getItem(`jigsaw-${lvl}`);
-    if (cached) {
-      setImageState({ status: "success", data: JSON.parse(cached) });
-    } else {
-      loadJigsaw(lvl);
+      console.warn("Using fallback jigsaw:", err.message);
+      const cached = localStorage.getItem(`jigsaw-${lvl}`);
+      if (cached) {
+        setImageState({ status: "success", data: JSON.parse(cached) });
+      } else {
+        setImageState({
+          status: "fallback",
+          data: { imageUrl: jigsawFallbackImages[lvl] }
+        });
+      }
     }
   };
 
@@ -170,7 +166,7 @@ export default function JigsawGame({ onQuit }) {
   }, [level]);
 
   useEffect(() => {
-    if (imageState.status === "success") {
+    if (imageState.status === "success" || imageState.status === "fallback") {
       const levels = ["easy", "medium", "hard", "pro"];
       const idx = levels.indexOf(level);
       if (idx >= 0 && idx < levels.length - 1) {
@@ -326,12 +322,12 @@ export default function JigsawGame({ onQuit }) {
                 Pro Level: Moves are limited. Complete the puzzle efficiently.
               </div>
             )}
-            <div className="mt-8 flex justify-center px-3">
+            <div className="mt-8 flex flex-col items-center gap-3 px-3">
               <button 
                 ref={startRef}
                 onClick={initGame} 
                 disabled={imageState.status === "loading" || !nextGame}
-                className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="start-game-btn w-full max-w-[260px] flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {imageState.status === "loading" ? (
                   <>
@@ -344,11 +340,7 @@ export default function JigsawGame({ onQuit }) {
                   </>
                 )}
               </button>
-              {imageState.status === "fallback" && (
-                <p className="text-amber-600 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200 text-sm font-semibold max-w-sm mx-auto text-center mt-4">
-                  Using offline fallback dataset. Check network or ask admin to add level data.
-                </p>
-              )}
+
             </div>
           </div>
         </Container>
@@ -438,7 +430,7 @@ export default function JigsawGame({ onQuit }) {
                     >
                       <div className={cn("w-full h-full transition-all duration-500", gameState === 'completed' ? "opacity-100" : isCorrect ? "opacity-90 grayscale-[20%]" : "opacity-80")}>
                         {currentGame.pieceImages[piece.id] && (
-                          <img src={currentGame.pieceImages[piece.id]} alt="puzzle piece" className="w-full h-full object-cover block m-0 p-0" />
+                          <img src={currentGame.pieceImages[piece.id]} alt="puzzle piece" loading="eager" decoding="async" className="w-full h-full object-cover block m-0 p-0" />
                         )}
                       </div>
                     </div>
@@ -448,7 +440,7 @@ export default function JigsawGame({ onQuit }) {
 
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-6">
                 <div className="w-32 h-32 rounded-xl overflow-hidden border border-slate-700 shadow-sm shrink-0 bg-[#000] flex items-center justify-center p-2">
-                  <img src={currentGame.puzzleImage} alt="Target" className="max-w-full max-h-full object-contain" />
+                  <img src={currentGame.puzzleImage} alt="Target" loading="eager" decoding="async" className="max-w-full max-h-full object-contain" />
                 </div>
                 <div className="flex flex-col gap-3">
                   <Button onClick={initGame} variant="outline" className="flex items-center gap-2 font-bold text-slate-600 justify-center">
@@ -482,8 +474,17 @@ export default function JigsawGame({ onQuit }) {
           />
         )}
 
-        {gameState === 'failed' && (
-          <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500">
+        {gameState === 'failed' && createPortal(
+          <div 
+            className="fixed z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500"
+            style={{
+              top: `${document.querySelector('header')?.offsetHeight || 72}px`,
+              left: 0,
+              width: '100%',
+              height: `calc(100vh - ${document.querySelector('header')?.offsetHeight || 72}px)`,
+              paddingBottom: 'env(safe-area-inset-bottom)'
+            }}
+          >
             <div className="w-full max-w-[300px] sm:max-w-[360px] bg-white rounded-[16px] shadow-2xl p-6 text-center flex flex-col items-center justify-center">
               <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-red-100/60">
                 <RefreshCw className="w-7 h-7" strokeWidth={2.5} />
@@ -505,7 +506,8 @@ export default function JigsawGame({ onQuit }) {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>

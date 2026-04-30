@@ -22,7 +22,10 @@ export const getAllReviewsAdmin = async (statusFilter, typeFilter) => {
 };
 
 export const createReview = async (data, file) => {
-  const { name, email, rating, review, type } = data;
+  let { name, email, rating, review, type } = data;
+  if (!name || name.trim() === '') {
+    name = "Anonymous";
+  }
   if (!type || !['service', 'education'].includes(type)) {
     throw new Error('Review type is required. Must be "service" or "education".');
   }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Fingerprint, Dna, Microscope, BadgeAlert, Camera, Search, Pipette, Briefcase, FileSignature, Gavel, Shield, FlaskConical } from 'lucide-react';
@@ -33,6 +34,13 @@ const ICON_SET = [
   "/icons/file-signature.svg",
   "/icons/gavel.svg"
 ];
+
+const fallbackMatchingData = {
+  easy: ICON_SET,
+  medium: ICON_SET,
+  hard: ICON_SET,
+  pro: ICON_SET
+};
 
 const preloadImages = (images) => {
   images.forEach((src) => {
@@ -72,7 +80,7 @@ export default function MatchingGame({ onQuit }) {
   
   const [gameConfig, setGameConfig] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isFallbackUsed, setIsFallbackUsed] = useState(false);
   const [currentGame, setCurrentGame] = useState(null);
 
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -142,84 +150,33 @@ export default function MatchingGame({ onQuit }) {
 
   const loadLevel = async (lvl) => {
     setIsLoading(true);
-    setError(null);
     const cacheKey = `matching-${lvl}`;
-    const cached = localStorage.getItem(cacheKey);
-
     const MIN_LOADING_TIME = 300;
     const startTime = Date.now();
 
     try {
-      let easyHasImages = false;
-      if (lvl !== 'easy') {
-        let easyData = localStorage.getItem('matching-easy');
-        if (!easyData) {
-           try {
-              const res = await api.get('/game/matching?level=easy');
-              easyData = JSON.stringify(res.data);
-              localStorage.setItem('matching-easy', easyData);
-           } catch(e) {}
-        }
-        try {
-          easyHasImages = easyData ? JSON.parse(easyData)?.images?.length > 0 : false;
-        } catch(e) {}
+      const res = await api.get(`/game/matching?level=${lvl}`);
+      
+      if (!res.data || !res.data.images || res.data.images.length === 0) {
+        throw new Error("Empty dataset");
       }
 
-      const processDataset = (dataset) => {
-        if (lvl === 'easy') {
-           easyHasImages = dataset?.images?.length > 0;
-        }
+      setGameConfig({ images: res.data.images });
+      localStorage.setItem(cacheKey, JSON.stringify(res.data.images));
+      setIsFallbackUsed(false);
 
-        const LEVELS = ["easy", "medium", "hard", "pro"];
-        const lvlIdx = LEVELS.indexOf(lvl);
-
-        let useIcons = false;
-
-        if (easyHasImages) {
-           // Pattern B: easy=images, medium=icons, hard=images, pro=icons
-           if (lvlIdx % 2 !== 0) useIcons = true;
-        } else {
-           // Pattern A: easy=icons, medium=images, hard=icons, pro=images
-           if (lvlIdx % 2 === 0) useIcons = true;
-        }
-
-        if (!useIcons && (!dataset.images || dataset.images.length < MEMORY_LEVELS[lvl].pairs)) {
-          throw new Error("Invalid dataset: images required");
-        }
-
-        const source = useIcons ? ICON_SET : dataset.images;
-        
-        if (!source || source.length === 0) {
-          throw new Error("No dataset available");
-        }
-        
-        return source;
-      };
-
-      let finalSource = null;
-      if (cached) {
-        const data = JSON.parse(cached);
-        try {
-          finalSource = processDataset(data);
-        } catch (e) {
-          // invalid cache, let it fetch
-        }
-      }
-      
-      if (!finalSource) {
-        const res = await api.get(`/game/matching?level=${lvl}`);
-        if (!res.data) throw new Error("Empty dataset");
-        
-        finalSource = processDataset(res.data);
-        localStorage.setItem(cacheKey, JSON.stringify(res.data));
-      }
-      
-      setGameConfig({ images: finalSource });
-      
     } catch (err) {
-      console.error("Data load failed:", err);
-      setGameConfig(null);
-      setError("No dataset available for this level. Please ask an admin to add one.");
+      console.warn("Using fallback data:", err.message);
+
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        setGameConfig({ images: JSON.parse(cached) });
+      } else {
+        setGameConfig({ images: fallbackMatchingData[lvl] });
+      }
+      setIsFallbackUsed(true);
+
     } finally {
       const elapsed = Date.now() - startTime;
       if (elapsed < MIN_LOADING_TIME) {
@@ -237,16 +194,15 @@ export default function MatchingGame({ onQuit }) {
     const idx = levels.indexOf(level);
     if (idx >= 0 && idx < levels.length - 1) {
        const nextLvl = levels[idx+1];
-       const preloadLevel = async (lvl) => {
-         const cacheKey = `matching-${lvl}`;
-         if (!localStorage.getItem(cacheKey)) {
-           try {
-             const res = await api.get(`/game/matching?level=${lvl}`);
-             if (res.data) localStorage.setItem(cacheKey, JSON.stringify(res.data));
-           } catch {}
-         }
+       const preloadNextLevel = async (nextLevel) => {
+         try {
+           const res = await api.get(`/game/matching?level=${nextLevel}`);
+           if (res.data && res.data.images) {
+             localStorage.setItem(`matching-${nextLevel}`, JSON.stringify(res.data.images));
+           }
+         } catch {}
        };
-       preloadLevel(nextLvl);
+       preloadNextLevel(nextLvl);
     }
   }, [level]);
 
@@ -424,11 +380,7 @@ export default function MatchingGame({ onQuit }) {
                   </>
                 )}
               </button>
-              {!isLoading && error && (
-                <p className="text-red-500 text-sm font-semibold max-w-sm mx-auto text-center">
-                  {error}
-                </p>
-              )}
+
             </div>
           </div>
         </Container>
@@ -574,8 +526,17 @@ export default function MatchingGame({ onQuit }) {
           />
         )}
 
-        {gameState === 'failed' && (
-          <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500">
+        {gameState === 'failed' && createPortal(
+          <div 
+            className="fixed z-[9999] bg-black/40 backdrop-blur-[4px] flex items-center justify-center p-4 animate-in fade-in duration-500"
+            style={{
+              top: `${document.querySelector('header')?.offsetHeight || 72}px`,
+              left: 0,
+              width: '100%',
+              height: `calc(100vh - ${document.querySelector('header')?.offsetHeight || 72}px)`,
+              paddingBottom: 'env(safe-area-inset-bottom)'
+            }}
+          >
             <div className="w-full max-w-[300px] sm:max-w-[360px] bg-white rounded-[16px] shadow-2xl p-6 text-center flex flex-col items-center justify-center">
               <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-red-100/60">
                 <RefreshCw className="w-7 h-7" strokeWidth={2.5} />
@@ -597,7 +558,8 @@ export default function MatchingGame({ onQuit }) {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>

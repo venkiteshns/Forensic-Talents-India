@@ -10,12 +10,24 @@ import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
 import useGameProgress from './useGameProgress';
 import { useScrollToRef } from '../../hooks/useScrollToRef';
+import { crosswordFallbackData } from '../../data/crosswordFallback';
+
+const isValidSet = (words) => {
+  return words.every(w =>
+    w.word &&
+    w.clue &&
+    w.word.length >= 3 &&
+    /^[A-Z]+$/.test(w.word)
+  );
+};
+
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 const CROSSWORD_LEVELS = {
   easy:    { words: 4 },
   medium:  { words: 6 },
   hard:    { words: 8 },
-  pro:     { words: 12 }
+  pro:     { words: 10 }
 };
 
 const FALLBACK_PUZZLE = {
@@ -71,6 +83,8 @@ export default function CrosswordGame({ onQuit }) {
 
   const [nextGameData, setNextGameData] = useState(null);
   const [wordsPool, setWordsPool] = useState([]);
+  const [isOffline, setIsOffline] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const isGeneratingRef = useRef(false);
   const workerRef = useRef(null);
 
@@ -99,41 +113,39 @@ export default function CrosswordGame({ onQuit }) {
 
 
   const loadLevel = async (lvl) => {
+    setIsDataLoading(true);
     const cacheKey = `crossword-${lvl}`;
-    const cached = localStorage.getItem(cacheKey);
-    let data;
-    const fallbackWords = [
-      { word: "FORENSIC", clue: "Scientific analysis for crime" },
-      { word: "CRIME", clue: "Unlawful act" },
-      { word: "SCENE", clue: "Location of the crime" },
-      { word: "EVIDENCE", clue: "Material proof" },
-      { word: "CLUE", clue: "Lead for investigation" },
-      { word: "AUTOPSY", clue: "Post-mortem examination" },
-      { word: "BLOOD", clue: "Red fluid in body" },
-      { word: "WEAPON", clue: "Instrument used in crime" },
-      { word: "SUSPECT", clue: "Person thought to be guilty" },
-      { word: "VICTIM", clue: "Person harmed in crime" },
-      { word: "WITNESS", clue: "Person who saw the event" },
-      { word: "DETECTIVE", clue: "Investigator of crimes" },
-      { word: "TRIAL", clue: "Court hearing" },
-      { word: "GUILTY", clue: "Culpable of a crime" }
-    ];
-    if (cached) {
-      data = JSON.parse(cached);
-      setWordsPool(data.words);
-    } else {
-      try {
-        const res = await api.get(`/game/crossword?level=${lvl}`);
-        if (res.data && res.data.words && res.data.words.length > 0) {
-          data = res.data;
-          localStorage.setItem(cacheKey, JSON.stringify(data));
-          setWordsPool(data.words);
-        } else {
-          setWordsPool(fallbackWords);
-        }
-      } catch (err) {
-        setWordsPool(fallbackWords);
+
+    try {
+      const res = await api.get(`/game/crossword?level=${lvl}`);
+      const data = res.data;
+
+      if (!data || !data.words || data.words.length === 0) {
+        throw new Error("Empty dataset");
       }
+
+      if (!isValidSet(data.words)) {
+        throw new Error("Invalid dataset structure");
+      }
+
+      setWordsPool(data.words);
+      localStorage.setItem(cacheKey, JSON.stringify(data.words));
+      setIsOffline(false);
+
+    } catch (err) {
+      console.warn("Using fallback crossword:", err.message);
+
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setWordsPool(Array.isArray(parsed) ? parsed : parsed.words || crosswordFallbackData[lvl]);
+      } else {
+        setWordsPool(crosswordFallbackData[lvl]);
+      }
+      setIsOffline(true);
+    } finally {
+      setIsDataLoading(false);
     }
   };
 
@@ -157,7 +169,9 @@ export default function CrosswordGame({ onQuit }) {
          if (!localStorage.getItem(cacheKey)) {
            try {
              const res = await api.get(`/game/crossword?level=${lvl}`);
-             if (res.data && res.data.words) localStorage.setItem(cacheKey, JSON.stringify(res.data));
+             if (res.data && res.data.words && isValidSet(res.data.words)) {
+               localStorage.setItem(cacheKey, JSON.stringify(res.data.words));
+             }
            } catch {}
          }
        };
@@ -172,8 +186,7 @@ export default function CrosswordGame({ onQuit }) {
     let attempts = 0;
     while (attempts < 3) {
       // Pick a subset + some extra for better intersection chances
-      const shuffled = [...words].sort(() => 0.5 - Math.random());
-      const selectedWords = shuffled.slice(0, targetWords + 4);
+      const selectedWords = shuffle(words).slice(0, targetWords + 4);
       
       try {
         const result = await generateWithTimeout(workerRef.current, selectedWords, 10000);
@@ -238,8 +251,6 @@ export default function CrosswordGame({ onQuit }) {
     if (gameToPlay) {
       applyPuzzle(gameToPlay);
       setNextGameData(null); // Clear next game so it generates a new one
-    } else {
-      setGameState('error');
     }
   };
 
@@ -396,13 +407,15 @@ export default function CrosswordGame({ onQuit }) {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
+
             <div className="mt-8 flex justify-center px-3">
               <button 
                 ref={startRef}
                 onClick={handleStartGameClick} 
+                disabled={isDataLoading}
                 className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5" /> Start Game
+                <Play className="w-4 h-4 sm:w-5 sm:h-5" /> {isDataLoading ? 'Loading Data...' : 'Start Game'}
               </button>
             </div>
           </div>
@@ -429,27 +442,7 @@ export default function CrosswordGame({ onQuit }) {
           </Container>
         )}
 
-        {gameState === 'error' && (
-          <Container>
-            <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-3xl p-8 text-center shadow-sm">
-              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <X size={32} strokeWidth={2.5} />
-              </div>
-              <h2 className="text-2xl font-bold text-red-900 mb-3">Invalid Puzzle Configuration</h2>
-              <p className="text-red-700 mb-8 leading-relaxed">
-                The generated crossword contains structural mismatches and cannot be rendered safely. Please restart or try another set.
-              </p>
-              <div className="flex justify-center gap-4">
-                <Button onClick={initGame} variant="primary" className="bg-red-600 hover:bg-red-700 border-none px-6">
-                  <RefreshCw size={18} className="mr-2" /> Try Again
-                </Button>
-                <button onClick={onQuit} className="px-6 py-2 text-red-600 font-semibold hover:bg-red-100 rounded-lg transition-colors">
-                  Go Back
-                </button>
-              </div>
-            </div>
-          </Container>
-        )}
+
 
         {(gameState === 'playing' || gameState === 'completed') && puzzleData && (
           <Container>
