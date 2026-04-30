@@ -82,7 +82,7 @@ export default function CrosswordGame({ onQuit }) {
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   const [nextGameData, setNextGameData] = useState(null);
-  const [wordsPool, setWordsPool] = useState([]);
+  const [wordsPool, setWordsPool] = useState({ level: null, words: [] });
   const [isOffline, setIsOffline] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
   const isGeneratingRef = useRef(false);
@@ -128,7 +128,7 @@ export default function CrosswordGame({ onQuit }) {
         throw new Error("Invalid dataset structure");
       }
 
-      setWordsPool(data.words);
+      setWordsPool({ level: lvl, words: data.words });
       localStorage.setItem(cacheKey, JSON.stringify(data.words));
       setIsOffline(false);
 
@@ -136,13 +136,13 @@ export default function CrosswordGame({ onQuit }) {
       console.warn("Using fallback crossword:", err.message);
 
       const cached = localStorage.getItem(cacheKey);
+      let fallbackWords = crosswordFallbackData[lvl];
 
       if (cached) {
         const parsed = JSON.parse(cached);
-        setWordsPool(Array.isArray(parsed) ? parsed : parsed.words || crosswordFallbackData[lvl]);
-      } else {
-        setWordsPool(crosswordFallbackData[lvl]);
+        fallbackWords = Array.isArray(parsed) ? parsed : parsed.words || crosswordFallbackData[lvl];
       }
+      setWordsPool({ level: lvl, words: fallbackWords });
       setIsOffline(true);
     } finally {
       setIsDataLoading(false);
@@ -200,9 +200,9 @@ export default function CrosswordGame({ onQuit }) {
   }, []);
 
   useEffect(() => {
-    if (wordsPool.length > 0 && (gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current) {
+    if (wordsPool.level === level && wordsPool.words.length > 0 && (gameState === 'idle' || gameState === 'playing') && !isGeneratingRef.current) {
       isGeneratingRef.current = true;
-      generatePuzzle(wordsPool, level).then(res => {
+      generatePuzzle(wordsPool.words, level).then(res => {
         setNextGameData(res);
         isGeneratingRef.current = false;
       });
@@ -240,7 +240,7 @@ export default function CrosswordGame({ onQuit }) {
 
     let gameToPlay = nextGameData;
     if (!gameToPlay) {
-      gameToPlay = await generatePuzzle(wordsPool, level);
+      gameToPlay = await generatePuzzle(wordsPool.words, level);
     }
 
     if (!gameToPlay) {
@@ -259,6 +259,7 @@ export default function CrosswordGame({ onQuit }) {
   const handleLevelChange = (newLevel) => {
     if (!isUnlocked(newLevel)) return;
     setLevel(newLevel);
+    setNextGameData(null);
     if (gameState !== 'idle') setGameState('idle');
   };
 
@@ -444,8 +445,8 @@ export default function CrosswordGame({ onQuit }) {
 
 
 
-        {(gameState === 'playing' || gameState === 'completed') && puzzleData && (
-          <Container>
+        {(gameState === 'playing' || gameState === 'completed') && puzzleData && gridData && gridData.length > 0 && (
+          <Container key={`board-${level}`}>
             <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 w-full">
                 <div>
@@ -467,8 +468,9 @@ export default function CrosswordGame({ onQuit }) {
               <div className="flex flex-col lg:flex-row gap-10">
                 <div className="lg:w-3/5 pb-4 w-full max-w-full overflow-hidden flex justify-center items-start">
                   <div
-                    className="grid bg-slate-300 border border-slate-300 mx-auto max-h-[80vh]"
-                    style={{ gridTemplateColumns: `repeat(${puzzleData.gridSizeC}, 1fr)`, gap: '2px', width: 'min(100%, 500px)' }}
+                    key={`grid-${level}-${puzzleData.gridSizeC}`}
+                    className="grid bg-slate-300 border border-slate-300 mx-auto max-h-[80vh] crossword-grid"
+                    style={{ '--cols': puzzleData.gridSizeC, gridTemplateColumns: 'repeat(var(--cols), 1fr)', gap: '2px', width: 'min(100%, 500px)' }}
                   >
                     {gridData.map((row, r) =>
                       row.map((cell, c) => {
