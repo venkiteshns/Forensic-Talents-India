@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, Upload, CheckCircle2 } from 'lucide-react';
 import { Container } from '../ui/Container';
 import ReviewCard from '../ui/ReviewCard';
+import TestimonialCarousel from '../ui/TestimonialCarousel';
 import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
 
@@ -16,8 +17,6 @@ function getInitials(name) {
 export default function ReviewsSection({ type }) {
   const [serviceReviews, setServiceReviews] = useState([]);
   const [educationReviews, setEducationReviews] = useState([]);
-  const [visibleService, setVisibleService] = useState(3);
-  const [visibleEducation, setVisibleEducation] = useState(3);
   const [loading, setLoading] = useState(true);
   
   // Form state
@@ -163,24 +162,7 @@ export default function ReviewsSection({ type }) {
                 <p className="text-slate-500 italic">No client reviews yet.</p>
               </div>
             ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-                  {serviceReviews.slice(0, visibleService).map((r) => (
-                    <ReviewCard key={r._id} review={r} />
-                  ))}
-                </div>
-                
-                {visibleService < serviceReviews.length && (
-                  <div className="text-center">
-                    <button 
-                      onClick={() => setVisibleService(prev => prev + 6)}
-                      className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                    >
-                      View More Reviews
-                    </button>
-                  </div>
-                )}
-              </>
+              <TestimonialCarousel testimonials={serviceReviews} speed={28} />
             )}
           </div>
         )}
@@ -203,24 +185,7 @@ export default function ReviewsSection({ type }) {
                 <p className="text-slate-500 italic">No student reviews yet.</p>
               </div>
             ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
-                  {educationReviews.slice(0, visibleEducation).map((r) => (
-                    <ReviewCard key={r._id} review={r} />
-                  ))}
-                </div>
-
-                {visibleEducation < educationReviews.length && (
-                  <div className="text-center">
-                    <button 
-                      onClick={() => setVisibleEducation(prev => prev + 6)}
-                      className="inline-flex items-center gap-2 px-6 py-2 border-2 border-slate-200 text-slate-600 rounded-full font-bold hover:bg-slate-100 hover:border-slate-300 transition-all"
-                    >
-                      View More Testimonials
-                    </button>
-                  </div>
-                )}
-              </>
+              <TestimonialCarousel testimonials={educationReviews} speed={32} />
             )}
           </div>
         )}

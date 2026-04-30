@@ -40,7 +40,7 @@ export default function ReviewCard({ review }) {
     <>
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col h-[220px] sm:h-[240px] md:h-[260px] overflow-hidden">
         {/* Header Section */}
-        <div className="flex items-center justify-between p-4 sm:p-5 bg-slate-50 border-b border-slate-100 shrink-0">
+        <div className="flex flex-col min-[390px]:flex-row min-[390px]:items-center justify-between p-4 sm:p-5 bg-slate-50 border-b border-slate-100 shrink-0 gap-2 min-[390px]:gap-0">
           <div className="flex items-center gap-3">
             {review.profileImage ? (
               <img src={review.profileImage} alt={review.name} className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-white" />
@@ -55,7 +55,7 @@ export default function ReviewCard({ review }) {
             </div>
           </div>
           {/* Rating */}
-          <div className="flex items-center gap-0.5 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0 max-[390px]:ml-[52px]">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star key={star} size={14} className={star <= review.rating ? "text-accent fill-accent" : "text-slate-200"} />
             ))}
