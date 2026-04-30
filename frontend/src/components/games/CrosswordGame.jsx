@@ -77,6 +77,9 @@ export default function CrosswordGame({ onQuit }) {
   const [gridData, setGridData] = useState([]);
   const [userInputs, setUserInputs] = useState({});
   const [activeWordId, setActiveWordId] = useState(null);
+  const [activeDirection, setActiveDirection] = useState('across');
+  const [completedWords, setCompletedWords] = useState({});
+  const [errorCells, setErrorCells] = useState({});
   const [activeCell, setActiveCell] = useState(null);
   const [gameState, setGameState] = useState('idle');
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -148,6 +151,22 @@ export default function CrosswordGame({ onQuit }) {
       setIsDataLoading(false);
     }
   };
+
+  useEffect(() => {
+    const keysToUpdate = Object.keys(completedWords).filter(key => completedWords[key]?.completed && !completedWords[key]?.animated);
+    if (keysToUpdate.length > 0) {
+      const timer = setTimeout(() => {
+        setCompletedWords(prev => {
+          const next = { ...prev };
+          keysToUpdate.forEach(key => {
+            if (next[key]) next[key] = { ...next[key], animated: true };
+          });
+          return next;
+        });
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [completedWords]);
 
   useEffect(() => {
     workerRef.current = new CrosswordWorker();
@@ -227,9 +246,12 @@ export default function CrosswordGame({ onQuit }) {
     setPuzzleData(puzzle.puzzleData);
     setGridData(puzzle.gridData);
     setUserInputs({});
+    setCompletedWords({});
     if (puzzle.puzzleData.words.length > 0) {
-      setActiveWordId(puzzle.puzzleData.words[0].id);
-      setActiveCell({ r: puzzle.puzzleData.words[0].r, c: puzzle.puzzleData.words[0].c });
+      const firstWord = puzzle.puzzleData.words[0];
+      setActiveWordId(firstWord.id);
+      setActiveDirection(firstWord.dir);
+      setActiveCell({ r: firstWord.r, c: firstWord.c });
     }
     setTimeElapsed(0);
     setGameState('playing');
@@ -285,57 +307,98 @@ export default function CrosswordGame({ onQuit }) {
     }
   };
 
+  const checkWordCompletion = (wordId, currentInputs) => {
+    if (!puzzleData || !wordId) return false;
+    const wordObj = puzzleData.words.find(w => w.id === wordId);
+    if (!wordObj || !wordObj.ans) return false;
+    
+    let userWord = "";
+    let r = wordObj.r;
+    let c = wordObj.c;
+    for (let i = 0; i < wordObj.ans.length; i++) {
+      const char = currentInputs[`${r}-${c}`] || "";
+      userWord += char;
+      if (wordObj.dir === 'across') c++;
+      else r++;
+    }
+    return userWord === wordObj.ans;
+  };
+
+  const validateWords = (newInputs, cellWords) => {
+    if (!puzzleData || !cellWords) return;
+    setCompletedWords(prev => {
+      let changed = false;
+      const next = { ...prev };
+      cellWords.forEach(wordId => {
+        const isCorrect = checkWordCompletion(wordId, newInputs);
+        const wordObj = puzzleData.words.find(w => w.id === wordId);
+        if (wordObj) {
+          const key = `${wordObj.dir}-${wordId}`;
+          if (isCorrect && !next[key]?.completed) {
+            next[key] = { completed: true, animated: false };
+            changed = true;
+          } else if (!isCorrect && next[key]) {
+            delete next[key];
+            changed = true;
+          }
+        }
+      });
+      return changed ? next : prev;
+    });
+  };
+
+  const triggerError = (r, c) => {
+    const key = `${r}-${c}`;
+    setErrorCells(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => {
+      setErrorCells(prev => {
+        const copy = { ...prev };
+        delete copy[key];
+        return copy;
+      });
+    }, 400);
+  };
+
   const moveTo = (r, c) => {
     if (gridData[r] && gridData[r][c] && gridData[r][c].isActive) {
       setActiveCell({ r, c });
-      const cellWords = gridData[r][c].words;
-      if (cellWords && cellWords.length > 0 && !cellWords.includes(activeWordId)) {
-        setActiveWordId(cellWords[0]);
-      }
       setTimeout(() => {
         inputRefs.current[`${r}-${c}`]?.focus();
       }, 0);
     }
   };
 
-  const getDirection = () => {
-    if (!activeWordId || !puzzleData) return 'across';
-    const activeWord = puzzleData.words.find(w => w.id === activeWordId);
-    return activeWord ? activeWord.dir : 'across';
+  const getNextCell = (row, col) => {
+    if (activeDirection === "across") return { row, col: col + 1 };
+    if (activeDirection === "down") return { row: row + 1, col };
+    return { row, col: col + 1 };
   };
 
   const moveToNext = (r, c) => {
-    if (getDirection() === "across") moveTo(r, c + 1);
-    else moveTo(r + 1, c);
+    const next = getNextCell(r, c);
+    moveTo(next.row, next.col);
   };
 
   const moveToPrevious = (r, c) => {
-    if (getDirection() === "across") {
-      const targetR = r;
-      const targetC = c - 1;
-      if (gridData[targetR] && gridData[targetR][targetC] && gridData[targetR][targetC].isActive) {
-        clearCell(targetR, targetC);
-        moveTo(targetR, targetC);
-      }
-    } else {
-      const targetR = r - 1;
-      const targetC = c;
-      if (gridData[targetR] && gridData[targetR][targetC] && gridData[targetR][targetC].isActive) {
-        clearCell(targetR, targetC);
-        moveTo(targetR, targetC);
-      }
+    const targetR = activeDirection === "across" ? r : r - 1;
+    const targetC = activeDirection === "across" ? c - 1 : c;
+    if (gridData[targetR] && gridData[targetR][targetC] && gridData[targetR][targetC].isActive) {
+      clearCell(targetR, targetC);
+      moveTo(targetR, targetC);
     }
   };
 
   const clearCell = (r, c) => {
     const newInputs = { ...userInputs, [`${r}-${c}`]: '' };
     setUserInputs(newInputs);
+    validateWords(newInputs, gridData[r][c].words);
   };
 
   const setLetter = (r, c, letter) => {
     const newInputs = { ...userInputs, [`${r}-${c}`]: letter };
     setUserInputs(newInputs);
     checkWin(newInputs);
+    validateWords(newInputs, gridData[r][c].words);
   };
 
   const handleCellChange = (r, c, val) => {
@@ -344,6 +407,10 @@ export default function CrosswordGame({ onQuit }) {
     if (!/^[A-Z]*$/.test(char)) return;
 
     if (char) {
+      const correctChar = gridData[r][c].correctChar;
+      if (char !== correctChar) {
+        triggerError(r, c);
+      }
       setLetter(r, c, char);
       moveToNext(r, c);
     } else {
@@ -360,7 +427,34 @@ export default function CrosswordGame({ onQuit }) {
     else if (e.key === 'ArrowRight') { e.preventDefault(); moveTo(r, c + 1); }
     else if (e.key === 'Backspace') {
       if (!userInputs[`${r}-${c}`]) { e.preventDefault(); moveToPrevious(r, c); }
-      else { e.preventDefault(); clearCell(r, c); }
+      else { 
+        const { isCorrect } = getCellState(gridData[r][c].words);
+        if (isCorrect) {
+          e.preventDefault();
+          moveToPrevious(r, c);
+        } else {
+          e.preventDefault(); clearCell(r, c); 
+        }
+      }
+    } else if (e.key.length === 1 && /^[a-zA-Z]$/.test(e.key)) {
+        const { isCorrect } = getCellState(gridData[r][c].words);
+        if (isCorrect) {
+            e.preventDefault();
+            moveToNext(r, c);
+        }
+    }
+  };
+
+  const handleFocus = (r, c, cellWords) => {
+    if (gameState !== 'playing') return;
+    setActiveCell({ r, c });
+    if (!cellWords.includes(activeWordId)) {
+      const acrossWord = puzzleData.words.find(w => cellWords.includes(w.id) && w.dir === 'across');
+      const downWord = puzzleData.words.find(w => cellWords.includes(w.id) && w.dir === 'down');
+      if (activeDirection === 'across' && acrossWord) setActiveWordId(acrossWord.id);
+      else if (activeDirection === 'down' && downWord) setActiveWordId(downWord.id);
+      else if (acrossWord) { setActiveDirection('across'); setActiveWordId(acrossWord.id); }
+      else if (downWord) { setActiveDirection('down'); setActiveWordId(downWord.id); }
     }
   };
 
@@ -368,12 +462,31 @@ export default function CrosswordGame({ onQuit }) {
     if (gameState !== 'playing') return;
     setActiveCell({ r, c });
 
-    if (cellWords.length > 1) {
-      const idx = cellWords.indexOf(activeWordId);
-      if (idx !== -1) setActiveWordId(cellWords[(idx + 1) % cellWords.length]);
-      else setActiveWordId(cellWords[0]);
-    } else if (cellWords.length === 1) {
-      setActiveWordId(cellWords[0]);
+    const acrossWord = puzzleData.words.find(w => cellWords.includes(w.id) && w.dir === 'across');
+    const downWord = puzzleData.words.find(w => cellWords.includes(w.id) && w.dir === 'down');
+
+    if (activeCell?.r === r && activeCell?.c === c && acrossWord && downWord) {
+      if (activeDirection === 'across') {
+        setActiveDirection('down');
+        setActiveWordId(downWord.id);
+      } else {
+        setActiveDirection('across');
+        setActiveWordId(acrossWord.id);
+      }
+    } else {
+      if (activeDirection === 'across' && acrossWord) {
+        setActiveWordId(acrossWord.id);
+      } else if (activeDirection === 'down' && downWord) {
+        setActiveWordId(downWord.id);
+      } else {
+        if (acrossWord) {
+          setActiveDirection('across');
+          setActiveWordId(acrossWord.id);
+        } else if (downWord) {
+          setActiveDirection('down');
+          setActiveWordId(downWord.id);
+        }
+      }
     }
     inputRefs.current[`${r}-${c}`]?.focus();
   };
@@ -382,6 +495,23 @@ export default function CrosswordGame({ onQuit }) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const getCellState = (cellWords) => {
+    if (!puzzleData) return { isCorrect: false, isCorrectActiveWord: false, shouldAnimate: false };
+    let isCorrect = false;
+    let isCorrectActiveWord = false;
+    let shouldAnimate = false;
+    cellWords.forEach(wordId => {
+      const wordObj = puzzleData.words.find(w => w.id === wordId);
+      const state = wordObj && completedWords[`${wordObj.dir}-${wordId}`];
+      if (state && state.completed) {
+        isCorrect = true;
+        if (wordId === activeWordId) isCorrectActiveWord = true;
+        if (!state.animated) shouldAnimate = true;
+      }
+    });
+    return { isCorrect, isCorrectActiveWord, shouldAnimate };
   };
 
   return (
@@ -405,7 +535,7 @@ export default function CrosswordGame({ onQuit }) {
 
       {gameState === 'idle' && (
         <Container ref={difficultySectionRef} id="difficulty-section" className="mb-12 relative z-10 scroll-mt-32">
-          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-2xl mx-auto game-container text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
 
@@ -425,7 +555,7 @@ export default function CrosswordGame({ onQuit }) {
       <div id="gameStart" className="relative z-10">
         {gameState === 'loading' && (
           <Container>
-            <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+            <div className="max-w-5xl mx-auto game-container relative overflow-hidden">
               <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
                 <div className="w-48 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
                 <div className="w-32 h-8 bg-slate-200 animate-pulse rounded-lg"></div>
@@ -447,7 +577,7 @@ export default function CrosswordGame({ onQuit }) {
 
         {(gameState === 'playing' || gameState === 'completed') && puzzleData && gridData && gridData.length > 0 && (
           <Container key={`board-${level}`}>
-            <div className="max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-200 shadow-xl relative overflow-hidden">
+            <div className="max-w-5xl mx-auto game-container relative overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 w-full">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
@@ -469,30 +599,49 @@ export default function CrosswordGame({ onQuit }) {
                 <div className="lg:w-3/5 pb-4 w-full max-w-full overflow-hidden flex justify-center items-start">
                   <div
                     key={`grid-${level}-${puzzleData.gridSizeC}`}
-                    className="grid bg-slate-300 border border-slate-300 mx-auto max-h-[80vh] crossword-grid"
-                    style={{ '--cols': puzzleData.gridSizeC, gridTemplateColumns: 'repeat(var(--cols), 1fr)', gap: '2px', width: 'min(100%, 500px)' }}
+                    className="grid mx-auto max-h-[80vh] crossword-grid"
+                    style={{ '--cols': puzzleData.gridSizeC, gridTemplateColumns: 'repeat(var(--cols), 1fr)', gap: '4px', width: 'min(100%, 500px)' }}
                   >
                     {gridData.map((row, r) =>
                       row.map((cell, c) => {
-                        if (!cell.isActive) return <div key={`${r}-${c}`} className="w-full aspect-square bg-transparent" />;
+                        if (!cell.isActive) return <div key={`${r}-${c}`} className="w-full aspect-square cell-blocked" />;
                         const isActiveWord = cell.words.includes(activeWordId);
                         const isActiveCell = activeCell?.r === r && activeCell?.c === c;
+                        
+                        const { isCorrect, isCorrectActiveWord, shouldAnimate } = getCellState(cell.words);
+                        const isCompletedGame = gameState === 'completed';
+                        
+                        const showDarkGreen = isCompletedGame ? false : isCorrectActiveWord;
+                        const showLightGreen = isCompletedGame ? true : (isCorrect && !isCorrectActiveWord);
+                        const isError = errorCells[`${r}-${c}`];
+                        
+                        const bgClass = showDarkGreen ? "cell-correct-active" :
+                                        showLightGreen ? "cell-correct" :
+                                        isActiveCell ? "cell-active bg-blue-50" :
+                                        isActiveWord ? "bg-slate-50" : "";
+
+                        const textClass = (showDarkGreen || showLightGreen) ? "text-[#166534]" : "text-slate-800";
+                                          
+                        const outlineClass = "";
+                        const numColor = (showDarkGreen || showLightGreen) ? "text-[#166534] opacity-70" : "text-slate-600";
+                        const animationClass = shouldAnimate ? "cell-correct-animate" : isError ? "cell-error border-[#dc2626]" : "";
+                        const lockedClass = isCorrect ? "pointer-events-none opacity-90" : "";
 
                         return (
                           <div
                             key={`${r}-${c}`}
-                            className={cn("relative w-full aspect-square transition-colors cell", isActiveCell ? "active bg-[#facc1533] outline outline-2 outline-[#facc15] z-20" : isActiveWord ? "bg-amber-50" : "bg-white")}
+                            className={cn("relative w-full aspect-square transition-colors cell", bgClass, outlineClass, animationClass, lockedClass)}
                             onClick={() => handleCellClick(r, c, cell.words)}
                           >
-                            {cell.num && <span className="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold text-slate-600 select-none pointer-events-none leading-none z-10">{cell.num}</span>}
+                            {cell.num && <span className={cn("absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold select-none pointer-events-none leading-none z-10", numColor)}>{cell.num}</span>}
                             <input
                               ref={el => inputRefs.current[`${r}-${c}`] = el}
-                              type="text" maxLength={1} value={userInputs[`${r}-${c}`] || ''}
+                              type="text" maxLength={2} value={userInputs[`${r}-${c}`] || ''}
                               onChange={(e) => handleCellChange(r, c, e.target.value)}
                               onKeyDown={(e) => handleKeyDown(e, r, c)}
-                              onFocus={() => handleCellClick(r, c, cell.words)}
-                              disabled={gameState === 'completed'}
-                              className={cn("absolute inset-0 w-full h-full text-center font-bold text-sm sm:text-lg md:text-xl uppercase bg-transparent outline-none caret-transparent cursor-pointer m-0 p-0", gameState === 'completed' && userInputs[`${r}-${c}`] === cell.correctChar ? "text-green-600" : "text-slate-800")}
+                              onFocus={() => handleFocus(r, c, cell.words)}
+                              readOnly={isCompletedGame || isCorrect}
+                              className={cn("absolute inset-0 w-full h-full text-center font-bold text-sm sm:text-lg md:text-xl uppercase bg-transparent outline-none caret-transparent cursor-pointer m-0 p-0", textClass)}
                             />
                           </div>
                         );
@@ -506,7 +655,7 @@ export default function CrosswordGame({ onQuit }) {
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Across</h3>
                     <ul className="space-y-3">
                       {[...puzzleData.words].filter(w => w.dir === 'across').sort((a, b) => a.num - b.num).map(w => (
-                        <li key={w.id} onClick={() => { if (gameState !== 'playing') return; setActiveWordId(w.id); setActiveCell({ r: w.r, c: w.c }); inputRefs.current[`${w.r}-${w.c}`]?.focus(); }} className={cn("text-sm p-2 rounded-lg cursor-pointer transition-colors border", activeWordId === w.id ? "bg-amber-50 border-amber-200 text-amber-900 font-medium shadow-sm" : "border-transparent text-slate-600 hover:bg-slate-50")}>
+                        <li key={w.id} onClick={() => { if (gameState !== 'playing') return; setActiveDirection('across'); setActiveWordId(w.id); setActiveCell({ r: w.r, c: w.c }); inputRefs.current[`${w.r}-${w.c}`]?.focus(); }} className={cn("text-sm p-2 rounded-lg cursor-pointer transition-colors border", activeWordId === w.id ? "bg-amber-50 border-amber-200 text-amber-900 font-medium shadow-sm" : completedWords[`across-${w.id}`]?.completed ? "bg-green-50 border-green-200 text-green-800" : "border-transparent text-slate-600 hover:bg-slate-50")}>
                           <span className="font-bold mr-2">{w.num}.</span>{w.clue}
                         </li>
                       ))}
@@ -517,7 +666,7 @@ export default function CrosswordGame({ onQuit }) {
                     <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 uppercase text-sm tracking-wider">Down</h3>
                     <ul className="space-y-3">
                       {[...puzzleData.words].filter(w => w.dir === 'down').sort((a, b) => a.num - b.num).map(w => (
-                        <li key={w.id} onClick={() => { if (gameState !== 'playing') return; setActiveWordId(w.id); setActiveCell({ r: w.r, c: w.c }); inputRefs.current[`${w.r}-${w.c}`]?.focus(); }} className={cn("text-sm p-2 rounded-lg cursor-pointer transition-colors border", activeWordId === w.id ? "bg-amber-50 border-amber-200 text-amber-900 font-medium shadow-sm" : "border-transparent text-slate-600 hover:bg-slate-50")}>
+                        <li key={w.id} onClick={() => { if (gameState !== 'playing') return; setActiveDirection('down'); setActiveWordId(w.id); setActiveCell({ r: w.r, c: w.c }); inputRefs.current[`${w.r}-${w.c}`]?.focus(); }} className={cn("text-sm p-2 rounded-lg cursor-pointer transition-colors border", activeWordId === w.id ? "bg-amber-50 border-amber-200 text-amber-900 font-medium shadow-sm" : completedWords[`down-${w.id}`]?.completed ? "bg-green-50 border-green-200 text-green-800" : "border-transparent text-slate-600 hover:bg-slate-50")}>
                           <span className="font-bold mr-2">{w.num}.</span>{w.clue}
                         </li>
                       ))}
