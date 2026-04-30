@@ -45,7 +45,7 @@ export function NavBar() {
   ];
 
   return (
-    <header 
+    <header
       ref={navRef}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
@@ -61,8 +61,8 @@ export function NavBar() {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
+            <Link
+              key={link.name}
               to={link.path}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-accent-cyan",
@@ -72,15 +72,10 @@ export function NavBar() {
               {link.name}
             </Link>
           ))}
-          <Link to="/contact" className="hidden xl:inline-flex">
-            <Button variant="primary" size="sm">
-              Book Consultation
-            </Button>
-          </Link>
         </nav>
 
         {/* Mobile Menu Toggle */}
-        <button 
+        <button
           className="lg:hidden text-primary p-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
@@ -92,8 +87,8 @@ export function NavBar() {
       {mobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-xl border-t border-gray-100 py-4 px-4 flex flex-col gap-4 fade-in">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
+            <Link
+              key={link.name}
               to={link.path}
               onClick={() => setMobileMenuOpen(false)}
               className={cn(
@@ -104,11 +99,6 @@ export function NavBar() {
               {link.name}
             </Link>
           ))}
-          <Link to="/contact" className="w-full mt-4 block" onClick={() => setMobileMenuOpen(false)}>
-            <Button variant="primary" className="w-full">
-              Book Consultation
-            </Button>
-          </Link>
         </div>
       )}
     </header>
