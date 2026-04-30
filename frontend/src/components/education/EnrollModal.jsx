@@ -45,6 +45,12 @@ export function EnrollModal({ isOpen, course, onClose }) {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (course?.prog?.modes?.length === 1) {
+      setCourseMode(course.prog.modes[0]);
+    }
+  }, [course]);
+
   // Default nationality to India and handle body scroll lock
   useEffect(() => {
     if (isOpen) {
@@ -78,7 +84,8 @@ export function EnrollModal({ isOpen, course, onClose }) {
       newErrors.nationality = "Nationality is required.";
     }
 
-    if (targetType === 'Course' && !courseMode) {
+    const showModeSelection = targetType === 'Course' && course?.prog?.modes?.length > 1;
+    if (showModeSelection && !courseMode) {
       newErrors.courseMode = "Please select a mode of study.";
     }
 
@@ -153,9 +160,11 @@ export function EnrollModal({ isOpen, course, onClose }) {
     if (internshipMode) payload.append('mode', internshipMode);   // backend will override from DB anyway
     
     if (targetType === 'Course') {
-      if (courseMode) payload.append('mode', courseMode);
+      const finalMode = courseMode || course?.prog?.modes?.[0];
+      if (finalMode) payload.append('mode', finalMode);
       if (course?.prog?.priceINR) payload.append('priceINR', course.prog.priceINR);
-      if (courseMode === 'Online' && course?.prog?.priceUSD) payload.append('priceUSD', course.prog.priceUSD);
+      const isOnline = finalMode?.toLowerCase() === 'online';
+      if (isOnline && course?.prog?.priceUSD) payload.append('priceUSD', course.prog.priceUSD);
     }
 
     if (targetType === 'Internship') {
@@ -359,47 +368,74 @@ export function EnrollModal({ isOpen, course, onClose }) {
                 )}
 
                 {/* ── PART 1: Course Mode & Pricing ── */}
-                {targetType === 'Course' && course?.prog?.modes?.length > 0 && (
+                {targetType === 'Course' && course?.prog?.modes?.length > 0 && (() => {
+                  const modes = course.prog.modes;
+                  const showModeSelection = modes.length > 1;
+                  const activeMode = courseMode || (modes.length === 1 ? modes[0] : '');
+                  const isOnline = activeMode.toLowerCase() === 'online';
+                  const isOffline = activeMode.toLowerCase() === 'offline';
+                  
+                  return (
                   <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
                     <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Program Preferences</h4>
-                    <div className="flex flex-col gap-1 mb-4">
-                      <CustomSelect
-                        label="Mode of Study"
-                        value={courseMode}
-                        onChange={(val) => {
-                          setCourseMode(val);
-                          if (errors.courseMode) setErrors(prev => ({...prev, courseMode: null}));
-                        }}
-                        options={course.prog.modes}
-                        placeholder="Select Mode"
-                        error={errors.courseMode}
-                        touched={touched.courseMode}
-                        required={true}
-                      />
-                    </div>
+                    
+                    {showModeSelection && (
+                      <div className="flex flex-col gap-1 mb-4">
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Mode of Study <span className="text-red-500">*</span></label>
+                        <select
+                          name="courseMode"
+                          value={courseMode}
+                          onChange={(e) => {
+                            setCourseMode(e.target.value);
+                            if (errors.courseMode) setErrors(prev => ({...prev, courseMode: null}));
+                          }}
+                          onBlur={handleBlur}
+                          className={`w-full px-4 py-3 rounded-xl border ${touched.courseMode && errors.courseMode ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white`}
+                        >
+                          <option value="">Select Mode</option>
+                          {modes.map((m) => (
+                            <option key={m} value={m}>
+                              {m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()}
+                            </option>
+                          ))}
+                        </select>
+                        {touched.courseMode && errors.courseMode && <p className="text-red-500 text-sm mt-1">{errors.courseMode}</p>}
+                      </div>
+                    )}
 
-                    {courseMode && (
+                    {activeMode && (
                       <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm animate-in fade-in zoom-in-95 duration-200">
                          <div>
-                            <p className="text-sm font-bold text-slate-800">Course Fee ({courseMode})</p>
+                            <p className="text-sm font-bold text-slate-800">Course Fee ({activeMode.charAt(0).toUpperCase() + activeMode.slice(1).toLowerCase()})</p>
                             <p className="text-xs text-slate-500 mt-0.5">Please review the applicable pricing below.</p>
                          </div>
                          <div className="flex gap-3">
-                            <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
-                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">INR</p>
-                               <p className="text-lg font-bold text-green-600 leading-none">₹{Number(course.prog.priceINR).toLocaleString("en-IN")}</p>
-                            </div>
-                            {courseMode === 'Online' && course.prog.priceUSD && (
+                            {isOffline && !isOnline && (
                               <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
-                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">USD</p>
-                                 <p className="text-lg font-bold text-blue-600 leading-none">${course.prog.priceUSD}</p>
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">INR</p>
+                                 <p className="text-lg font-bold text-green-600 leading-none">₹{Number(course.prog.priceINR).toLocaleString("en-IN")}</p>
                               </div>
+                            )}
+                            {isOnline && (
+                              <>
+                                <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">INR</p>
+                                   <p className="text-lg font-bold text-green-600 leading-none">₹{Number(course.prog.priceINR).toLocaleString("en-IN")}</p>
+                                </div>
+                                {course.prog.priceUSD && (
+                                  <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">USD</p>
+                                     <p className="text-lg font-bold text-blue-600 leading-none">${course.prog.priceUSD}</p>
+                                  </div>
+                                )}
+                              </>
                             )}
                          </div>
                       </div>
                     )}
                   </div>
-                )}
+                  );
+                })()}
 
                 <div className="space-y-4 pt-2">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 border-b border-slate-100 pb-3">

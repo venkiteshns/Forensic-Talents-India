@@ -10,7 +10,8 @@ export const getReviews = async (req, res, next) => {
 
 export const getAdminReviews = async (req, res, next) => {
   try {
-    const reviews = await reviewService.getAllReviewsAdmin();
+    const { status, type } = req.query;
+    const reviews = await reviewService.getAllReviewsAdmin(status, type);
     res.json(reviews);
   } catch (err) { next(err); }
 };
@@ -29,9 +30,9 @@ export const approveReview = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-export const deleteReview = async (req, res, next) => {
+export const rejectReview = async (req, res, next) => {
   try {
-    await reviewService.deleteReview(req.params.id);
-    res.json({ message: "Review deleted" });
+    await reviewService.rejectReview(req.params.id);
+    res.json({ message: "Review rejected and image removed" });
   } catch (err) { next(err); }
 };

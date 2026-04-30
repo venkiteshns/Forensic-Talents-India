@@ -42,8 +42,8 @@ export default function ReviewCard({ review }) {
         {/* Header Section */}
         <div className="flex items-center justify-between p-4 sm:p-5 bg-slate-50 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-3">
-            {review.photo ? (
-              <img src={review.photo} alt={review.name} className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-white" />
+            {review.profileImage ? (
+              <img src={review.profileImage} alt={review.name} className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-white" />
             ) : (
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary font-bold text-lg shadow-sm shrink-0 border border-slate-100">
                 {getInitials(review.name)}
@@ -99,8 +99,8 @@ export default function ReviewCard({ review }) {
             
             <div className="p-6 md:p-8 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
               <div className="flex items-center gap-4 pb-6 mb-6 border-b border-slate-100 shrink-0">
-                {review.photo ? (
-                  <img src={review.photo} alt={review.name} className="w-14 h-14 rounded-full object-cover shadow-sm shrink-0" />
+                {review.profileImage ? (
+                  <img src={review.profileImage} alt={review.name} className="w-14 h-14 rounded-full object-cover shadow-sm shrink-0" />
                 ) : (
                   <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl shadow-sm shrink-0">
                     {getInitials(review.name)}

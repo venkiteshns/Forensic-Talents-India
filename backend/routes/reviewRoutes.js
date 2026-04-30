@@ -8,6 +8,6 @@ const router = express.Router();
 router.get('/', reviewController.getReviews);
 router.post('/', eventUpload.single('photo'), reviewController.submitReview);
 router.put('/:id/approve', protect, reviewController.approveReview);
-router.delete('/:id', protect, reviewController.deleteReview);
+router.put('/:id/reject', protect, reviewController.rejectReview);
 
 export default router;

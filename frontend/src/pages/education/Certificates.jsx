@@ -36,7 +36,7 @@ export default function Certificates() {
           duration: course.duration,
           priceINR: course.priceINR,
           priceUSD: course.priceUSD,
-          modes: course.mode,
+          modes: course.modes || course.mode || [],
           desc: course.description,
           topics: course.topics
         });
@@ -155,16 +155,43 @@ export default function Certificates() {
                               <Clock size={20} className="text-accent" /> {prog.duration}
                             </h3>
                             <div className="flex gap-2">
-                              {prog.modes.map(mode => (
-                                <span key={mode} className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
-                                  {mode === 'Online' ? <Globe size={12} /> : <MapPin size={12} />} {mode}
-                                </span>
-                              ))}
+                              {(prog.modes || []).map(mode => {
+                                const modeLower = mode.toLowerCase();
+                                const displayMode = mode.charAt(0).toUpperCase() + mode.slice(1).toLowerCase();
+                                return (
+                                  <span key={mode} className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
+                                    {modeLower === 'online' ? <Globe size={12} /> : <MapPin size={12} />} {displayMode}
+                                  </span>
+                                );
+                              })}
                             </div>
                           </div>
                           <div className="text-right">
                             <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-lg flex items-center justify-center border border-green-200 w-max md:ml-auto shadow-sm leading-tight">
-                              <span className="font-bold flex items-center">₹{Number(prog.priceINR).toLocaleString("en-IN")}</span>
+                              {(() => {
+                                const modesLower = (prog.modes || []).map(m => m.toLowerCase());
+                                const isOnline = modesLower.includes("online");
+                                const isOffline = modesLower.includes("offline");
+                                return (
+                                  <div className="price flex gap-2 items-center">
+                                    {isOffline && !isOnline && (
+                                      <span className="font-bold flex items-center">₹{Number(prog.priceINR).toLocaleString("en-IN")}</span>
+                                    )}
+                                    {isOnline && !isOffline && (
+                                      <>
+                                        <span className="font-bold flex items-center">₹{Number(prog.priceINR).toLocaleString("en-IN")}</span>
+                                        {prog.priceUSD && <span className="usd text-sm font-bold opacity-70">${prog.priceUSD}</span>}
+                                      </>
+                                    )}
+                                    {isOnline && isOffline && (
+                                      <>
+                                        <span className="font-bold flex items-center">₹{Number(prog.priceINR).toLocaleString("en-IN")}</span>
+                                        {prog.priceUSD && <span className="usd text-sm font-bold opacity-70">${prog.priceUSD}</span>}
+                                      </>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
