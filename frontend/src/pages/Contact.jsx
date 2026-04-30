@@ -178,7 +178,7 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
             {/* Contact Form */}
-            <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+            <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100 relative">
               <h2 className="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
 
               {serverError && (

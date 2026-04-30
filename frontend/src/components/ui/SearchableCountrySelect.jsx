@@ -99,7 +99,12 @@ export default function SearchableCountrySelect({
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
-                autoFocus
+                ref={(el) => {
+                  if (el && document.activeElement !== el) {
+                    // Prevent browser from aggressively scrolling to the portal
+                    el.focus({ preventScroll: true });
+                  }
+                }}
                 placeholder="Search country..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
