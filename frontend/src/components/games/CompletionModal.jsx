@@ -27,14 +27,8 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
   }, []);
 
   const handleNextLevel = () => {
-    // Slight delay allows modal to disappear cleanly before the DOM heavily shifts
-    setTimeout(() => {
-      onNextLevel();
-      document.getElementById("levelSelectionArea")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, 120);
+    // Modal closes cleanly
+    onNextLevel();
   };
 
   const handlePlayAgain = () => {

@@ -159,7 +159,27 @@ export default function WordSearchGame({ onQuit }) {
   const [startCell, setStartCell] = useState(null);
   const [currentPath, setCurrentPath] = useState([]);
 
+  const difficultySectionRef = useRef(null);
   const [startRef, scrollToStart] = useScrollToRef();
+
+  const scrollToDifficultySection = () => {
+    setTimeout(() => {
+      if (!difficultySectionRef.current) return;
+      if (window.innerWidth < 640) {
+        difficultySectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      } else {
+        const yOffset = -80;
+        const y = difficultySectionRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({
+          top: y,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
+  };
 
   const loadLevel = async (lvl) => {
     setIsLoading(true);
@@ -369,7 +389,7 @@ export default function WordSearchGame({ onQuit }) {
       </section>
 
       {gameState === 'idle' && (
-        <Container id="levelSelectionArea" className="mb-12 relative z-10 scroll-mt-32">
+        <Container ref={difficultySectionRef} id="difficulty-section" className="mb-12 relative z-10 scroll-mt-32">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
@@ -509,7 +529,7 @@ export default function WordSearchGame({ onQuit }) {
               setGameState('idle');
               setCurrentGame(null);
               requestAnimationFrame(() => {
-                setTimeout(scrollToStart, 120);
+                scrollToDifficultySection();
               });
             }}
             onQuit={onQuit}

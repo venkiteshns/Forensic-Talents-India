@@ -19,15 +19,34 @@ const MEMORY_LEVELS = {
   pro:     { pairs: 12, maxMoves: 35 }
 };
 
+const ICON_SET = [
+  "/icons/fingerprint.svg",
+  "/icons/dna.svg",
+  "/icons/microscope.svg",
+  "/icons/evidence.svg",
+  "/icons/lab.svg",
+  "/icons/camera.svg",
+  "/icons/badge.svg",
+  "/icons/search.svg",
+  "/icons/pipette.svg",
+  "/icons/briefcase.svg",
+  "/icons/file-signature.svg",
+  "/icons/gavel.svg"
+];
+
+const preloadImages = (images) => {
+  images.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+};
+
 const generateDeck = (customImages, numPairs) => {
   if (!customImages || customImages.length < numPairs) return [];
   
   const imagesToUse = customImages.slice(0, numPairs);
   // Preload images to prevent lag during gameplay
-  imagesToUse.forEach(url => {
-    const img = new Image();
-    img.src = url;
-  });
+  preloadImages(imagesToUse);
   
   const baseItems = imagesToUse.map((img, index) => ({
     id: `img-${index}`,
@@ -53,8 +72,8 @@ export default function MatchingGame({ onQuit }) {
   
   const [gameConfig, setGameConfig] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentGame, setCurrentGame] = useState(null);
-  const [nextGame, setNextGame] = useState(null);
 
   const [flippedIndices, setFlippedIndices] = useState([]);
   const [matchedIds, setMatchedIds] = useState(new Set());
@@ -65,8 +84,27 @@ export default function MatchingGame({ onQuit }) {
 
   const [cardSize, setCardSize] = useState(0);
   const containerRef = useRef(null);
+  const difficultySectionRef = useRef(null);
   const [startRef, scrollToStart] = useScrollToRef();
 
+  const scrollToDifficultySection = () => {
+    setTimeout(() => {
+      if (!difficultySectionRef.current) return;
+      if (window.innerWidth < 640) {
+        difficultySectionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      } else {
+        const yOffset = -80; // adjust based on header height
+        const y = difficultySectionRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({
+          top: y,
+          behavior: "smooth"
+        });
+      }
+    }, 100);
+  };
   useEffect(() => {
     const calculateLayout = () => {
       const COLS = 4;
@@ -104,34 +142,92 @@ export default function MatchingGame({ onQuit }) {
 
   const loadLevel = async (lvl) => {
     setIsLoading(true);
-    setGameConfig(null); // clear previous
+    setError(null);
     const cacheKey = `matching-${lvl}`;
     const cached = localStorage.getItem(cacheKey);
 
+    const MIN_LOADING_TIME = 300;
+    const startTime = Date.now();
+
     try {
+      let easyHasImages = false;
+      if (lvl !== 'easy') {
+        let easyData = localStorage.getItem('matching-easy');
+        if (!easyData) {
+           try {
+              const res = await api.get('/game/matching?level=easy');
+              easyData = JSON.stringify(res.data);
+              localStorage.setItem('matching-easy', easyData);
+           } catch(e) {}
+        }
+        try {
+          easyHasImages = easyData ? JSON.parse(easyData)?.images?.length > 0 : false;
+        } catch(e) {}
+      }
+
+      const processDataset = (dataset) => {
+        if (lvl === 'easy') {
+           easyHasImages = dataset?.images?.length > 0;
+        }
+
+        const LEVELS = ["easy", "medium", "hard", "pro"];
+        const lvlIdx = LEVELS.indexOf(lvl);
+
+        let useIcons = false;
+
+        if (easyHasImages) {
+           // Pattern B: easy=images, medium=icons, hard=images, pro=icons
+           if (lvlIdx % 2 !== 0) useIcons = true;
+        } else {
+           // Pattern A: easy=icons, medium=images, hard=icons, pro=images
+           if (lvlIdx % 2 === 0) useIcons = true;
+        }
+
+        if (!useIcons && (!dataset.images || dataset.images.length < MEMORY_LEVELS[lvl].pairs)) {
+          throw new Error("Invalid dataset: images required");
+        }
+
+        const source = useIcons ? ICON_SET : dataset.images;
+        
+        if (!source || source.length === 0) {
+          throw new Error("No dataset available");
+        }
+        
+        return source;
+      };
+
+      let finalSource = null;
       if (cached) {
         const data = JSON.parse(cached);
-        if (data.images && data.images.length > 0) {
-          setGameConfig({ images: data.images });
-          return;
+        try {
+          finalSource = processDataset(data);
+        } catch (e) {
+          // invalid cache, let it fetch
         }
       }
       
-      const res = await api.get(`/game/matching?level=${lvl}`);
-      if (!res.data || !res.data.images?.length) {
-        throw new Error("Empty dataset");
+      if (!finalSource) {
+        const res = await api.get(`/game/matching?level=${lvl}`);
+        if (!res.data) throw new Error("Empty dataset");
+        
+        finalSource = processDataset(res.data);
+        localStorage.setItem(cacheKey, JSON.stringify(res.data));
       }
-      localStorage.setItem(cacheKey, JSON.stringify(res.data));
-      setGameConfig({ images: res.data.images });
+      
+      setGameConfig({ images: finalSource });
       
     } catch (err) {
       console.error("Data load failed:", err);
       setGameConfig(null);
+      setError("No dataset available for this level. Please ask an admin to add one.");
     } finally {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_LOADING_TIME) {
+        await new Promise(r => setTimeout(r, MIN_LOADING_TIME - elapsed));
+      }
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     loadLevel(level);
   }, [level]);
@@ -160,12 +256,11 @@ export default function MatchingGame({ onQuit }) {
     return { deck, config: MEMORY_LEVELS[lvl] };
   }, []);
 
-  useEffect(() => {
+  const nextGame = useMemo(() => {
     if ((gameState === 'idle' || gameState === 'playing') && gameConfig) {
-      setNextGame(generateGameData(gameConfig, level));
-    } else if (!gameConfig) {
-      setNextGame(null);
+      return generateGameData(gameConfig, level);
     }
+    return null;
   }, [gameConfig, level, gameState, generateGameData]);
 
   useEffect(() => {
@@ -302,7 +397,7 @@ export default function MatchingGame({ onQuit }) {
       </section>
 
       {gameState === 'idle' && (
-        <Container id="levelSelectionArea" className="mb-12 relative z-10 scroll-mt-32">
+        <Container ref={difficultySectionRef} id="difficulty-section" className="mb-12 relative z-10 scroll-mt-32">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
@@ -329,9 +424,9 @@ export default function MatchingGame({ onQuit }) {
                   </>
                 )}
               </button>
-              {!isLoading && !nextGame && (
+              {!isLoading && error && (
                 <p className="text-red-500 text-sm font-semibold max-w-sm mx-auto text-center">
-                  No dataset available for this level. Please ask an admin to add one.
+                  {error}
                 </p>
               )}
             </div>
@@ -472,7 +567,7 @@ export default function MatchingGame({ onQuit }) {
               setGameState('idle');
               setCurrentGame(null);
               requestAnimationFrame(() => {
-                setTimeout(scrollToStart, 120);
+                scrollToDifficultySection();
               });
             }}
             onQuit={onQuit}

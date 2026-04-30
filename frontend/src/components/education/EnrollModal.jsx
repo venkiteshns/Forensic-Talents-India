@@ -381,25 +381,22 @@ export function EnrollModal({ isOpen, course, onClose }) {
                     
                     {showModeSelection && (
                       <div className="flex flex-col gap-1 mb-4">
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Mode of Study <span className="text-red-500">*</span></label>
-                        <select
-                          name="courseMode"
+                        <CustomSelect
+                          label="Mode of Study"
                           value={courseMode}
-                          onChange={(e) => {
-                            setCourseMode(e.target.value);
+                          onChange={(val) => {
+                            setCourseMode(val);
                             if (errors.courseMode) setErrors(prev => ({...prev, courseMode: null}));
                           }}
-                          onBlur={handleBlur}
-                          className={`w-full px-4 py-3 rounded-xl border ${touched.courseMode && errors.courseMode ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white`}
-                        >
-                          <option value="">Select Mode</option>
-                          {modes.map((m) => (
-                            <option key={m} value={m}>
-                              {m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()}
-                            </option>
-                          ))}
-                        </select>
-                        {touched.courseMode && errors.courseMode && <p className="text-red-500 text-sm mt-1">{errors.courseMode}</p>}
+                          options={modes.map((m) => ({
+                            value: m,
+                            label: m.charAt(0).toUpperCase() + m.slice(1).toLowerCase()
+                          }))}
+                          placeholder="Select Mode"
+                          error={errors.courseMode}
+                          touched={touched.courseMode}
+                          required={true}
+                        />
                       </div>
                     )}
 
