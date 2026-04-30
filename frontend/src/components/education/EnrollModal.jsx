@@ -157,6 +157,11 @@ export function EnrollModal({ isOpen, course, onClose }) {
       if (course?.prog?.priceINR) payload.append('priceINR', course.prog.priceINR);
       if (courseMode === 'Online' && course?.prog?.priceUSD) payload.append('priceUSD', course.prog.priceUSD);
     }
+
+    if (targetType === 'Internship') {
+      if (course?.priceINR) payload.append('priceINR', course.priceINR);
+      if (internshipMode === 'online' && course?.priceUSD) payload.append('priceUSD', course.priceUSD);
+    }
     
     payload.append('paymentProof', paymentProof);
 
@@ -329,6 +334,30 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   </div>
                 )}
 
+                {/* ── Internship Pricing ── */}
+                {targetType === 'Internship' && course?.priceINR && (
+                  <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+                         <div>
+                            <p className="text-sm font-bold text-slate-800">Internship Fee ({internshipMode === 'online' ? 'Online' : 'Offline'})</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Please review the applicable pricing below.</p>
+                         </div>
+                         <div className="flex gap-3">
+                            <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">INR</p>
+                               <p className="text-lg font-bold text-green-600 leading-none">₹{Number(course.priceINR).toLocaleString("en-IN")}</p>
+                            </div>
+                            {internshipMode === 'online' && course.priceUSD && (
+                              <div className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg text-center shadow-sm min-w-[90px]">
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">USD</p>
+                                 <p className="text-lg font-bold text-blue-600 leading-none">${course.priceUSD}</p>
+                              </div>
+                            )}
+                         </div>
+                      </div>
+                  </div>
+                )}
+
                 {/* ── PART 1: Course Mode & Pricing ── */}
                 {targetType === 'Course' && course?.prog?.modes?.length > 0 && (
                   <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -373,12 +402,12 @@ export function EnrollModal({ isOpen, course, onClose }) {
                 )}
 
                 <div className="space-y-4 pt-2">
-                  <div className="flex justify-between items-end border-b border-slate-100 pb-2">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 border-b border-slate-100 pb-3">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-1">Payment Details</h4>
-                      <p className="text-xs text-slate-500 max-w-[280px]">Please complete your payment using our secure credentials and upload the proof below.</p>
+                      <p className="text-xs text-slate-500 leading-relaxed text-left">Please complete your payment using our secure credentials and upload the proof below.</p>
                     </div>
-                    <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center gap-1.5 transition-colors bg-accent/5 hover:bg-accent/10 px-3 py-1.5 rounded-lg border border-accent/20">
+                    <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center justify-center gap-1.5 transition-colors bg-accent/5 hover:bg-accent/10 px-4 py-2.5 sm:py-2 rounded-lg border border-accent/20 whitespace-nowrap w-full sm:w-auto min-h-[44px] sm:min-h-0">
                       <CreditCard size={16} /> View Payment Credentials
                     </button>
                   </div>

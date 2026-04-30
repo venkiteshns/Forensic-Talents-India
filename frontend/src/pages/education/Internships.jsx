@@ -45,7 +45,9 @@ export default function Internships() {
         category: `${internship.type} Internship`,
         prog: { duration: internship.duration },
         internshipId:   internship._id,
-        internshipMode: internship.mode,   // system source of truth
+        internshipMode: internship.type.toLowerCase(),   // system source of truth (type is 'Offline' or 'Online')
+        priceINR: internship.priceINR,
+        priceUSD: internship.priceUSD
       }
     });
   };
