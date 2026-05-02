@@ -3,11 +3,17 @@ import Review from '../models/Review.js';
 
 export const getPendingCounts = async (req, res) => {
   try {
-    const [enquiries, reviews] = await Promise.all([
-      Enrollment.countDocuments({ statusApproval: 'pending' }),
+    const [courseEnquiries, internshipEnquiries, reviews] = await Promise.all([
+      Enrollment.countDocuments({ statusApproval: 'pending', targetType: 'Course' }),
+      Enrollment.countDocuments({ statusApproval: 'pending', targetType: 'Internship' }),
       Review.countDocuments({ status: 'pending' })
     ]);
-    res.json({ enquiries, reviews });
+    res.json({ 
+      enquiries: courseEnquiries + internshipEnquiries,
+      courseEnquiries,
+      internshipEnquiries,
+      reviews 
+    });
   } catch (error) {
     console.error("Failed to fetch pending counts", error);
     res.status(500).json({ message: "Server error" });
