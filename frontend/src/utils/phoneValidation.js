@@ -21,25 +21,21 @@ export const validatePhoneNumber = (phone, countryName) => {
   
   // Special handling for India as requested
   if (countryCode === 'IN') {
-    // If it's India, we expect exactly 10 digits for the national number
-    // The phone string from CountryPhoneInput is likely "+91 1234567890"
-    const phoneNumber = parsePhoneNumberFromString(phone, 'IN');
-    
-    if (!phoneNumber) {
-      return { isValid: false, error: "Please enter a valid Indian phone number." };
+    // Extract the national part by removing the dial code.
+    const dialCode = country.dialCode || '+91';
+    let value = phone;
+    if (phone.startsWith(dialCode)) {
+      value = phone.slice(dialCode.length).trim();
     }
 
-    if (phoneNumber.country !== 'IN') {
-      return { isValid: false, error: "Please enter a valid Indian phone number (+91)." };
+    if (!/^\d+$/.test(value)) {
+      return { isValid: false, error: "Only numeric digits are allowed." };
     }
-
-    const nationalNumber = phoneNumber.nationalNumber;
-    if (nationalNumber.length !== 10) {
+    if (!/^[6-9]/.test(value)) {
+      return { isValid: false, error: "Numbers starting with 0-5 are not accepted. Please start with 6, 7, 8, or 9." };
+    }
+    if (value.length !== 10) {
       return { isValid: false, error: "Indian phone numbers must be exactly 10 digits." };
-    }
-
-    if (!phoneNumber.isPossible()) {
-      return { isValid: false, error: "Invalid Indian phone number format." };
     }
   } else {
     // General validation for other countries

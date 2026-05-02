@@ -93,7 +93,7 @@ export default function CountryPhoneInput({
       </div>
       
       {touched && error && (
-        <p className="text-red-500 text-sm mt-1">{error}</p>
+        <p className="text-[#EF4444] text-sm mt-1">{error}</p>
       )}
     </div>
   );

@@ -5,7 +5,7 @@ export const getPendingCounts = async (req, res) => {
   try {
     const [enquiries, reviews] = await Promise.all([
       Enrollment.countDocuments({ statusApproval: 'pending' }),
-      Review.countDocuments({ isApproved: false })
+      Review.countDocuments({ status: 'pending' })
     ]);
     res.json({ enquiries, reviews });
   } catch (error) {
