@@ -8,6 +8,7 @@ import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
+import UniversalProModal from './UniversalProModal';
 import useGameProgress from './useGameProgress';
 import { useScrollToRef } from '../../hooks/useScrollToRef';
 
@@ -233,7 +234,7 @@ export default function MatchingGame({ onQuit }) {
     return () => { document.body.style.overflow = 'auto'; };
   }, [gameState]);
 
-  const handleStartGameClick = () => {
+  const startGameLogic = () => {
     setGameState('loading');
 
     const gameToPlay = nextGame || generateGameData(gameConfig, level);
@@ -243,6 +244,14 @@ export default function MatchingGame({ onQuit }) {
     setMoves(0);
     setTimeElapsed(0);
     setGameState('playing');
+  };
+
+  const handleStartGameClick = () => {
+    if (level === 'pro' && gameState !== 'warning') {
+      setGameState('warning');
+      return;
+    }
+    startGameLogic();
   };
 
   const initGame = () => handleStartGameClick();
@@ -357,15 +366,10 @@ export default function MatchingGame({ onQuit }) {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
-            {level === 'pro' && (
-              <div className="bg-red-50 text-red-700 text-sm font-bold p-3 rounded-xl mt-4 max-w-md mx-auto border border-red-100">
-                Pro Level: You have a maximum of 35 moves. Plan carefully and play strategically.
-              </div>
-            )}
             <div className="mt-8 flex flex-col justify-center items-center px-3 gap-3">
               <button 
                 ref={startRef}
-                onClick={initGame} 
+                onClick={handleStartGameClick} 
                 disabled={isLoading || !nextGame}
                 className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
@@ -523,6 +527,17 @@ export default function MatchingGame({ onQuit }) {
               });
             }}
             onQuit={onQuit}
+          />
+        )}
+
+        {gameState === 'warning' && (
+          <UniversalProModal
+            constraintType="moves"
+            onStart={() => startGameLogic()}
+            onCancel={() => {
+              setGameState('idle');
+              setLevel('hard');
+            }}
           />
         )}
 

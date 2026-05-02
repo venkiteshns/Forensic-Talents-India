@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { Search, Image as ImageIcon, CheckSquare, PenTool, Play, Info } from 'lucide-react';
 import { cn } from '../utils/cn';
-
-// Import Games
-import WordSearchGame from '../components/games/WordSearchGame';
-import MatchingGame from '../components/games/MatchingGame';
-import JigsawGame from '../components/games/JigsawGame';
-import CrosswordGame from '../components/games/CrosswordGame';
 
 const GAMES = [
   {
@@ -45,21 +40,7 @@ const GAMES = [
 ];
 
 export default function Games() {
-  const [activeGame, setActiveGame] = useState(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeGame]);
-
-  const handleQuit = () => {
-    setActiveGame(null);
-  };
-
-  // If a game is active, render it instead of the hub
-  if (activeGame === 'word-search') return <WordSearchGame onQuit={handleQuit} />;
-  if (activeGame === 'matching') return <MatchingGame onQuit={handleQuit} />;
-  if (activeGame === 'jigsaw') return <JigsawGame onQuit={handleQuit} />;
-  if (activeGame === 'crossword') return <CrosswordGame onQuit={handleQuit} />;
+  const navigate = useNavigate();
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
@@ -106,7 +87,7 @@ export default function Games() {
               <div
                 key={game.id}
                 className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer"
-                onClick={() => setActiveGame(game.id)}
+                onClick={() => navigate(`/games/${game.id}`)}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="p-8 flex-grow">

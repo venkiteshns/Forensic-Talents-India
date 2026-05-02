@@ -7,6 +7,7 @@ import { cn } from '../../utils/cn';
 import api from '../../utils/api';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
+import UniversalProModal from './UniversalProModal';
 import useGameProgress from './useGameProgress';
 import { useScrollToRef } from '../../hooks/useScrollToRef';
 
@@ -216,7 +217,7 @@ export default function JigsawGame({ onQuit }) {
     return () => { document.body.style.overflow = 'auto'; };
   }, [gameState]);
 
-  const handleStartGameClick = async () => {
+  const startGameLogic = async () => {
     setGameState('loading');
 
     try {
@@ -236,6 +237,14 @@ export default function JigsawGame({ onQuit }) {
       console.error(err);
       setGameState('error');
     }
+  };
+
+  const handleStartGameClick = async () => {
+    if (level === 'pro' && gameState !== 'warning') {
+      setGameState('warning');
+      return;
+    }
+    await startGameLogic();
   };
 
   const initGame = () => handleStartGameClick();
@@ -317,15 +326,10 @@ export default function JigsawGame({ onQuit }) {
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">Select Difficulty</h2>
             <LevelSelector currentLevel={level} onSelectLevel={handleLevelChange} isUnlocked={isUnlocked} />
-            {level === 'pro' && (
-              <div className="bg-red-50 text-red-700 text-sm font-bold p-3 rounded-xl mt-4 max-w-md mx-auto border border-red-100">
-                Pro Level: Moves are limited. Complete the puzzle efficiently.
-              </div>
-            )}
             <div className="mt-8 flex flex-col items-center gap-3 px-3">
               <button 
                 ref={startRef}
-                onClick={initGame} 
+                onClick={handleStartGameClick} 
                 disabled={imageState.status === "loading" || !nextGame}
                 className="start-game-btn w-full max-w-[260px] flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
@@ -471,6 +475,17 @@ export default function JigsawGame({ onQuit }) {
               });
             }}
             onQuit={onQuit}
+          />
+        )}
+
+        {gameState === 'warning' && (
+          <UniversalProModal
+            constraintType="moves"
+            onStart={() => startGameLogic()}
+            onCancel={() => {
+              setGameState('idle');
+              setLevel('hard');
+            }}
           />
         )}
 

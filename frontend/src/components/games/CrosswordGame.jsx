@@ -8,6 +8,8 @@ import { getErrorMessage } from '../../utils/errorHandler';
 import CrosswordWorker from './crosswordWorker?worker';
 import LevelSelector from './LevelSelector';
 import CompletionModal from './CompletionModal';
+import UniversalProModal from './UniversalProModal';
+import TimeoutModal from './TimeoutModal';
 import useGameProgress from './useGameProgress';
 import { useScrollToRef } from '../../hooks/useScrollToRef';
 import { crosswordFallbackData } from '../../data/crosswordFallback';
@@ -231,13 +233,22 @@ export default function CrosswordGame({ onQuit }) {
   useEffect(() => {
     let interval;
     if (gameState === 'playing') {
-      interval = setInterval(() => setTimeElapsed(t => t + 1), 1000);
+      interval = setInterval(() => {
+        setTimeElapsed(t => {
+          const next = t + 1;
+          if (level === 'pro' && next >= 300) {
+            setGameState('timeout');
+            clearInterval(interval);
+          }
+          return next;
+        });
+      }, 1000);
     }
     return () => clearInterval(interval);
-  }, [gameState]);
+  }, [gameState, level]);
 
   useEffect(() => {
-    if (gameState === 'completed') document.body.style.overflow = 'hidden';
+    if (gameState === 'completed' || gameState === 'timeout') document.body.style.overflow = 'hidden';
     else document.body.style.overflow = 'auto';
     return () => { document.body.style.overflow = 'auto'; };
   }, [gameState]);
@@ -257,7 +268,7 @@ export default function CrosswordGame({ onQuit }) {
     setGameState('playing');
   };
 
-  const handleStartGameClick = async () => {
+  const startGameLogic = async () => {
     setGameState('loading');
 
     let gameToPlay = nextGameData;
@@ -274,6 +285,14 @@ export default function CrosswordGame({ onQuit }) {
       applyPuzzle(gameToPlay);
       setNextGameData(null); // Clear next game so it generates a new one
     }
+  };
+
+  const handleStartGameClick = async () => {
+    if (level === 'pro' && gameState !== 'warning') {
+      setGameState('warning');
+      return;
+    }
+    startGameLogic();
   };
 
   const initGame = () => handleStartGameClick();
@@ -587,9 +606,9 @@ export default function CrosswordGame({ onQuit }) {
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="text-center">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Time</p>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Time{level === 'pro' && ' Left'}</p>
                     <div className="flex items-center gap-1.5 text-xl font-bold text-slate-800 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-100">
-                      <Clock size={18} className="text-accent" /> {formatTime(timeElapsed)}
+                      <Clock size={18} className="text-accent" /> {formatTime(level === 'pro' ? Math.max(0, 300 - timeElapsed) : timeElapsed)}
                     </div>
                   </div>
                 </div>
@@ -702,6 +721,25 @@ export default function CrosswordGame({ onQuit }) {
                 scrollToDifficultySection();
               });
             }}
+            onQuit={onQuit}
+          />
+        )}
+
+        {gameState === 'warning' && (
+          <UniversalProModal
+            constraintType="time"
+            onStart={() => startGameLogic()}
+            onCancel={() => {
+              setGameState('idle');
+              setLevel('hard');
+            }}
+          />
+        )}
+
+        {gameState === 'timeout' && (
+          <TimeoutModal
+            level={level}
+            onPlayAgain={initGame}
             onQuit={onQuit}
           />
         )}

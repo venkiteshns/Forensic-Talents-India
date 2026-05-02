@@ -1,5 +1,10 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
+
+const GameRoute = ({ component: GameComponent }) => {
+  const navigate = useNavigate();
+  return <GameComponent onQuit={() => navigate('/games')} />;
+};
 
 // Pages
 import Home from './pages/Home';
@@ -16,6 +21,11 @@ import Contact from './pages/Contact';
 import Games from './pages/Games';
 import UserNotFound from './pages/UserNotFound';
 
+import WordSearchGame from './components/games/WordSearchGame';
+import MatchingGame from './components/games/MatchingGame';
+import JigsawGame from './components/games/JigsawGame';
+import CrosswordGame from './components/games/CrosswordGame';
+
 function App() {
   return (
     <Routes>
@@ -31,6 +41,10 @@ function App() {
         <Route path="education/quiz" element={<Quiz />} />
         <Route path="education/resources" element={<Resources />} />
         <Route path="games" element={<Games />} />
+        <Route path="games/word-search" element={<GameRoute component={WordSearchGame} />} />
+        <Route path="games/matching" element={<GameRoute component={MatchingGame} />} />
+        <Route path="games/jigsaw" element={<GameRoute component={JigsawGame} />} />
+        <Route path="games/crossword" element={<GameRoute component={CrosswordGame} />} />
 
         <Route path="contact" element={<Contact />} />
       </Route>
