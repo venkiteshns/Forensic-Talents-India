@@ -14,6 +14,7 @@ import Quiz from './pages/education/Quiz';
 import Resources from './pages/education/Resources';
 import Contact from './pages/Contact';
 import Games from './pages/Games';
+import UserNotFound from './pages/UserNotFound';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
 
         <Route path="contact" element={<Contact />} />
       </Route>
+      <Route path="*" element={<UserNotFound />} />
     </Routes>
   );
 }
