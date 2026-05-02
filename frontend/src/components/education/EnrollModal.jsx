@@ -20,6 +20,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
   })();
 
   const [courseMode, setCourseMode] = useState('');
+  const [paymentMode, setPaymentMode] = useState('online');
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', nationality: 'India',
@@ -55,6 +56,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
   useEffect(() => {
     if (isOpen) {
       setFormData(prev => ({ ...prev, nationality: prev.nationality || 'India' }));
+      setPaymentMode('online');
       document.body.classList.add('modal-open');
     } else {
       document.body.classList.remove('modal-open');
@@ -64,6 +66,16 @@ export function EnrollModal({ isOpen, course, onClose }) {
       document.body.classList.remove('modal-open');
     };
   }, [isOpen]);
+
+  const activeCourseMode = courseMode || course?.prog?.modes?.[0];
+  const isOfflineMode = (targetType === 'Course' && activeCourseMode?.toLowerCase() === 'offline') || 
+                        (targetType === 'Internship' && internshipMode === 'offline');
+
+  useEffect(() => {
+    if (!isOfflineMode) {
+      setPaymentMode('online');
+    }
+  }, [isOfflineMode]);
 
   const validate = (data = formData) => {
     let newErrors = {};
@@ -76,8 +88,10 @@ export function EnrollModal({ isOpen, course, onClose }) {
 
     if (!data.qualification.trim()) newErrors.qualification = "Qualification is required.";
     if (!data.status)               newErrors.status        = "Current Status is required.";
-    if (!data.transactionId.trim()) newErrors.transactionId = "Transaction ID is required.";
-    if (!paymentProof)              newErrors.paymentProof  = "Payment proof is required.";
+    if (paymentMode === 'online') {
+      if (!data.transactionId.trim()) newErrors.transactionId = "Transaction ID is required.";
+      if (!paymentProof)              newErrors.paymentProof  = "Payment proof is required.";
+    }
 
     // Nationality is required for Internship and Course
     if ((targetType === 'Course' || targetType === 'Internship') && !data.nationality) {
@@ -154,6 +168,7 @@ export function EnrollModal({ isOpen, course, onClose }) {
     payload.append('transactionId', formData.transactionId);
     payload.append('additionalInfo', formData.additionalInfo);
     payload.append('targetType',    targetType);
+    payload.append('paymentMode',   paymentMode);
     payload.append('targetName',    `${course?.category || 'Program'} - ${course?.prog?.duration || ''}`.trim());
     
     if (internshipId)   payload.append('internshipId', internshipId);
@@ -172,7 +187,9 @@ export function EnrollModal({ isOpen, course, onClose }) {
       if (internshipMode === 'online' && course?.priceUSD) payload.append('priceUSD', course.priceUSD);
     }
     
-    payload.append('paymentProof', paymentProof);
+    if (paymentMode === 'online' && paymentProof) {
+      payload.append('paymentProof', paymentProof);
+    }
 
     try {
       const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
@@ -434,30 +451,63 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   );
                 })()}
 
+                {isOfflineMode && (
+                  <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Payment Method</h4>
+                    <div className="flex bg-slate-100 p-1 rounded-xl">
+                      <button 
+                        type="button"
+                        onClick={() => setPaymentMode('online')}
+                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${paymentMode === 'online' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        Online Payment
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setPaymentMode('offline')}
+                        className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${paymentMode === 'offline' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                      >
+                        On-Site (Offline) Payment
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-4 pt-2">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 border-b border-slate-100 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start sm:items-center gap-3 sm:gap-4 border-b border-slate-100 pb-3">
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-1">Payment Details</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed text-left">Please complete your payment using our secure credentials and upload the proof below.</p>
+                      {paymentMode === 'offline' ? (
+                        <div className="bg-[#1e293b] p-4 rounded-xl mt-2 animate-in fade-in zoom-in-95 duration-200">
+                           <p className="text-[#F8FAFC] text-sm font-medium leading-relaxed">Payment for on-site programs can be settled in person at our administrative office on or before the first day of the course.</p>
+                           <p className="text-[#94A3B8] text-xs mt-2">For further assistance regarding payment schedules, please contact our support team.</p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-500 leading-relaxed text-left animate-in fade-in duration-200">Please complete your payment using our secure credentials and upload the proof below.</p>
+                      )}
                     </div>
-                    <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center justify-center gap-1.5 transition-colors bg-accent/5 hover:bg-accent/10 px-4 py-2.5 sm:py-2 rounded-lg border border-accent/20 whitespace-nowrap w-full sm:w-auto min-h-[44px] sm:min-h-0">
-                      <CreditCard size={16} /> View Payment Credentials
-                    </button>
+                    {paymentMode === 'online' && (
+                      <button type="button" onClick={() => setShowPaymentModal(true)} className="text-sm font-bold text-accent hover:text-accent-hover flex items-center justify-center gap-1.5 transition-colors bg-accent/5 hover:bg-accent/10 px-4 py-2.5 sm:py-2 rounded-lg border border-accent/20 whitespace-nowrap w-full sm:w-auto min-h-[44px] sm:min-h-0 animate-in fade-in zoom-in-95 duration-200">
+                        <CreditCard size={16} /> View Payment Credentials
+                      </button>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1 mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Transaction ID <span className="text-red-500">*</span></label>
-                      <input type="text" name="transactionId" value={formData.transactionId} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.transactionId && errors.transactionId ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="e.g. UTR / Ref No." />
-                      {touched.transactionId && errors.transactionId && <p className="text-red-500 text-sm mt-1">{errors.transactionId}</p>}
+                  {paymentMode === 'online' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex flex-col gap-1 mb-4">
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Transaction ID <span className="text-red-500">*</span></label>
+                        <input type="text" name="transactionId" value={formData.transactionId} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.transactionId && errors.transactionId ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="e.g. UTR / Ref No." />
+                        {touched.transactionId && errors.transactionId && <p className="text-red-500 text-sm mt-1">{errors.transactionId}</p>}
+                      </div>
+                      <div className="flex flex-col gap-1 mb-4">
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Payment Screenshot <span className="text-red-500">*</span></label>
+                        <input type="file" name="paymentProof" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} className={`w-full px-4 py-2.5 rounded-xl border ${touched.paymentProof && errors.paymentProof ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20`} />
+                        <p className="text-xs text-slate-500 mt-0.5">Max size: 5MB (JPG, PNG, WEBP)</p>
+                        {touched.paymentProof && errors.paymentProof && <p className="text-red-500 text-sm mt-1">{errors.paymentProof}</p>}
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-1 mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Payment Screenshot <span className="text-red-500">*</span></label>
-                      <input type="file" name="paymentProof" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} className={`w-full px-4 py-2.5 rounded-xl border ${touched.paymentProof && errors.paymentProof ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm bg-white file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20`} />
-                      <p className="text-xs text-slate-500 mt-0.5">Max size: 5MB (JPG, PNG, WEBP)</p>
-                      {touched.paymentProof && errors.paymentProof && <p className="text-red-500 text-sm mt-1">{errors.paymentProof}</p>}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1 mb-4 pt-2">

@@ -9,8 +9,9 @@ const enrollmentSchema = new mongoose.Schema({
   status: { type: String, enum: ['Student', 'Professional'], required: true },
   institutionName: { type: String }, // For Student
   organizationName: { type: String }, // For Professional
-  transactionId: { type: String, required: true },
-  paymentProofUrl: { type: String, required: true },
+  paymentMode: { type: String, enum: ['online', 'offline'], default: 'online' },
+  transactionId: { type: String, required: function() { return this.paymentMode === 'online'; } },
+  paymentProofUrl: { type: String, required: function() { return this.paymentMode === 'online'; } },
   targetType: { type: String, required: true }, // e.g., 'Course', 'Internship', 'Quiz'
   targetName: { type: String, required: true }, // e.g., 'Online Internship - 2 months'
   internshipId: { type: mongoose.Schema.Types.ObjectId, ref: 'Internship' }, // set when targetType = Internship

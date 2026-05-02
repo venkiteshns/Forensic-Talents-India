@@ -8,10 +8,10 @@ export const processEnrollment = async (data, file) => {
     name, email, phone, nationality, qualification, status,
     institutionName, organizationName, transactionId,
     targetType, targetName, internshipId, additionalInfo,
-    mode, priceINR, priceUSD
+    mode, priceINR, priceUSD, paymentMode
   } = data;
 
-  if (!file) throw new Error('Payment proof is required');
+  if (paymentMode === 'online' && !file) throw new Error('Payment proof is required for online payments');
 
   // ── PART 5: Backend mode validation ──────────────────────────────────────
   let resolvedMode = undefined;
@@ -34,15 +34,21 @@ export const processEnrollment = async (data, file) => {
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  const b64 = Buffer.from(file.buffer).toString('base64');
-  const dataURI = "data:" + file.mimetype + ";base64," + b64;
-  const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_enrollments" });
-  const paymentProofUrl = cldRes.secure_url;
-  const paymentScreenshotPublicId = cldRes.public_id;
+  let paymentProofUrl = undefined;
+  let paymentScreenshotPublicId = undefined;
+
+  if (paymentMode === 'online' && file) {
+    const b64 = Buffer.from(file.buffer).toString('base64');
+    const dataURI = "data:" + file.mimetype + ";base64," + b64;
+    const cldRes = await cloudinary.uploader.upload(dataURI, { resource_type: "auto", folder: "forensic_talents_enrollments" });
+    paymentProofUrl = cldRes.secure_url;
+    paymentScreenshotPublicId = cldRes.public_id;
+  }
 
   const newEnrollment = new Enrollment({
     name, email, phone, nationality, qualification, status,
     institutionName, organizationName, transactionId, paymentProofUrl, paymentScreenshotPublicId,
+    paymentMode,
     targetType, targetName,
     internshipId: targetType === 'Internship' ? internshipId : undefined,
     mode: resolvedMode,
@@ -73,8 +79,11 @@ export const processEnrollment = async (data, file) => {
       ${resolvedMode ? `<p><strong>Mode${targetType === 'Internship' ? ' (system-verified)' : ''}:</strong> ${resolvedMode}</p>` : ''}
       ${targetType === 'Course' && priceINR ? `<p><strong>Price (INR):</strong> ₹${priceINR}</p>` : ''}
       ${targetType === 'Course' && priceUSD ? `<p><strong>Price (USD):</strong> $${priceUSD}</p>` : ''}
+      <p><strong>Payment Method:</strong> ${paymentMode === 'offline' ? 'On-Site (Offline) Payment' : 'Online Payment'}</p>
+      ${paymentMode === 'online' ? `
       <p><strong>Transaction ID:</strong> ${transactionId}</p>
       <p><strong>Payment Proof:</strong> <a href="${paymentProofUrl}">View Image</a></p>
+      ` : ''}
       ${additionalInfo ? `<p><strong>Additional Info:</strong> ${additionalInfo}</p>` : ''}
     `
   };
