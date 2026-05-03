@@ -61,12 +61,36 @@ body.modal-open {
   }
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-container {
+  width: min(600px, 95%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 20px;
+}
+
 :root {
   --page-bg: #f5f7fb;
   --container-bg: #ffffff;
-  --grid-bg: #f9fafb;
-  --cell-border: #d1d5db;
+  --grid-bg: #f8fafc;
   --cell-bg: #ffffff;
+  --cell-border: #cbd5e1;
+
+  --blocked-cell: #1e293b;
+  --blocked-cell-soft: #334155;
+  --text-primary: #0f172a;
+
   --success-bg: #e6f4ea;
   --success-border: #b7e1c1;
   --success-text: #166534;
@@ -84,19 +108,153 @@ body {
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.06),
     0 2px 6px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.crossword-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.grid-section {
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pro-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.pro-layout .clues-section {
+  margin-top: 20px;
+  max-height: none;
+  overflow: visible;
+  max-width: 100%;
+}
+
+.clues-section {
+  width: 100%;
+  max-width: 340px;
+  min-width: 280px;
+  overflow-y: auto;
+  max-height: 75vh;
+  position: sticky;
+  top: 20px;
+}
+
+@media (max-width: 900px) {
+  .crossword-layout {
+    grid-template-columns: 1fr;
+  }
+  .clues-section {
+    max-width: 100%;
+    min-width: unset;
+    max-height: none;
+    margin-top: 20px;
+    position: static;
+  }
+}
+
+.grid-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .crossword-grid {
-  background-color: var(--grid-bg);
-  padding: 12px;
+  background: var(--grid-bg);
+  padding: 10px;
   border-radius: 12px;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+@media (max-width: 510px) {
+  .grid-wrapper {
+    padding: 0 6px;
+    overflow-x: hidden;
+  }
+
+  .crossword-grid {
+    width: 100%;
+    grid-template-columns: repeat(var(--cols), 1fr) !important;
+    border-right: 1px solid #cbd5e1;
+    transform: translateX(-0.5px);
+  }
+
+  .cell, .cell-blocked {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+  }
+
+  .cell {
+    font-size: clamp(8px, 2.5vw, 14px) !important;
+  }
+}
+
+.crossword-grid.pro {
+  --cell-size: min(
+    calc(95vw / var(--cols)),
+    calc(55vh / var(--rows))
+  );
+  width: calc(var(--cell-size) * var(--cols) + (var(--cols) - 1) * 2px);
 }
 
 .cell {
-  background-color: var(--cell-bg);
+  background: var(--cell-bg);
   border: 1px solid var(--cell-border);
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   transition: all 0.2s ease;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.cell input,
+.cell span {
+  font-weight: 600;
+  text-align: center;
+  line-height: 1;
+}
+
+.cell-number {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.cell input {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  text-transform: uppercase;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
+  background: transparent;
 }
 
 .cell:hover {
@@ -111,7 +269,13 @@ body {
 }
 
 .cell-blocked {
-  background-color: #e5e7eb;
+  background: var(--blocked-cell);
+  border: none;
+  box-sizing: border-box;
+}
+
+.cell-blocked:hover {
+  background: var(--blocked-cell-soft);
 }
 
 .cell-correct {
@@ -149,14 +313,20 @@ body {
   }
 }
 
-.cell-error {
-  animation: shake 0.3s ease;
+.wrong-cell {
+  background-color: #FEE2E2 !important; /* soft red background */
+  border-color: #DC2626 !important;     /* strong red border */
+  color: #991B1B !important;
 }
 
-@keyframes shake {
+.word-shake {
+  animation: subtle-shake 0.25s ease-in-out;
+}
+
+@keyframes subtle-shake {
   0% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  50% { transform: translateX(3px); }
-  75% { transform: translateX(-2px); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
   100% { transform: translateX(0); }
 }

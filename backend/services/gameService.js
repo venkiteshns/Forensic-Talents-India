@@ -12,6 +12,10 @@ const getModel = (type) => {
   return null;
 };
 
+export const getCrosswordDataByLevel = async (level) => {
+  return await Crossword.findOne({ level });
+};
+
 export const getGameData = async (type, level) => {
   const Model = getModel(type);
   if (!Model) throw new Error('Invalid game type');
@@ -48,45 +52,8 @@ export const getGameData = async (type, level) => {
       return { words: fallbackWords[level] || fallbackWords.easy, level };
     }
     if (type === 'crossword') {
-      const fallbackPairs = {
-        easy: [
-          { word: "DNA", clue: "Genetic code" },
-          { word: "LAW", clue: "Legal rule" },
-          { word: "CELL", clue: "Biological unit" },
-          { word: "CLUE", clue: "Hint for a case" }
-        ],
-        medium: [
-          { word: "CRIME", clue: "Illegal act" },
-          { word: "SCENE", clue: "Location of crime" },
-          { word: "BLOOD", clue: "Red vital fluid" },
-          { word: "GUILTY", clue: "Culpable person" },
-          { word: "VICTIM", clue: "Harmed person" },
-          { word: "TRIAL", clue: "Court hearing" }
-        ],
-        hard: [
-          { word: "FORENSIC", clue: "Scientific investigation" },
-          { word: "EVIDENCE", clue: "Proof of fact" },
-          { word: "SUSPECT", clue: "Person of interest" },
-          { word: "WEAPON", clue: "Tool of harm" },
-          { word: "AUTOPSY", clue: "Post-mortem examination" },
-          { word: "WITNESS", clue: "Observer of event" },
-          { word: "DETECTIVE", clue: "Investigator" },
-          { word: "COURT", clue: "Legal tribunal" }
-        ],
-        pro: [
-          { word: "TOXICOLOGY", clue: "Study of poisons" },
-          { word: "PATHOLOGY", clue: "Study of disease" },
-          { word: "BALLISTICS", clue: "Study of projectiles" },
-          { word: "FINGERPRINT", clue: "Unique skin pattern" },
-          { word: "SEROLOGY", clue: "Study of bodily fluids" },
-          { word: "ODONTOLOGY", clue: "Dental forensics" },
-          { word: "ENTOMOLOGY", clue: "Insect study" },
-          { word: "ANTHROPOLOGY", clue: "Study of human bones" },
-          { word: "MICROSCOPE", clue: "Magnifying instrument" },
-          { word: "SPECTROSCOPY", clue: "Light interaction study" }
-        ]
-      };
-      return { words: fallbackPairs[level] || fallbackPairs.easy, level };
+      // (This is only reached if allWords.length === 0 above)
+      throw new Error(`No active sets found for level ${level}`);
     }
     if (type === 'jigsaw') {
       return { imageUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=800&auto=format&fit=crop', level };

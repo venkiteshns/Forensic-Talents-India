@@ -45,7 +45,7 @@ router.post('/upload', protect, upload.single('file'), resourceController.upload
 
 import * as gameController from '../controllers/gameController.js';
 router.get('/word-search', (req, res, next) => { req.params.type = 'word-search'; gameController.getGame(req, res, next); });
-router.get('/crossword', (req, res, next) => { req.params.type = 'crossword'; gameController.getGame(req, res, next); });
+router.get('/crossword/:level', gameController.getCrosswordByLevel);
 router.get('/jigsaw', (req, res, next) => { req.params.type = 'jigsaw'; gameController.getGame(req, res, next); });
 router.get('/matching', (req, res, next) => { req.params.type = 'matching'; gameController.getGame(req, res, next); });
 

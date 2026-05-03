@@ -171,13 +171,126 @@ const isValidLayout = (placedWords, gridSizeR, gridSizeC) => {
   return true;
 };
 
+// ─── Subset Optimization ────────────────────────────────────────────────────────
+
+const GRID_LIMITS = {
+  easy:   7,
+  medium: 8,
+  hard:   10,
+  pro:    10,
+};
+
+function selectMobileOptimizedWords(allWords) {
+  // Step 1: sort by shortest length first, but keep them reasonably long for intersections
+  const sorted = [...allWords].sort((a, b) => a.word.length - b.word.length);
+
+  let selected = [];
+
+  // Pick a good starting word (medium length)
+  const startIdx = Math.floor(sorted.length / 2);
+  if (sorted.length > 0) {
+    selected.push(sorted[startIdx]);
+    sorted.splice(startIdx, 1);
+  }
+
+  while (selected.length < 9 && sorted.length > 0) {
+    let bestWord = null;
+    let bestScore = -1;
+    let bestIdx = -1;
+
+    for (let i = 0; i < sorted.length; i++) {
+      const wordObj = sorted[i];
+      let overlapCount = 0;
+      
+      // Count how many unique letters this word shares with the already selected words
+      const letters = new Set(wordObj.word.split(''));
+      for (const w of selected) {
+        for (const l of letters) {
+          if (w.word.includes(l)) {
+             overlapCount++;
+          }
+        }
+      }
+
+      if (overlapCount > bestScore) {
+        bestScore = overlapCount;
+        bestWord = wordObj;
+        bestIdx = i;
+      }
+    }
+
+    if (bestScore > 0) {
+      selected.push(bestWord);
+      sorted.splice(bestIdx, 1);
+    } else {
+      // If no overlap found, just pick the next shortest to fill
+      selected.push(sorted[0]);
+      sorted.splice(0, 1);
+    }
+  }
+
+  return selected;
+}
+
+function selectOptimalWords(allWords, limit = 10) {
+  if (!allWords || allWords.length === 0) return [];
+  // Step 1: sort by length (desc)
+  const sorted = [...allWords].sort((a, b) => b.word.length - a.word.length);
+
+  // Step 2: pick top candidates by intersection potential
+  let selected = [sorted[0]];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const word = sorted[i];
+
+    const hasCommonLetter = selected.some(w =>
+      w.word.split("").some(letter => word.word.includes(letter))
+    );
+
+    if (hasCommonLetter) {
+      selected.push(word);
+    }
+
+    if (selected.length === limit) break;
+  }
+
+  // fallback: fill to minimum 7 if possible
+  while (selected.length < 7 && selected.length < sorted.length) {
+    const unselected = sorted.filter(w => !selected.includes(w));
+    if (unselected.length === 0) break;
+    selected.push(unselected[0]);
+  }
+
+  return selected.slice(0, limit);
+}
+
+function prepareWordsForGrid(allWords, level, isMobileSmall) {
+  if (isMobileSmall) {
+    return selectMobileOptimizedWords(allWords);
+  }
+  const limit = GRID_LIMITS[level] || 10;
+  return selectOptimalWords(allWords, limit);
+}
+
 // ─── Main layout generator ────────────────────────────────────────────────────
 
-const generateLayout = (wordList) => {
+const generateLayoutCore = (wordList, level = 'easy', isMobileSmall = false, maxCols = 15) => {
   if (!wordList || wordList.length === 0) return { gridSizeR: 0, gridSizeC: 0, words: [] };
 
+  let pool = [...wordList];
+  if (isMobileSmall) {
+    const MOBILE_MAX_LENGTH = 8;
+    const filtered = pool.filter(w => w.word.length <= MOBILE_MAX_LENGTH);
+    if (filtered.length >= 3) {
+      pool = filtered;
+    }
+  }
+
+  // Always optimize — select best intersecting subset capped to GRID_LIMITS[level]
+  const optimizedWords = prepareWordsForGrid(pool, level, isMobileSmall);
+
   const seen = new Set();
-  const inputClues = wordList
+  const inputClues = optimizedWords
     .map(w => ({ answer: w.word.toUpperCase().replace(/[^A-Z]/g, ''), clue: w.clue.trim() }))
     .filter(w => {
       if (w.answer.length < 3 || seen.has(w.answer)) return false;
@@ -187,7 +300,7 @@ const generateLayout = (wordList) => {
 
   if (inputClues.length === 0) throw new Error('No valid words to generate a crossword.');
 
-  const MAX_ATTEMPTS = 60;
+  const MAX_ATTEMPTS = 150;
 
   const parseRaw = (rawResult) => {
     if (!rawResult) return [];
@@ -218,7 +331,15 @@ const generateLayout = (wordList) => {
   let best = null;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const ordered = shuffleArray(inputClues);
+    // Attempt 0: Strictly sorted by length (longest first)
+    // Other attempts: Sorted with random jitter to explore alternative packings
+    const ordered = [...inputClues].sort((a, b) => {
+      if (attempt === 0) return b.answer.length - a.answer.length;
+      const lenDiff = b.answer.length - a.answer.length;
+      const randomJitter = (Math.random() - 0.5) * 6;
+      return lenDiff + randomJitter;
+    });
+
     const layout = silentCall(() => crosswordLib.generateLayout(ordered));
     if (!layout?.result) continue;
 
@@ -230,6 +351,9 @@ const generateLayout = (wordList) => {
     const gridSizeR = maxR - minR + 1;
     const gridSizeC = maxC - minC + 1;
 
+    // Strict column enforcement
+    if (gridSizeC > maxCols) continue;
+
     // Normalize to zero-origin
     const normalized = placed.map(w => ({ ...w, r: w.r - minR, c: w.c - minC }));
 
@@ -240,7 +364,7 @@ const generateLayout = (wordList) => {
     const connected = keepLargestComponent(normalized);
     if (connected.length < 3) continue;
 
-    // Re-validate the connected subset (may be a subset of normalized)
+    // Re-validate the connected subset
     const { minR: cr, maxR: eR, minC: cc, maxC: eC } = computeBounds(connected);
     const cGridR = eR - cr + 1;
     const cGridC = eC - cc + 1;
@@ -248,13 +372,17 @@ const generateLayout = (wordList) => {
 
     if (!isValidLayout(reNorm, cGridR, cGridC)) continue;
 
-    const score = connected.length * 10 + Math.random() * 0.5;
+    // SCORING LOGIC:
+    // 1. Maximize connected words (highest priority)
+    // 2. Minimize bounding box area (trim unused space, pack tightly)
+    // 3. Maximize overlaps naturally by minimizing area for the same word count
+    const area = cGridR * cGridC;
+    // Tighter packing: penalize width to encourage vertical growth if it saves space, but primarily minimize area
+    const score = (connected.length * 100000) - (area * 10) - cGridC;
+
     if (!best || score > best.score) {
       best = { score, words: reNorm, gridSizeR: cGridR, gridSizeC: cGridC };
     }
-
-    // Perfect: all words placed and connected
-    if (best.words.length === inputClues.length) break;
   }
 
   if (!best || best.words.length < 3) {
@@ -276,6 +404,38 @@ const generateLayout = (wordList) => {
   if (safeWords.length < 3) throw new Error('Too few words remain after safety filtering.');
 
   return { gridSizeR: best.gridSizeR, gridSizeC: best.gridSizeC, words: safeWords };
+};
+
+const generateLayout = (wordList, level = 'easy', isMobileSmall = false, maxCols = 15) => {
+  if (!isMobileSmall) {
+    return generateLayoutCore(wordList, level, false, maxCols);
+  }
+
+  const isRestricted = level === 'hard' || level === 'pro';
+  const minWordsRequired = isRestricted ? Math.min(6, wordList.length) : 3;
+  const MOBILE_MAX_COLS = maxCols;
+  
+  let attemptWords = [...wordList];
+
+  while (attemptWords.length >= minWordsRequired) {
+    try {
+      const grid = generateLayoutCore(attemptWords, level, true, maxCols);
+      // Only accept if it fits the columns AND contains the minimum required words
+      if (grid.gridSizeC <= MOBILE_MAX_COLS && grid.words.length >= minWordsRequired) {
+        return grid;
+      }
+    } catch (e) {
+      // Ignore generation failure, proceed to drop a word
+    }
+    
+    // Remove the longest word to make it smaller
+    attemptWords.sort((a, b) => a.word.length - b.word.length);
+    attemptWords.pop();
+  }
+
+  // Fallback if all strictly constrained grids fail
+  // We STILL enforce maxCols to prevent completely broken layouts
+  return generateLayoutCore(wordList, level, true, maxCols);
 };
 
 // ─── Grid data builder ────────────────────────────────────────────────────────
@@ -372,7 +532,7 @@ const validatePuzzle = (puzzleData, gridData) => {
 // ─── Worker entry point ───────────────────────────────────────────────────────
 
 self.onmessage = (e) => {
-  const { type, words } = e.data;
+  const { type, words, level, isMobileSmall, maxCols } = e.data;
   if (type !== 'GENERATE') return;
 
   const MAX_RETRIES = 5;
@@ -380,7 +540,7 @@ self.onmessage = (e) => {
 
   for (let retry = 0; retry < MAX_RETRIES; retry++) {
     try {
-      const puzzleData = generateLayout(words);
+      const puzzleData = generateLayout(words, level, isMobileSmall, maxCols);
       const gridData = generateGridData(puzzleData);
 
       // Final pre-render validation – if this throws, retry

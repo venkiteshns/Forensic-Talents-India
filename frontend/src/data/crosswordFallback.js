@@ -1,53 +1,50 @@
 export const crosswordFallbackData = {
   easy: [
-    { word: "CRIMINOLOGY", clue: "Study of crime" },
-    { word: "CRIMINAL", clue: "Person who commits crime" },
-    { word: "CRIME", clue: "Illegal act" },
-    { word: "DACTYLOSCOPY", clue: "Fingerprint study" },
-    { word: "DETECTIVE", clue: "Person who investigates crime" },
-    { word: "FORENSIC", clue: "Evidence from body" },
-    { word: "DECEPTION", clue: "Telling lies" },
-    { word: "MURDER", clue: "Killing someone intentionally" },
-    { word: "THEFT", clue: "Stealing property" },
-    { word: "WAR", clue: "War between countries" }
+    { word: "JAIL", clue: "Place where accused are kept" },
+    { word: "CLUE", clue: "Piece of evidence that helps solve a case" },
+    { word: "CRIME", clue: "Illegal act punishable by law" },
+    { word: "THEFT", clue: "Taking property without permission" },
+    { word: "PRINT", clue: "Unique mark left by a finger" },
+    { word: "COURT", clue: "Place where legal cases are heard" },
+    { word: "MURDER", clue: "Killing a person intentionally" },
+    { word: "POLICE", clue: "Government force that enforces law" },
+    { word: "VICTIM", clue: "Person harmed by a crime" },
+    { word: "LAWYER", clue: "Person who argues a case in court" }
   ],
-
   medium: [
-    { word: "AUTOPSY", clue: "Study of dead bodies" },
-    { word: "SPATTER", clue: "Crime scene blood pattern study" },
-    { word: "PSEUDOSCIENCE", clue: "False science" },
-    { word: "INSANITY", clue: "Mental illness defense" },
-    { word: "SURVEILLANCE", clue: "Secret observation" },
-    { word: "FORGERY", clue: "Written false statement" },
-    { word: "CUSTODY", clue: "Evidence chain tracking" },
-    { word: "UNDERGROUND", clue: "Hidden illegal activity" },
-    { word: "CONVICTION", clue: "Law violation record" },
-    { word: "TACTICS", clue: "War strategy planning" }
+    { word: "GSR", clue: "Gunshot residue test material" },
+    { word: "RIGOR", clue: "Stiffening of muscles after death" },
+    { word: "DECAY", clue: "Breakdown of a body after death" },
+    { word: "FIBER", clue: "Small thread-like trace evidence" },
+    { word: "TOXIN", clue: "Poisonous chemical substance" },
+    { word: "FRAUD", clue: "Crime of financial deception" },
+    { word: "AUTOPSY", clue: "Medical examination of a dead body" },
+    { word: "PERJURY", clue: "Giving false statement under oath" },
+    { word: "EXHIBIT", clue: "Object presented as court evidence" },
+    { word: "RESIDUE", clue: "Chemical trace left after explosion" }
   ],
-
   hard: [
-    { word: "PROFILING", clue: "Study of criminal behavior patterns" },
-    { word: "POLYGRAPH", clue: "Scientific test for lies" },
-    { word: "TREASON", clue: "Crime of betraying nation" },
-    { word: "TOXICOLOGY", clue: "Study of poisons" },
-    { word: "FALLACY", clue: "False cause reasoning error" },
-    { word: "ANARCHY", clue: "War without rules" },
-    { word: "MENSREA", clue: "Intent behind crime" },
-    { word: "ACTUSREUS", clue: "Physical act of crime" },
-    { word: "RECONSTRUCTION", clue: "Crime scene reconstruction" },
-    { word: "AMBUSH", clue: "Hidden military attack" }
+    { word: "PCR", clue: "DNA copying method" },
+    { word: "ARSON", clue: "Investigation of fire-related crimes" },
+    { word: "LIVOR", clue: "Blood pooling after death" },
+    { word: "FACIAL", clue: "Rebuilding a face from a skull" },
+    { word: "PLASMA", clue: "Liquid part of blood" },
+    { word: "INSANITY", clue: "Legal defense of unsound mind" },
+    { word: "PHONETICS", clue: "Study of speech sounds in voice analysis" },
+    { word: "OSTEOLOGY", clue: "Scientific study of bones" },
+    { word: "NINHYDRIN", clue: "Chemical used to reveal fingerprints" },
+    { word: "PROFILING", clue: "Analysis of criminal behavior patterns" }
   ],
-
   pro: [
-    { word: "POVERTY", clue: "Root cause of crime" },
-    { word: "ANGER", clue: "Emotion driving violent crime" },
-    { word: "MAFIA", clue: "Organized criminal group" },
-    { word: "OPPRESSION", clue: "Abuse of power in war" },
-    { word: "BIAS", clue: "Failure of scientific truth" },
-    { word: "GREED", clue: "Crime due to greed" },
-    { word: "JUSTICE", clue: "Law enforcement system" },
-    { word: "WAR", clue: "Conflict without work" },
-    { word: "FRAUD", clue: "Misleading scientific claim" },
-    { word: "INEQUALITY", clue: "Social condition causing crime" }
+    { word: "LOOP", clue: "Fingerprint pattern with curved ridges" },
+    { word: "ARCH", clue: "Fingerprint pattern forming arch shape" },
+    { word: "EXIT", clue: "Wound where a bullet exits the body" },
+    { word: "WHORL", clue: "Circular fingerprint pattern" },
+    { word: "ENTRY", clue: "Wound where a bullet enters the body" },
+    { word: "INTENT", clue: "Purpose behind committing a crime" },
+    { word: "MAPPING", clue: "Measuring and documenting crime scene" },
+    { word: "CUSTODY", clue: "Record of evidence handling" },
+    { word: "PEDOLOGY", clue: "Study of soil in forensics" },
+    { word: "TEXTILES", clue: "Study of textile fibers" }
   ]
 };

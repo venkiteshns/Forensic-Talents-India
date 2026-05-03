@@ -18,6 +18,20 @@ export const getGame = async (req, res, next) => {
   }
 };
 
+export const getCrosswordByLevel = async (req, res, next) => {
+  try {
+    const { level } = req.params;
+    const document = await gameService.getCrosswordDataByLevel(level);
+    if (!document) {
+      return res.status(404).json({ message: 'No crossword data found for this level.' });
+    }
+    res.json({ level: document.level, words: document.words });
+  } catch (err) {
+    console.error("GAME CONTROLLER ERROR:", err.stack);
+    next(err);
+  }
+};
+
 export const getAllGameSets = async (req, res, next) => {
   try {
     const { type } = req.params;
