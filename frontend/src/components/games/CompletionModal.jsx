@@ -1,22 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { CheckCircle2, Award, ChevronRight, RefreshCw, Grid } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { CheckCircle2, ChevronRight, RefreshCw, GraduationCap } from 'lucide-react';
 
-export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain, onNextLevel, onQuit }) {
+export default function CompletionModal({ 
+  level, 
+  timeElapsed, 
+  moves, 
+  onPlayAgain, 
+  onNextLevel, 
+  onQuit, 
+  totalLevels = 4 
+}) {
+  const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
-  const isPro = level === 'pro';
+  
+  // Map string levels to numbers for the progress bar
+  const levelMap = { 'easy': 1, 'medium': 2, 'hard': 3, 'pro': 4 };
+  const currentLevelNum = typeof level === 'number' ? level : (levelMap[level] || 1);
+  const displayTotal = Math.max(currentLevelNum, totalLevels);
+
+  // Dynamic Titles
+  const titles = ["Level Completed", "Excellent Work", "Well Done", "Outstanding Performance"];
+  const dynamicTitle = useMemo(() => titles[Math.floor(Math.random() * titles.length)], []);
 
   useEffect(() => {
-    if (isPro) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 1800);
-      return () => clearTimeout(timer);
-    }
-  }, [isPro]);
-
-  useEffect(() => {
-    const headerHeight = document.querySelector("header")?.offsetHeight || 72;
-    document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
+    // Show subtle confetti for a premium feel
+    setShowConfetti(true);
+    const timer = setTimeout(() => setShowConfetti(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -26,133 +38,341 @@ export default function CompletionModal({ level, timeElapsed, moves, onPlayAgain
     };
   }, []);
 
-  const handleNextLevel = () => {
-    // Modal closes cleanly
-    onNextLevel();
+  // Deterministic alternation based on level number
+  // Odd levels (1, 3, 5...) -> internship
+  // Even levels (2, 4...) -> courses
+  const ctaType = currentLevelNum % 2 !== 0 ? 'internships' : 'courses';
+
+  const handleExplore = () => {
+    if (ctaType === 'courses') {
+      navigate('/education/certificates');
+    } else {
+      navigate('/education/internships');
+    }
   };
 
-  const handlePlayAgain = () => {
-    setTimeout(() => {
+  const handleSecondaryAction = () => {
+    if (onNextLevel && currentLevelNum < displayTotal) {
+      onNextLevel();
+    } else {
       onPlayAgain();
-      document.getElementById("gameStart")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }, 120);
+    }
   };
 
   return createPortal(
-    <div className="modal-overlay animate-in fade-in duration-300">
+    <div className="modal-overlay">
       
       {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-          {Array.from({ length: 40 }).map((_, i) => (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-[10000]">
+          {Array.from({ length: 32 }).map((_, i) => (
             <div 
               key={i}
-              className="absolute w-2 h-2 rounded-sm bg-amber-400"
+              className="absolute w-1.5 h-1.5 rounded-full"
               style={{
                 left: `${Math.random() * 100}%`,
-                top: `-20px`,
-                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'][Math.floor(Math.random() * 4)],
-                animation: `confetti-drop ${1.2 + Math.random() * 0.6}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
-                animationDelay: `${Math.random() * 0.2}s`
+                top: `-10px`,
+                backgroundColor: ['#16A34A', '#22C55E', '#2563EB', '#60A5FA'][Math.floor(Math.random() * 4)],
+                animation: `confetti-fall ${1.5 + Math.random() * 1.5}s ease-out forwards`,
+                animationDelay: `${Math.random() * 0.5}s`
               }}
             />
           ))}
         </div>
       )}
 
-      <div className="modal-box shadow-2xl text-center flex flex-col items-center justify-center relative z-10 border border-slate-800 animate-in zoom-in-95 duration-250" style={{ scrollbarWidth: 'none' }}>
-        
-        <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-5 border border-emerald-500/20">
-          {isPro ? <Award className="w-7 h-7" strokeWidth={2} /> : <CheckCircle2 className="w-7 h-7" strokeWidth={2} />}
+      <div className="modal-container animate-modal-entry">
+        {/* Success Icon */}
+        <div className="success-icon-container">
+          <div className="success-icon-bg">
+            <CheckCircle2 className="w-8 h-8 text-[#16A34A]" strokeWidth={2.5} />
+          </div>
         </div>
         
-        <h2 className="text-2xl font-bold text-white mb-3">
-          {isPro ? "Congratulations" : "Level Completed"}
-        </h2>
+        {/* Title */}
+        <h2 className="modal-title">{dynamicTitle}</h2>
         
-        <p className="text-slate-400 text-sm mb-6 leading-relaxed max-w-[300px]">
-          {isPro 
-            ? "You have completed the Pro Level. This reflects strong attention to detail and problem-solving ability." 
-            : "Well done. You've successfully completed this level."}
-        </p>
-        
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg px-6 py-3 text-sm text-slate-300 mb-8 flex justify-center gap-6 w-full">
-          <div>
-            <span className="block text-xs uppercase tracking-wider text-slate-500 mb-1">Time</span>
-            <span className="font-semibold text-white text-base">{timeElapsed}</span>
+        {/* Progress Display */}
+        <div className="progress-section">
+          <div className="progress-text">Level {currentLevelNum} / {displayTotal} completed</div>
+          <div className="progress-bar-container">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${(currentLevelNum / displayTotal) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Performance Summary */}
+        <div className="stats-grid">
+          <div className="stat-item">
+            <span className="stat-label">TIME</span>
+            <span className="stat-value">{timeElapsed}</span>
           </div>
           {moves !== undefined && moves !== null && (
-            <div>
-              <span className="block text-xs uppercase tracking-wider text-slate-500 mb-1">Moves</span>
-              <span className="font-semibold text-white text-base">{moves}</span>
+            <div className="stat-item">
+              <span className="stat-label">MOVES</span>
+              <span className="stat-value">{moves}</span>
             </div>
           )}
         </div>
         
-        <div className="flex flex-col gap-3 w-full">
-          {!isPro && (
-            <button 
-              onClick={handleNextLevel} 
-              className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm font-semibold rounded-lg flex items-center justify-center gap-2 text-sm transition-colors"
-            >
-              Continue to Next Level <ChevronRight className="w-4 h-4" />
-            </button>
-          )}
+        {/* Reinforcement Message */}
+        <p className="reinforcement-message">
+          You’ve successfully completed this challenge with strong accuracy and focus.
+          <br /><br />
+          Ready to take your skills to the next level? Explore {ctaType === 'courses' ? 'structured courses' : 'internship programs'} designed to build real-world expertise.
+        </p>
+        
+        {/* CTA Section */}
+        <div className="cta-group">
+          <button 
+            onClick={handleExplore} 
+            className="primary-cta"
+          >
+            <GraduationCap className="w-5 h-5" />
+            Explore {ctaType === 'courses' ? 'Certified Courses' : 'Internship Programs'}
+          </button>
           
           <button 
-            onClick={handlePlayAgain} 
-            className="w-full h-12 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 text-sm transition-colors border border-slate-700"
+            onClick={handleSecondaryAction} 
+            className="secondary-cta"
           >
-            <RefreshCw className="w-4 h-4" /> Play Again
+            Continue Playing
+            <ChevronRight className="w-4 h-4" />
           </button>
 
-          {isPro && (
-            <button 
-              onClick={onQuit} 
-              className="w-full h-12 bg-transparent hover:bg-slate-800/50 text-slate-400 hover:text-white font-semibold rounded-lg flex items-center justify-center gap-2 text-sm transition-colors mt-2"
-            >
-              <Grid className="w-4 h-4" /> Explore Other Games
-            </button>
-          )}
+          <button 
+            onClick={onPlayAgain} 
+            className="text-link-cta"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Restart Level
+          </button>
         </div>
       </div>
       
       <style dangerouslySetInnerHTML={{__html: `
-        :root {
-          --header-height: 72px;
-        }
         .modal-overlay {
           position: fixed;
-          top: var(--header-height);
+          top: 0;
           left: 0;
           right: 0;
           bottom: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 16px;
-          background: rgba(0, 0, 0, 0.6);
-          z-index: 9999;
-        }
-        .modal-box {
-          width: min(92%, 420px);
-          max-height: calc(100vh - var(--header-height) - 32px);
-          overflow-y: auto;
-          border-radius: 16px;
           padding: 20px;
-          background: #0f172a;
+          background: rgba(15, 23, 42, 0.4);
+          backdrop-filter: blur(8px);
+          z-index: 9999;
+          animation: fade-in 300ms ease-out;
         }
-        @media (max-height: 600px) {
-          .modal-box {
-            max-height: calc(100vh - var(--header-height) - 16px);
-          }
+
+        .modal-container {
+          background: #FFFFFF;
+          border-radius: 20px;
+          padding: 32px 24px;
+          max-width: 420px;
+          width: 100%;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          position: relative;
+          border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        @keyframes confetti-drop {
+
+        .animate-modal-entry {
+          animation: modal-scale-in 250ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .success-icon-container {
+          margin-bottom: 20px;
+        }
+
+        .success-icon-bg {
+          width: 64px;
+          height: 64px;
+          background: #ECFDF5;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #D1FAE5;
+        }
+
+        .modal-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: #0F172A;
+          margin-bottom: 12px;
+        }
+
+        .progress-section {
+          width: 100%;
+          margin-bottom: 24px;
+          max-width: 280px;
+        }
+
+        .progress-text {
+          font-size: 12px;
+          font-weight: 600;
+          color: #16A34A;
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .progress-bar-container {
+          width: 100%;
+          height: 6px;
+          background: #ECFDF5;
+          border-radius: 100px;
+          overflow: hidden;
+        }
+
+        .progress-bar-fill {
+          height: 100%;
+          background: #22C55E;
+          border-radius: 100px;
+          transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+          gap: 16px;
+          width: 100%;
+          margin-bottom: 24px;
+          padding: 16px;
+          background: #F8FAFC;
+          border-radius: 12px;
+          border: 1px solid #F1F5F9;
+        }
+
+        .stat-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .stat-label {
+          font-size: 10px;
+          font-weight: 700;
+          color: #94A3B8;
+          letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+          font-size: 16px;
+          font-weight: 600;
+          color: #1E293B;
+        }
+
+        .reinforcement-message {
+          font-size: 14px;
+          color: #475569;
+          line-height: 1.6;
+          margin-bottom: 32px;
+          padding: 0 8px;
+        }
+
+        .cta-group {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .primary-cta {
+          background: #2563EB;
+          color: white;
+          height: 48px;
+          border-radius: 12px;
+          font-weight: 600;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          transition: all 200ms ease;
+          border: none;
+          cursor: pointer;
+          font-size: 15px;
+        }
+
+        .primary-cta:hover {
+          background: #1D4ED8;
+          transform: translateY(-1px);
+          box-shadow: 0 10px 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .secondary-cta {
+          background: transparent;
+          color: #475569;
+          height: 48px;
+          border-radius: 12px;
+          font-weight: 600;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: all 200ms ease;
+          border: 1px solid #E2E8F0;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .secondary-cta:hover {
+          background: #F8FAFC;
+          border-color: #CBD5E1;
+          color: #1E293B;
+        }
+
+        .text-link-cta {
+          background: transparent;
+          color: #94A3B8;
+          font-size: 13px;
+          font-weight: 500;
+          border: none;
+          cursor: pointer;
+          padding: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: color 200ms ease;
+        }
+
+        .text-link-cta:hover {
+          color: #64748B;
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes modal-scale-in {
+          from { opacity: 0; transform: scale(0.94); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes confetti-fall {
           0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          80% { opacity: 1; }
-          100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 480px) {
+          .modal-container {
+            width: 92%;
+            padding: 32px 20px;
+          }
+          .modal-title {
+            font-size: 18px;
+          }
         }
       `}} />
     </div>,
