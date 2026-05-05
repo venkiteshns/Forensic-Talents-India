@@ -4,9 +4,11 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Public route mapping to current active/legacy quiz shape
 router.get('/latest', quizController.getLatestQuiz);
-router.post('/', protect, quizController.createQuiz);
-router.put('/:id', protect, quizController.updateQuiz);
-router.put('/:id/toggle', protect, quizController.toggleQuizVisibility);
+
+// Admin routes for complete state management
+router.get('/state', protect, quizController.getQuizState);
+router.put('/state', protect, quizController.updateQuizState);
 
 export default router;

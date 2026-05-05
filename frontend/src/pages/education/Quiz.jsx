@@ -16,6 +16,7 @@ export default function Quiz() {
 
   // Certificate Verification State
   const [certNumber, setCertNumber] = useState('');
+  const [participantName, setParticipantName] = useState('');
   const [certResult, setCertResult] = useState(null);
   const [certError, setCertError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -27,24 +28,34 @@ export default function Quiz() {
     setCertResult(null);
     setResendMessage('');
 
-    if (!certNumber.trim()) {
-      setCertError('Please enter a certificate number.');
+    if (!certNumber.trim() || !participantName.trim()) {
+      setCertError('Please enter both certificate number and name');
       return;
     }
 
-    // Format validation: FOR-T/CS/minimum 6 numbers
-    const certRegex = /^FOR-T\/CS\/\d{6,}$/;
+    // Format validation: FOR-T/CS/number
+    const certRegex = /^FOR-T\/CS\/\d+$/;
     if (!certRegex.test(certNumber.trim())) {
-      setCertError('Invalid certificate number format. Ensure it matches FOR-T/CS/XXXXXX.');
+      setCertError('Invalid certificate number format. Ensure it matches FOR-T/CS/ followed by a number.');
       return;
     }
 
     setIsVerifying(true);
     try {
-      const res = await api.post('/certificates/verify', { certificateNumber: certNumber.trim() });
-      setCertResult(res.data);
+      const res = await api.post('/certificates/verify', {
+        certificateNumber: certNumber.trim(),
+        participantName: participantName.trim()
+      });
+      setCertResult(res.data.data);
     } catch (err) {
-      setCertError(getErrorMessage(err, { 500: 'Failed to verify certificate. Please try again.' }));
+      const msg = err.response?.data?.message;
+      if (msg === 'Certificate not found') {
+        setCertError('No certificate found with this number');
+      } else if (msg === 'Name does not match our records') {
+        setCertError('Name does not match the certificate');
+      } else {
+        setCertError(getErrorMessage(err, { 500: 'Failed to verify certificate. Please try again.' }));
+      }
     } finally {
       setIsVerifying(false);
     }
@@ -187,11 +198,40 @@ export default function Quiz() {
                   </Button>
                 </>
               ) : (
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <h2 className="text-2xl font-heading font-bold text-primary mb-4">Current Status</h2>
-                  <p className="text-slate-700 leading-relaxed font-medium">
-                    {quiz ? `Previous quiz was conducted on ${new Date(quiz.date).toLocaleDateString()}. A new quiz will be announced shortly.` : "A new quiz will be announced shortly."}
-                  </p>
+
+                  {quiz ? (
+                    <div className="mb-6">
+                      <p className="text-slate-800 font-bold mb-1 text-lg">
+                        {quiz.title ? `The Quiz "${quiz.title}" has Concluded.` : 'Monthly Forensic Quiz has Concluded.'}
+                      </p>
+                      <p className="text-slate-600">
+                        The quiz was successfully conducted on {new Date(quiz.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-slate-700 leading-relaxed font-medium mb-6">
+                      No Quiz information available at the moment.
+                    </p>
+                  )}
+
+                  <div className="border-t border-slate-200 pt-6">
+                    {quiz?.registrationEnabled && quiz?.registrationLink ? (
+                      <>
+                        <p className="text-slate-700 leading-relaxed font-medium mb-4">
+                          Registrations are now open for the upcoming Monthly Forensic Quiz. Secure your spot and participate in a professionally designed forensic challenge.
+                        </p>
+                        <Button variant="primary" size="lg" className="w-full group shadow-md hover:-translate-y-0.5 active:scale-95 transition-all" onClick={() => window.open(quiz.registrationLink, '_blank')}>
+                          Register for Next Quiz
+                        </Button>
+                      </>
+                    ) : (
+                      <p className="text-slate-700 leading-relaxed font-medium">
+                        Registrations for the next quiz are not yet open. For further information, please contact us.
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -263,38 +303,51 @@ export default function Quiz() {
                 </div>
               </div>
 
-              <div className="lg:w-1/2 w-full">
-                <div className="bg-slate-50/50 p-6 md:p-10 rounded-[2rem] border border-slate-100 shadow-inner backdrop-blur-sm relative">
-                  <label htmlFor="cert_verify_input" className="block text-slate-800 font-bold mb-3 text-lg">
-                    Certificate Number
-                  </label>
-                  <div className="relative">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="relative flex-1">
+              <div className="lg:w-1/2 w-full lg:flex lg:justify-end">
+                <div className="w-full grid grid-cols-1 lg:max-w-[420px] bg-[#FFFFFF] rounded-2xl p-[20px] md:p-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                  <div className="flex flex-col">
+                    <div className="flex flex-col gap-[12px]">
+                      <div>
+                        <label htmlFor="cert_number" className="block text-slate-800 font-bold mb-1.5 text-sm">
+                          Certificate Number
+                        </label>
                         <input
                           type="text"
-                          id="cert_verify_input"
+                          id="cert_number"
                           value={certNumber}
                           onChange={(e) => setCertNumber(e.target.value)}
                           placeholder="e.g., FOR-T/CS/260501"
-                          className="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 transition-all font-medium text-lg shadow-sm"
+                          className="h-[48px] px-[14px] w-full rounded-[10px] text-[14px] border border-[#D1D5DB] bg-[#F9FAFB] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-[2px] focus:ring-[#2563EB]/15 transition-all"
                         />
                       </div>
-                      <Button
-                        variant="primary"
-                        size="lg"
+                      <div>
+                        <label htmlFor="participant_name" className="block text-slate-800 font-bold mb-1.5 text-sm">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          id="participant_name"
+                          value={participantName}
+                          onChange={(e) => setParticipantName(e.target.value)}
+                          placeholder="Enter your full name (as on certificate)"
+                          className="h-[48px] px-[14px] w-full rounded-[10px] text-[14px] border border-[#D1D5DB] bg-[#F9FAFB] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-[2px] focus:ring-[#2563EB]/15 transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-[16px]">
+                      <button
                         onClick={handleVerify}
                         disabled={isVerifying}
-                        className="sm:px-10 py-4 h-auto rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
+                        className="h-[48px] w-full rounded-[10px] text-[14px] font-medium bg-[#1E293B] text-[#FFFFFF] hover:bg-[#0F172A] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                       >
                         {isVerifying ? (
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <Search size={20} />
-                        )}
-                        <span>{isVerifying ? 'Verifying...' : 'Verify'}</span>
-                      </Button>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : null}
+                        <span>{isVerifying ? 'Verifying...' : 'Verify Certificate'}</span>
+                      </button>
                     </div>
+
                     {certError && (
                       <p className="mt-3 text-red-500 font-medium text-sm flex items-center gap-2 bg-red-50 p-3 rounded-xl border border-red-100">
                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
@@ -304,8 +357,7 @@ export default function Quiz() {
                   </div>
 
                   {certResult && (
-                    <div className="mt-8 space-y-3 animate-in fade-in slide-in-from-top-4">
-
+                    <div className="mt-6 space-y-3 animate-in fade-in slide-in-from-top-4">
                       {/* ── Card 1: Verification Result ── */}
                       <div className="bg-white border border-green-200 rounded-xl p-5 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
@@ -338,13 +390,13 @@ export default function Quiz() {
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
                         {/* Single row: label + button */}
                         <div className="flex items-center flex-col justify-between gap-4">
-                          <p className="text-sm text-slate-600 leading-snug">
+                          <p className="text-sm text-slate-600 leading-snug text-center">
                             Resend certificate to registered email
                           </p>
                           <button
                             onClick={handleResend}
                             disabled={isResending}
-                            className="shrink-0 h-9 px-5 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-700 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="shrink-0 h-[48px] w-full bg-[#1E293B] text-[#FFFFFF] text-[14px] font-medium rounded-[10px] hover:bg-[#0F172A] active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
                           >
                             {isResending ? 'Sending…' : 'Resend to Email'}
                           </button>
@@ -364,12 +416,11 @@ export default function Quiz() {
                           </div>
                         )}
                       </div>
-
                     </div>
                   )}
 
                   {!certResult && !certError && (
-                    <p className="mt-6 text-sm text-slate-500 text-center flex items-center justify-center gap-2">
+                    <p className="mt-5 text-sm text-slate-500 text-center flex items-center justify-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
                       Unique number can be found at the bottom of your certificate.
                     </p>

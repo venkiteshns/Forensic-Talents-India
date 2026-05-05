@@ -30,6 +30,10 @@ app.use(errorHandler);
 // Start Keep-Alive Ping
 startKeepAlive();
 
+// Start Quiz Cron
+import { startQuizCron } from './cron/quizCron.js';
+startQuizCron();
+
 // Start Server
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);

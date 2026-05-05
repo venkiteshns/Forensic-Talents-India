@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, GraduationCap, Scale, BrainCircuit, Users, Award, Activity, Bell, Leaf, Landmark } from 'lucide-react';
+import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, GraduationCap, Scale, BrainCircuit, Users, Award, Activity, Bell, Leaf, Landmark, X } from 'lucide-react';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import api from '../utils/api';
@@ -14,13 +14,131 @@ function getInitials(name) {
   return parts[0]?.[0]?.toUpperCase() || '?';
 }
 
+const QuizAlertBanner = ({ quiz }) => {
+  const [dismissed, setDismissed] = useState(true);
+  const [timeLeft, setTimeLeft] = useState('');
+  const [quizState, setQuizState] = useState(null);
+
+  useEffect(() => {
+    if (localStorage.getItem('quiz_banner_dismissed') !== 'true') {
+      setDismissed(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (quiz) {
+      setQuizState(quiz.status === 'ACTIVE' ? 'ACTIVE' : quiz.registrationEnabled ? 'REGISTRATION' : null);
+    }
+  }, [quiz]);
+
+  useEffect(() => {
+    if (quizState === 'REGISTRATION' && quiz?.upcomingQuizDate) {
+      const targetDate = new Date(quiz.upcomingQuizDate).getTime();
+      let interval;
+      
+      const updateTimer = () => {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+        
+        if (diff <= 0) {
+          setQuizState('ACTIVE');
+          if (interval) clearInterval(interval);
+          return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if (days > 0) {
+          setTimeLeft(`Starts in ${days}d ${hours}h ${minutes}m ${seconds}s`);
+        } else {
+          setTimeLeft(`Starts in ${hours}h ${minutes}m ${seconds}s`);
+        }
+      };
+      
+      updateTimer();
+      interval = setInterval(updateTimer, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [quizState, quiz?.upcomingQuizDate]);
+
+  if (dismissed || !quizState) return null;
+
+  let message = '';
+  let ctaText = '';
+  let link = '';
+  
+  if (quizState === 'ACTIVE') {
+    message = 'Monthly Forensic Quiz is now live. Participate now and test your knowledge.';
+    ctaText = 'Start Quiz';
+    link = '/education/quiz#quiz_box_section';
+  } else if (quizState === 'REGISTRATION') {
+    message = 'Registrations are now open for the upcoming Monthly Forensic Quiz.';
+    ctaText = 'Register Now';
+    link = '/education/quiz#quiz_box_section';
+  } else {
+    return null;
+  }
+
+  const handleDismiss = () => {
+    localStorage.setItem('quiz_banner_dismissed', 'true');
+    setDismissed(true);
+  };
+
+  return (
+    <div className="w-full relative z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+      <Container>
+        <style>{`
+          @keyframes ctaPulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+          }
+          .cta-pulse {
+            animation: ctaPulse 2.5s infinite;
+          }
+        `}</style>
+        <div style={{ background: 'linear-gradient(90deg, #0F172A, #1E293B)' }} className="rounded-xl px-4 py-3.5 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white shadow-xl max-w-5xl mx-auto border border-slate-700/50">
+          
+          <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto text-center md:text-left pr-6 md:pr-0">
+            <div className="flex shrink-0 items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 text-blue-400">
+              <Bell className="w-4 h-4" />
+            </div>
+            <div>
+              <span className={`font-medium text-sm md:text-base leading-snug block transition-opacity duration-300 ${quizState === 'ACTIVE' ? 'animate-in fade-in' : ''}`}>{message}</span>
+              {quizState === 'REGISTRATION' && timeLeft && (
+                <span className="inline-block mt-1 text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md whitespace-nowrap">
+                  ⏱ {timeLeft}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            <Link to={link} className="cta-pulse w-full sm:w-auto flex items-center justify-center px-4 h-10 rounded-lg text-white font-medium shadow-md transition-colors whitespace-nowrap" style={{ background: '#22C55E' }} onMouseEnter={(e) => { e.currentTarget.style.background = '#16A34A'; e.currentTarget.style.animation = 'none'; }} onMouseLeave={(e) => { e.currentTarget.style.background = '#22C55E'; e.currentTarget.style.animation = 'ctaPulse 2.5s infinite'; }}>
+              {ctaText}
+            </Link>
+            
+            <button onClick={handleDismiss} className="absolute top-3 right-3 md:static md:top-auto md:right-auto text-slate-400 hover:text-white transition-colors p-1" aria-label="Close">
+               <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+        </div>
+      </Container>
+    </div>
+  );
+};
+
 export default function Home() {
   const [activeQuiz, setActiveQuiz] = useState(null);
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
         const res = await api.get('/quiz/latest');
-        if (res.data && res.data.isVisible) {
+        if (res.data && (res.data.status === 'ACTIVE' || res.data.registrationEnabled)) {
           setActiveQuiz(res.data);
         }
       } catch (err) {
@@ -55,6 +173,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-32 bg-primary overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <QuizAlertBanner quiz={activeQuiz} />
         <Container className="relative z-10 flex flex-col items-center text-center">
           <div className="fade-in">
             <img src="/assets/logo.png" alt="Forensic Talents" className="h-28 md:h-36 mb-8 mx-auto object-contain bg-white rounded-lg p-2" />
@@ -77,23 +196,6 @@ export default function Home() {
           </div>
         </Container>
       </section>
-
-      {/* Dynamic Quiz Banner */}
-      {activeQuiz && (
-        <div className="bg-accent text-primary py-3 px-4 shadow-md relative z-20">
-          <Container className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
-            <div className="flex flex-col md:flex-row items-center gap-3 font-semibold text-center md:text-left">
-              <div className="flex shrink-0 items-center justify-center w-9 h-9 rounded-full bg-black/10 hover:scale-110 transition-transform animate-pulse">
-                <Bell className="h-5 w-5 md:h-6 md:w-6 text-slate-900" />
-              </div>
-              <span>New Quiz Available: {activeQuiz.title} – Participate Now</span>
-            </div>
-            <Link to="/education/quiz#quiz_box_section" className="bg-primary text-white px-4 py-1.5 rounded-md text-sm font-bold hover:bg-[#1E293B] transition-colors whitespace-nowrap mt-1 md:mt-0">
-              Take Quiz
-            </Link>
-          </Container>
-        </div>
-      )}
 
       {/* About Preview */}
       <section className="py-20 bg-white">

@@ -2,6 +2,11 @@ import Certificate from '../models/Certificate.js';
 import Counter from '../models/Counter.js';
 import Quiz from '../models/Quiz.js';
 
+const normalize = (str) => {
+  if (!str) return '';
+  return str.trim().toLowerCase().replace(/\s+/g, " ");
+};
+
 export const createCertificate = async ({ name, email, marksScored }) => {
   // Fetch the first/only quiz document
   const quiz = await Quiz.findOne().sort({ createdAt: -1 });
@@ -58,11 +63,16 @@ export const getCertificates = async () => {
   return await Certificate.find().sort({ createdAt: -1 });
 };
 
-export const verifyCertificate = async (certificateNumber) => {
+export const verifyCertificate = async (certificateNumber, participantName) => {
   const certificate = await Certificate.findOne({ certificateNumber });
   if (!certificate) {
     throw new Error('Certificate not found');
   }
+
+  if (normalize(certificate.name) !== normalize(participantName)) {
+    throw new Error('Name does not match our records');
+  }
+
   return certificate;
 };
 

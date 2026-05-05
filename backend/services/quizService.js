@@ -1,25 +1,54 @@
-import Quiz from '../models/Quiz.js';
+import QuizState from '../models/QuizState.js';
 
-export const getLatestQuiz = async () => {
-  const quiz = await Quiz.findOne().sort({ createdAt: -1 });
-  if (!quiz) throw new Error('No quiz found');
-  return quiz;
+export const getQuizState = async () => {
+  let state = await QuizState.findOne();
+  if (!state) {
+    state = new QuizState();
+    await state.save();
+  }
+  return state;
 };
 
-export const createQuiz = async (data) => {
-  const quiz = new Quiz(data);
-  return await quiz.save();
+export const updateQuizState = async (data) => {
+  let state = await QuizState.findOne();
+  if (!state) {
+    state = new QuizState(data);
+  } else {
+    state.set(data);
+  }
+  return await state.save();
 };
 
-export const updateQuiz = async (id, data) => {
-  const updated = await Quiz.findByIdAndUpdate(id, data, { returnDocument: 'after' });
-  if (!updated) throw new Error('Quiz not found');
-  return updated;
-};
+export const autoTransitionQuiz = async () => {
+  const state = await QuizState.findOne();
+  if (!state) return;
 
-export const toggleQuizVisibility = async (id) => {
-  const quiz = await Quiz.findById(id);
-  if (!quiz) throw new Error('Quiz not found');
-  quiz.isVisible = !quiz.isVisible;
-  return await quiz.save();
+  const now = new Date();
+  
+  if (
+    state.currentQuiz?.status === "FINISHED" &&
+    state.upcomingQuiz?.scheduledDateTime &&
+    now >= new Date(state.upcomingQuiz.scheduledDateTime)
+  ) {
+    // Promote upcoming quiz to current quiz
+    state.currentQuiz = {
+      name: state.upcomingQuiz.name,
+      description: state.upcomingQuiz.description,
+      link: state.upcomingQuiz.link,
+      conductedDate: state.upcomingQuiz.scheduledDateTime,
+      status: "ACTIVE"
+    };
+
+    // Reset upcoming quiz
+    state.upcomingQuiz = {
+      name: "",
+      description: "",
+      link: "",
+      scheduledDateTime: null,
+      visibility: false
+    };
+
+    await state.save();
+    console.log("[CRON] Promoted upcoming quiz to current active quiz.");
+  }
 };

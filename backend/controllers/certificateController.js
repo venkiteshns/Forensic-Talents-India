@@ -20,15 +20,18 @@ export const getCertificates = async (req, res, next) => {
 
 export const verifyCertificate = async (req, res, next) => {
   try {
-    const { certificateNumber } = req.body;
-    if (!certificateNumber) {
-      return res.status(400).json({ message: 'Certificate number is required' });
+    const { certificateNumber, participantName } = req.body;
+    if (!certificateNumber || !participantName) {
+      return res.status(400).json({ message: 'Certificate number and participant name are required' });
     }
-    const certificate = await certificateService.verifyCertificate(certificateNumber);
-    res.json(certificate);
+    const certificate = await certificateService.verifyCertificate(certificateNumber, participantName);
+    res.json({ success: true, data: certificate });
   } catch (err) {
     if (err.message === 'Certificate not found') {
-      return res.status(404).json({ message: err.message });
+      return res.status(404).json({ success: false, message: err.message });
+    }
+    if (err.message === 'Name does not match our records') {
+      return res.status(403).json({ success: false, message: err.message });
     }
     next(err);
   }
