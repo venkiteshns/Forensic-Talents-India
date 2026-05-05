@@ -88,7 +88,7 @@ const QuizAlertBanner = ({ quiz }) => {
   };
 
   return (
-    <div className="w-full relative z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+    <div className="w-full relative z-40 animate-in fade-in slide-in-from-top-4 duration-300">
       <Container>
         <style>{`
           @keyframes ctaPulse {
