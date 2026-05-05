@@ -80,74 +80,76 @@ export default function CompletionModal({
         </div>
       )}
 
-      <div className="modal-container animate-modal-entry">
-        {/* Success Icon */}
-        <div className="success-icon-container">
-          <div className="success-icon-bg">
-            <CheckCircle2 className="w-8 h-8 text-[#16A34A]" strokeWidth={2.5} />
-          </div>
-        </div>
-        
-        {/* Title */}
-        <h2 className="modal-title">{dynamicTitle}</h2>
-        
-        {/* Progress Display */}
-        <div className="progress-section">
-          <div className="progress-text">Level {currentLevelNum} / {displayTotal} completed</div>
-          <div className="progress-bar-container">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${(currentLevelNum / displayTotal) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Performance Summary */}
-        <div className="stats-grid">
-          <div className="stat-item">
-            <span className="stat-label">TIME</span>
-            <span className="stat-value">{timeElapsed}</span>
-          </div>
-          {moves !== undefined && moves !== null && (
-            <div className="stat-item">
-              <span className="stat-label">MOVES</span>
-              <span className="stat-value">{moves}</span>
+      <div className="completion-modal animate-modal-entry">
+        <div className="completion-modal-content">
+          {/* Success Icon */}
+          <div className="success-icon-container">
+            <div className="success-icon-bg">
+              <CheckCircle2 className="w-8 h-8 text-[#16A34A]" strokeWidth={2.5} />
             </div>
-          )}
-        </div>
-        
-        {/* Reinforcement Message */}
-        <p className="reinforcement-message">
-          You’ve successfully completed this challenge with strong accuracy and focus.
-          <br /><br />
-          Ready to take your skills to the next level? Explore {ctaType === 'courses' ? 'structured courses' : 'internship programs'} designed to build real-world expertise.
-        </p>
-        
-        {/* CTA Section */}
-        <div className="cta-group">
-          <button 
-            onClick={handleExplore} 
-            className="primary-cta"
-          >
-            <GraduationCap className="w-5 h-5" />
-            Explore {ctaType === 'courses' ? 'Certified Courses' : 'Internship Programs'}
-          </button>
+          </div>
           
-          <button 
-            onClick={handleSecondaryAction} 
-            className="secondary-cta"
-          >
-            Continue Playing
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          {/* Title */}
+          <h2 className="modal-title">{dynamicTitle}</h2>
+          
+          {/* Progress Display */}
+          <div className="progress-section">
+            <div className="progress-text">Level {currentLevelNum} / {displayTotal} completed</div>
+            <div className="progress-bar-container">
+              <div 
+                className="progress-bar-fill" 
+                style={{ width: `${(currentLevelNum / displayTotal) * 100}%` }}
+              />
+            </div>
+          </div>
 
-          <button 
-            onClick={onPlayAgain} 
-            className="text-link-cta"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Restart Level
-          </button>
+          {/* Performance Summary */}
+          <div className="stats-grid">
+            <div className="stat-item">
+              <span className="stat-label">TIME</span>
+              <span className="stat-value">{timeElapsed}</span>
+            </div>
+            {moves !== undefined && moves !== null && (
+              <div className="stat-item">
+                <span className="stat-label">MOVES</span>
+                <span className="stat-value">{moves}</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Reinforcement Message */}
+          <p className="reinforcement-message">
+            You’ve successfully completed this challenge with strong accuracy and focus.
+            <br /><br />
+            Ready to take your skills to the next level? Explore {ctaType === 'courses' ? 'structured courses' : 'internship programs'} designed to build real-world expertise.
+          </p>
+          
+          {/* CTA Section */}
+          <div className="cta-group">
+            <button 
+              onClick={handleExplore} 
+              className="primary-cta"
+            >
+              <GraduationCap className="w-5 h-5" />
+              Explore {ctaType === 'courses' ? 'Certified Courses' : 'Internship Programs'}
+            </button>
+            
+            <button 
+              onClick={handleSecondaryAction} 
+              className="secondary-cta"
+            >
+              Continue Playing
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            <button 
+              onClick={onPlayAgain} 
+              className="text-link-cta"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Restart Level
+            </button>
+          </div>
         </div>
       </div>
       
@@ -168,19 +170,46 @@ export default function CompletionModal({
           animation: fade-in 300ms ease-out;
         }
 
-        .modal-container {
+        .completion-modal {
           background: #FFFFFF;
           border-radius: 20px;
-          padding: 32px 24px;
           max-width: 420px;
           width: 100%;
           box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+          position: relative;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          overflow: hidden;
+        }
+
+        .completion-modal-content {
+          padding: 32px 24px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          position: relative;
-          border: 1px solid rgba(0, 0, 0, 0.05);
+          max-height: 90vh;
+          overflow-y: auto;
+          scrollbar-width: none; /* Firefox */
+        }
+
+        .completion-modal-content::-webkit-scrollbar {
+          display: none; /* Chrome/Safari */
+        }
+
+        @media (max-width: 510px) {
+          .completion-modal {
+            width: 92%;
+            max-height: 85vh;
+            margin: 16px;
+            margin-top: calc(16px + env(safe-area-inset-top));
+            margin-bottom: calc(16px + env(safe-area-inset-bottom));
+            border-radius: 16px;
+          }
+
+          .completion-modal-content {
+            padding: 24px 20px;
+            max-height: calc(85vh - 20px);
+          }
         }
 
         .animate-modal-entry {
@@ -363,16 +392,6 @@ export default function CompletionModal({
         @keyframes confetti-fall {
           0% { transform: translateY(0) rotate(0deg); opacity: 1; }
           100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-
-        @media (max-width: 480px) {
-          .modal-container {
-            width: 92%;
-            padding: 32px 20px;
-          }
-          .modal-title {
-            font-size: 18px;
-          }
         }
       `}} />
     </div>,
