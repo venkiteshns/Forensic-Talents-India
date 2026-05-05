@@ -8,7 +8,13 @@
   body {
     @apply text-slate-800 bg-secondary-light font-sans antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading text-primary font-bold;
   }
 }
@@ -17,6 +23,7 @@
   .section-padding {
     @apply py-16 md:py-24;
   }
+
   .glass-card {
     @apply bg-white/90 backdrop-blur-md border border-white/20 shadow-xl;
   }
@@ -32,6 +39,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -42,10 +50,11 @@
 .highlight-scroll {
   transition: transform 0.2s ease, box-shadow 0.2s ease !important;
   transform: scale(1.05) !important;
-  box-shadow: 0 0 0 4px rgba(59,130,246,0.3) !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3) !important;
 }
 
-html, body {
+html,
+body {
   overscroll-behavior: none;
 }
 
@@ -64,7 +73,7 @@ body.modal-open {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,6 +162,7 @@ body {
   .crossword-layout {
     grid-template-columns: 1fr;
   }
+
   .clues-section {
     max-width: 100%;
     min-width: unset;
@@ -170,12 +180,14 @@ body {
 
 .crossword-grid {
   background: var(--grid-bg);
-  padding: 10px;
+  padding: 8px;
   border-radius: 12px;
   display: grid;
   gap: 2px;
   width: max-content;
   max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
   box-shadow:
     0 8px 24px rgba(15, 23, 42, 0.08),
     0 2px 6px rgba(15, 23, 42, 0.04);
@@ -184,33 +196,37 @@ body {
 @media (max-width: 510px) {
   .grid-wrapper {
     padding: 0 6px;
-    overflow-x: hidden;
+    overflow-x: auto;
+    overflow-y: auto;
   }
 
   .crossword-grid {
     width: 100%;
-    grid-template-columns: repeat(var(--cols), 1fr) !important;
     border-right: 1px solid #cbd5e1;
     transform: translateX(-0.5px);
   }
 
-  .cell, .cell-blocked {
-    width: 100% !important;
-    height: auto !important;
+  .cell,
+  .cell-blocked {
     aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 24px;
+    min-height: 24px;
   }
 
-  .cell {
-    font-size: clamp(8px, 2.5vw, 14px) !important;
+  .cell-number {
+    font-size: 0.55em;
+    top: 0.5px;
+    left: 0.5px;
+  }
+
+  .cell-letter {
+    font-size: 0.7em !important;
   }
 }
 
 .crossword-grid.pro {
-  --cell-size: min(
-    calc(95vw / var(--cols)),
-    calc(55vh / var(--rows))
-  );
-  width: calc(var(--cell-size) * var(--cols) + (var(--cols) - 1) * 2px);
+  /* Removed width: 100% so it can shrink to fit exactCellSize columns and center */
 }
 
 .cell {
@@ -223,6 +239,10 @@ body {
   transition: all 0.2s ease;
   font-weight: 500;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .cell input,
@@ -234,15 +254,17 @@ body {
 
 .cell-number {
   position: absolute;
-  top: 2px;
-  left: 4px;
-  font-size: 10px;
-  color: #64748b;
+  top: 0.15em;
+  left: 0.2em;
+  font-size: 0.6em;
+  font-weight: 600;
+  color: #94a3b8;
+  line-height: 1;
   pointer-events: none;
+  opacity: 0.75;
 }
 
 .cell input {
-  font-size: inherit;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -255,6 +277,13 @@ body {
   font-family: 'Inter', sans-serif;
   letter-spacing: 0.5px;
   background: transparent;
+  min-width: 0;
+  min-height: 0;
+}
+
+.cell-letter {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .cell:hover {
@@ -272,6 +301,8 @@ body {
   background: var(--blocked-cell);
   border: none;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 }
 
 .cell-blocked:hover {
@@ -283,7 +314,7 @@ body {
   color: var(--success-text);
   border-color: var(--success-border);
   font-weight: 600;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .cell-correct:hover {
@@ -295,7 +326,7 @@ body {
   border-color: #86efac;
   color: var(--success-text);
   font-weight: 600;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .cell-correct-animate {
@@ -307,6 +338,7 @@ body {
     transform: scale(0.95);
     opacity: 0.6;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -314,8 +346,10 @@ body {
 }
 
 .wrong-cell {
-  background-color: #FEE2E2 !important; /* soft red background */
-  border-color: #DC2626 !important;     /* strong red border */
+  background-color: #FEE2E2 !important;
+  /* soft red background */
+  border-color: #DC2626 !important;
+  /* strong red border */
   color: #991B1B !important;
 }
 
@@ -324,9 +358,23 @@ body {
 }
 
 @keyframes subtle-shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  50% { transform: translateX(2px); }
-  75% { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+
+  75% {
+    transform: translateX(-1px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }

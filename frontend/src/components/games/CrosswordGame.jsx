@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
-import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, PenTool, X } from 'lucide-react';
+import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, PenTool, X, AlertTriangle } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
@@ -80,6 +80,7 @@ export default function CrosswordGame({ onQuit }) {
   const [gameState, setGameState] = useState('idle');
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [cellSize, setCellSize] = useState(36);
+  const MAX_GRID_ROWS = 22; // max rows to show on desktop before clipping
   const [isMobileSmall, setIsMobileSmall] = useState(typeof window !== 'undefined' ? window.innerWidth < 510 : false);
   const [showAllClues, setShowAllClues] = useState(false);
   const gridWrapperRef = useRef(null);
@@ -197,8 +198,19 @@ export default function CrosswordGame({ onQuit }) {
     const observer = new ResizeObserver(entries => {
       if (!entries[0]) return;
       const containerWidth = entries[0].contentRect.width;
-      const size = Math.floor((containerWidth - 24) / columns);
-      setCellSize(Math.max(Math.min(size, 36), 20));
+      const rows = puzzleData.gridSizeR || 10;
+      
+      // Calculate max width-based cell size
+      const availableWidth = containerWidth - 16 - ((columns - 1) * 2);
+      const widthBasedSize = availableWidth / columns;
+      
+      // Calculate max height-based cell size (90vh constraint)
+      const availableHeight = (window.innerHeight * 0.9) - 16 - ((rows - 1) * 2);
+      const heightBasedSize = availableHeight / rows;
+      
+      // Take the smaller of the two, but don't shrink below usability threshold (18px)
+      const exactCellSize = Math.max(Math.min(widthBasedSize, heightBasedSize), 18);
+      setCellSize(exactCellSize);
     });
     observer.observe(gridWrapperRef.current);
     return () => observer.disconnect();
@@ -258,10 +270,9 @@ export default function CrosswordGame({ onQuit }) {
       
       try {
         const isMobileSmall = window.innerWidth < 510;
-        let maxCols = 15; // default max
+        let maxCols = 25; // Desktop max columns (enough room for 20 words)
         if (isMobileSmall) {
           const containerWidth = gridWrapperRef.current?.clientWidth || (window.innerWidth - 48);
-          // start with 13, then validate
           maxCols = validateGrid(13, containerWidth);
         }
 
@@ -274,7 +285,7 @@ export default function CrosswordGame({ onQuit }) {
         const result = await generateWithTimeout(workerRef.current, payload, 10000);
         return result;
       } catch (err) {
-        console.error("Worker generation failed, retrying...", getErrorMessage(err));
+        console.error("Worker generation failed, retrying...", err.message || err);
         attempts++;
       }
     }
@@ -651,6 +662,17 @@ export default function CrosswordGame({ onQuit }) {
     return { isCorrect, isCorrectActiveWord, shouldAnimate };
   };
 
+  const validatedWords = React.useMemo(() => {
+    if (!puzzleData || !puzzleData.words) return null;
+    if (isMobileSmall) return puzzleData.words;
+
+    const MIN_REQUIRED = 6;
+    if (puzzleData.words.length >= MIN_REQUIRED) return puzzleData.words;
+
+    console.warn(`Insufficient clues for ${level}. Found: ${puzzleData.words.length}`);
+    return null;
+  }, [puzzleData, isMobileSmall, level]);
+
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans animate-in fade-in duration-500">
       <section className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12 min-h-[340px]">
@@ -712,7 +734,24 @@ export default function CrosswordGame({ onQuit }) {
 
 
 
-        {(gameState === 'playing' || gameState === 'completed') && puzzleData && gridData && gridData.length > 0 && (
+        {(gameState === 'playing' || gameState === 'completed') && puzzleData && !validatedWords && (
+          <Container key={`board-${level}`}>
+            <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-red-100 p-8 text-center mt-8">
+              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Insufficient Clues</h3>
+              <p className="text-slate-600 mb-6">
+                This crossword set does not meet the minimum requirement. Please update the dataset.
+              </p>
+              <Button onClick={() => setGameState('idle')} variant="outline">
+                Back to Difficulty Selection
+              </Button>
+            </div>
+          </Container>
+        )}
+
+        {(gameState === 'playing' || gameState === 'completed') && validatedWords && gridData && gridData.length > 0 && (
           <Container key={`board-${level}`}>
             <div className="max-w-5xl mx-auto game-container relative overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 w-full">
@@ -738,9 +777,16 @@ export default function CrosswordGame({ onQuit }) {
                     <div
                       key={`grid-${level}-${puzzleData.gridSizeC}`}
                       className={cn("crossword-grid", level === 'pro' && "pro")}
-                      style={{ 
-                        gridTemplateColumns: `repeat(${puzzleData.gridSizeC}, ${cellSize}px)`,
-                        '--cols': puzzleData.gridSizeC
+                      style={{
+                        gridTemplateColumns: !isMobileSmall ? `repeat(${puzzleData.gridSizeC}, ${cellSize}px)` : `repeat(${puzzleData.gridSizeC}, minmax(0, 1fr))`,
+                        // Use exact cellSize for row heights to ensure perfect squares, matching the grid columns
+                        gridAutoRows: !isMobileSmall ? `${cellSize}px` : undefined,
+                        // Parent grid-container handles max-height 90vh via CSS/JS logic, this just prevents overflow bugs
+                        maxHeight: !isMobileSmall ? '90vh' : undefined,
+                        overflow: !isMobileSmall ? 'hidden' : undefined,
+                        transition: 'max-height 0.2s ease',
+                        '--cols': puzzleData.gridSizeC,
+                        '--rows': puzzleData.gridSizeR
                       }}
                     >
                       {gridData.map((row, r) =>
@@ -750,8 +796,7 @@ export default function CrosswordGame({ onQuit }) {
                             return (
                               <div 
                                 key={`${r}-${c}`} 
-                                className="cell-blocked" 
-                                style={{ width: cellSize, height: cellSize }}
+                                className="cell-blocked"
                               />
                             );
                           }
@@ -783,9 +828,9 @@ export default function CrosswordGame({ onQuit }) {
                             key={`${r}-${c}`}
                             className={cn("cell", bgClass, outlineClass, animationClass, lockedClass)}
                             onClick={() => handleCellClick(r, c, cell.words)}
-                            style={{ width: cellSize, height: cellSize, fontSize: cellSize * 0.5, fontWeight: 500 }}
+                            style={{ fontSize: Math.max(cellSize * 0.45, 9) }}
                           >
-                            {cell.num && <span className="cell-number" style={{ fontSize: Math.max(10, cellSize * 0.25) }}>{cell.num}</span>}
+                            {cell.num && <span className="cell-number">{cell.num}</span>}
                             <input
                               ref={el => inputRefs.current[`${r}-${c}`] = el}
                               type="text" maxLength={2} value={userInputs[`${r}-${c}`] || ''}
@@ -793,7 +838,7 @@ export default function CrosswordGame({ onQuit }) {
                               onKeyDown={(e) => handleKeyDown(e, r, c)}
                               onFocus={() => handleFocus(r, c, cell.words)}
                               readOnly={isCompletedGame || isCorrect}
-                              className={textClass}
+                              className={cn("cell-letter", textClass)}
                             />
                           </div>
                         );
