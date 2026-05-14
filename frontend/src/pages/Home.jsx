@@ -295,11 +295,11 @@ function QuizAlertBanner({ quiz }) {
       {shouldShow && (
         <motion.div
           key="banner"
-          initial={{ opacity: 0, x: "-50%", y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, x: "-50%", y: 0, scale: 1 }}
-          exit={{ opacity: 0, x: "-50%", y: -20, scale: 0.95 }}
+          initial={{ opacity: 0, y: -20, scale: 0.95, height: 0, marginTop: 0, marginBottom: 0 }}
+          animate={{ opacity: 1, y: 0, scale: 1, height: 'auto', marginTop: '1.5rem', marginBottom: '1.5rem' }}
+          exit={{ opacity: 0, y: -20, scale: 0.95, height: 0, marginTop: 0, marginBottom: 0 }}
           transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-          className="absolute top-full left-1/2 mt-4 w-[90%] max-w-4xl z-40"
+          className="relative w-[90%] max-w-4xl mx-auto z-40"
         >
           <motion.div layout className="relative overflow-hidden w-full rounded-2xl px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white shadow-2xl border border-white/10 bg-black/40 backdrop-blur-md">
 
@@ -617,15 +617,17 @@ export default function Home() {
           </p>
         </FadeInSection>
         <InfiniteMarquee />
+      </section>
 
-        {/* ─── FLOATING QUIZ ALERT NOTIFICATION ──────────────────── */}
+      {/* ─── FLOATING QUIZ ALERT NOTIFICATION ──────────────────── */}
+      <div className="w-full bg-white">
         <AnimatePresence>
           {activeQuiz && <QuizAlertBanner quiz={activeQuiz} />}
         </AnimatePresence>
-      </section>
+      </div>
 
       {/* ─── ABOUT PREVIEW ─────────────────────────────────────── */}
-      <section className="pt-48 pb-24 md:pt-36 bg-white">
+      <section className="py-20 md:py-24 bg-white">
         <Container>
           <FadeInSection>
             <div className="max-w-4xl mx-auto text-center">
