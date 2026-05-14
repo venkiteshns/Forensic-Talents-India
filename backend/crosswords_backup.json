@@ -1,0 +1,792 @@
+[
+  {
+    "_id": "69f74e1b00fe1ededc906171",
+    "level": "easy",
+    "word": "CRIME",
+    "clue": "Illegal act punishable by law",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.935Z",
+    "updatedAt": "2026-05-03T13:31:07.935Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906172",
+    "level": "easy",
+    "word": "CRIMINAL",
+    "clue": "Person who commits a crime",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906173",
+    "level": "easy",
+    "word": "JAIL",
+    "clue": "Place where accused are kept",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906174",
+    "level": "easy",
+    "word": "WITNESS",
+    "clue": "Person who saw a crime happen",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906175",
+    "level": "easy",
+    "word": "CLUE",
+    "clue": "Piece of evidence that helps solve a case",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906176",
+    "level": "easy",
+    "word": "THEFT",
+    "clue": "Taking property without permission",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906177",
+    "level": "easy",
+    "word": "MURDER",
+    "clue": "Killing a person intentionally",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906178",
+    "level": "easy",
+    "word": "POLICE",
+    "clue": "Government force that enforces law",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906179",
+    "level": "easy",
+    "word": "VERDICT",
+    "clue": "Final decision given by a court",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617a",
+    "level": "easy",
+    "word": "BURGLARY",
+    "clue": "Entering a house illegally to steal",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617b",
+    "level": "easy",
+    "word": "SUSPECT",
+    "clue": "Person suspected of a crime",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.937Z",
+    "updatedAt": "2026-05-03T13:31:07.937Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617c",
+    "level": "easy",
+    "word": "PRINT",
+    "clue": "Unique mark left by a finger",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617d",
+    "level": "easy",
+    "word": "SENTENCE",
+    "clue": "Legal punishment given by a judge",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617e",
+    "level": "easy",
+    "word": "ROBBERY",
+    "clue": "Taking property using force",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90617f",
+    "level": "easy",
+    "word": "STATUTE",
+    "clue": "Written law passed by authority",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906180",
+    "level": "easy",
+    "word": "VICTIM",
+    "clue": "Person harmed by a crime",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906181",
+    "level": "easy",
+    "word": "JUSTICE",
+    "clue": "Fair treatment under law",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906182",
+    "level": "easy",
+    "word": "COURT",
+    "clue": "Place where legal cases are heard",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906183",
+    "level": "easy",
+    "word": "FORENSIC",
+    "clue": "Science used to investigate crimes",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906184",
+    "level": "easy",
+    "word": "LAWYER",
+    "clue": "Person who argues a case in court",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906185",
+    "level": "medium",
+    "word": "CRIMINOLOGY",
+    "clue": "Study of crime and criminal behavior",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906186",
+    "level": "medium",
+    "word": "AUTOPSY",
+    "clue": "Medical examination of a dead body",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906187",
+    "level": "medium",
+    "word": "RIGOR",
+    "clue": "Stiffening of muscles after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906188",
+    "level": "medium",
+    "word": "DECAY",
+    "clue": "Breakdown of a body after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906189",
+    "level": "medium",
+    "word": "SPLATTER",
+    "clue": "Study of blood stain patterns",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618a",
+    "level": "medium",
+    "word": "TOXICOLOGY",
+    "clue": "Science of analyzing drugs and poisons",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.938Z",
+    "updatedAt": "2026-05-03T13:31:07.938Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618b",
+    "level": "medium",
+    "word": "GRAPHOLOGY",
+    "clue": "Study of handwriting for identification",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618c",
+    "level": "medium",
+    "word": "FIBER",
+    "clue": "Small thread-like trace evidence",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618d",
+    "level": "medium",
+    "word": "GSR",
+    "clue": "Gunshot residue test material",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618e",
+    "level": "medium",
+    "word": "GENETICS",
+    "clue": "Study of genes for identification",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90618f",
+    "level": "medium",
+    "word": "PERJURY",
+    "clue": "Giving false statement under oath",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906190",
+    "level": "medium",
+    "word": "FORENSICS",
+    "clue": "Crime scene investigation work",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906191",
+    "level": "medium",
+    "word": "TRESPASS",
+    "clue": "Entering property without permission",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906192",
+    "level": "medium",
+    "word": "TOXIN",
+    "clue": "Poisonous chemical substance",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906193",
+    "level": "medium",
+    "word": "OSTEOLOGY",
+    "clue": "Scientific study of bones",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906194",
+    "level": "medium",
+    "word": "FRAUD",
+    "clue": "Crime of financial deception",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906195",
+    "level": "medium",
+    "word": "CYBERCRIME",
+    "clue": "Crime committed using computers",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906196",
+    "level": "medium",
+    "word": "EXHIBIT",
+    "clue": "Object presented as court evidence",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906197",
+    "level": "medium",
+    "word": "INSPECTOR",
+    "clue": "Police officer rank above sub-inspector",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906198",
+    "level": "medium",
+    "word": "RESIDUE",
+    "clue": "Chemical trace left after explosion",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc906199",
+    "level": "hard",
+    "word": "ENTOMOLOGY",
+    "clue": "Study of insects on dead bodies",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619a",
+    "level": "hard",
+    "word": "TRIGONOMETRY",
+    "clue": "Math used to calculate blood angles",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619b",
+    "level": "hard",
+    "word": "CRANIOMETRY",
+    "clue": "Measurement of skull features",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619c",
+    "level": "hard",
+    "word": "ARSON",
+    "clue": "Investigation of fire-related crimes",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619d",
+    "level": "hard",
+    "word": "BALLISTICS",
+    "clue": "Science of bullets and firearms",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.939Z",
+    "updatedAt": "2026-05-03T13:31:07.939Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619e",
+    "level": "hard",
+    "word": "TOXICOLOGY",
+    "clue": "Study of toxic substances",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc90619f",
+    "level": "hard",
+    "word": "QUESTIONED",
+    "clue": "Analysis of disputed documents",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a0",
+    "level": "hard",
+    "word": "PHONETICS",
+    "clue": "Study of speech sounds in voice analysis",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a1",
+    "level": "hard",
+    "word": "LIVOR",
+    "clue": "Blood pooling after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a2",
+    "level": "hard",
+    "word": "OSTEOLOGY",
+    "clue": "Scientific study of bones",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a3",
+    "level": "hard",
+    "word": "PCR",
+    "clue": "DNA copying method",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a4",
+    "level": "hard",
+    "word": "ODONTOLOGY",
+    "clue": "Study of bite marks for identification",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a5",
+    "level": "hard",
+    "word": "NINHYDRIN",
+    "clue": "Chemical used to reveal fingerprints",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a6",
+    "level": "hard",
+    "word": "TRAJECTORY",
+    "clue": "Path followed by a bullet",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a7",
+    "level": "hard",
+    "word": "FACIAL",
+    "clue": "Rebuilding a face from a skull",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a8",
+    "level": "hard",
+    "word": "PLASMA",
+    "clue": "Liquid part of blood",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061a9",
+    "level": "hard",
+    "word": "RECONSTRUCT",
+    "clue": "Rebuilding sequence of a crime",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061aa",
+    "level": "hard",
+    "word": "CONTAMINATE",
+    "clue": "Mixing that damages evidence",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061ab",
+    "level": "hard",
+    "word": "INSANITY",
+    "clue": "Legal defense of unsound mind",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061ac",
+    "level": "hard",
+    "word": "PROFILING",
+    "clue": "Analysis of criminal behavior patterns",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061ad",
+    "level": "pro",
+    "word": "ALGORMORTIS",
+    "clue": "Body cooling after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061ae",
+    "level": "pro",
+    "word": "LIVORMORTIS",
+    "clue": "Blood settling after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061af",
+    "level": "pro",
+    "word": "RIGORMORTIS",
+    "clue": "Muscle stiffening after death",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b0",
+    "level": "pro",
+    "word": "PROFILING",
+    "clue": "DNA-based identification method",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b1",
+    "level": "pro",
+    "word": "TRICHOLOGY",
+    "clue": "Scientific study of hair",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b2",
+    "level": "pro",
+    "word": "PEDOLOGY",
+    "clue": "Study of soil in forensics",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.940Z",
+    "updatedAt": "2026-05-03T13:31:07.940Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b3",
+    "level": "pro",
+    "word": "TEXTILES",
+    "clue": "Study of textile fibers",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b4",
+    "level": "pro",
+    "word": "NARCOTICS",
+    "clue": "Laws regulating illegal drugs",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b5",
+    "level": "pro",
+    "word": "WHORL",
+    "clue": "Circular fingerprint pattern",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b6",
+    "level": "pro",
+    "word": "LOOP",
+    "clue": "Fingerprint pattern with curved ridges",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b7",
+    "level": "pro",
+    "word": "ARCH",
+    "clue": "Fingerprint pattern forming arch shape",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b8",
+    "level": "pro",
+    "word": "MAPPING",
+    "clue": "Measuring and documenting crime scene",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061b9",
+    "level": "pro",
+    "word": "ENTRY",
+    "clue": "Wound where a bullet enters the body",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061ba",
+    "level": "pro",
+    "word": "EXIT",
+    "clue": "Wound where a bullet exits the body",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061bb",
+    "level": "pro",
+    "word": "CUSTODY",
+    "clue": "Record of evidence handling",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061bc",
+    "level": "pro",
+    "word": "BALLISTICS",
+    "clue": "Study of firearms in forensics",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061bd",
+    "level": "pro",
+    "word": "CHLORINE",
+    "clue": "Green toxic gas used in chemical exposure",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061be",
+    "level": "pro",
+    "word": "LIABILITY",
+    "clue": "Legal responsibility for damage",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  },
+  {
+    "_id": "69f74e1b00fe1ededc9061bf",
+    "level": "pro",
+    "word": "INTENT",
+    "clue": "Purpose behind committing a crime",
+    "__v": 0,
+    "createdAt": "2026-05-03T13:31:07.941Z",
+    "updatedAt": "2026-05-03T13:31:07.941Z",
+    "words": []
+  }
+]

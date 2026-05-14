@@ -1,10 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
+/* ── Bug 1 Fix: Prevents white flash before React hydrates bg-primary ──
+   The browser paints html/body before any React class is applied.
+   Matching #root + body to --color-primary means there is nothing
+   to flash from — the background exists from byte 0. */
+html, body, #root {
+  background-color: var(--color-primary, #0F172A);
+  margin: 0;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Body defaults to the page off-white — sections override per-section. */
   body {
     @apply text-slate-800 bg-secondary-light font-sans antialiased;
   }
@@ -27,6 +37,27 @@
   .glass-card {
     @apply bg-white/90 backdrop-blur-md border border-white/20 shadow-xl;
   }
+
+  /* Custom Premium Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+}
+
+/* Firefox Support */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 /* Subtle animations */

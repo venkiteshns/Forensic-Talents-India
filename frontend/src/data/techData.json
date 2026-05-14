@@ -1,0 +1,2255 @@
+[
+  {
+    "slug": "vehicles",
+    "categoryTitle": "Vehicles and Transport Systems",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Modern vehicles are no longer just mechanical machines\u2014they are connected digital systems. In India, even mid-range cars now come with",
+            "items": [
+              "GPS navigation",
+              "Mobile app connectivity",
+              "Bluetooth syncing",
+              "Cloud-based vehicle data",
+              "Brands like Tata Motors, Hyundai Motor India, and Mahindra & Mahindra offer connected car features through apps.",
+              "This means your car is also a data-generating device, similar to a smartphone."
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Types of Vehicle Technologies",
+        "subSections": [
+          {
+            "subTitle": "1. Location Tracking Systems",
+            "blocks": [
+              {
+                "blockLabel": "Most cars today use",
+                "items": [
+                  "Built-in GPS",
+                  "Navigation history",
+                  "Real-time tracking via apps"
+                ]
+              },
+              {
+                "blockLabel": "How it works",
+                "items": [
+                  "The car continuously sends location data to servers",
+                  "This data is accessible through mobile apps or infotainment systems"
+                ]
+              },
+              {
+                "blockLabel": "In India Example",
+                "items": []
+              },
+              {
+                "blockLabel": "Apps like",
+                "items": [
+                  "Tata iRA",
+                  "Hyundai Blue Link",
+                  "allow owners to track vehicle location in real time"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "If login credentials are shared (or not updated after separation), another person can",
+                "items": [
+                  "Track where you go",
+                  "Identify frequent locations (home, workplace, etc.)"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "2. Mobile App & Account Integration",
+            "blocks": [
+              {
+                "blockLabel": "Cars are often linked to",
+                "items": [
+                  "Mobile numbers",
+                  "Email IDs",
+                  "Cloud accounts"
+                ]
+              },
+              {
+                "blockLabel": "How it works",
+                "items": [
+                  "A single account controls multiple features",
+                  "Multiple users may be added (family/shared use)"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "Ex-partners or family members may still have access",
+                  "OTP-based logins can be misused if SIM access exists",
+                  "In India, SIM-based identity makes this particularly sensitive."
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Remote Access Features",
+            "blocks": [
+              {
+                "blockLabel": "Modern vehicles allow",
+                "items": [
+                  "Lock/unlock doors",
+                  "Start engine remotely",
+                  "Turn on AC",
+                  "Flash lights or honk"
+                ]
+              },
+              {
+                "blockLabel": "How it works",
+                "items": [
+                  "Commands are sent from the mobile app to the vehicle via internet"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "This can be misused to",
+                "items": [
+                  "Intimidate (locking/unlocking repeatedly)",
+                  "Create fear or confusion",
+                  "Show continued control over the victim"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Data Storage Inside Vehicles",
+            "blocks": [
+              {
+                "blockLabel": "Cars store",
+                "items": [
+                  "Call logs (via Bluetooth)",
+                  "Contacts synced from phone",
+                  "Navigation history",
+                  "Voice commands"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "Even if you disconnect your phone",
+                "items": [
+                  "Data may remain in the system",
+                  "Anyone using the car later can access it"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5.  Integration with Other Services",
+            "blocks": [
+              {
+                "blockLabel": "Vehicles often connect with",
+                "items": [
+                  "Google Maps",
+                  "Uber",
+                  "OLA"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "Travel patterns become predictable",
+                  "Frequent destinations can be tracked",
+                  "Ride history can reveal personal routines"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Detailed Risk Analysis",
+        "subSections": [
+          {
+            "subTitle": "1. Real-Time Tracking",
+            "blocks": [
+              {
+                "blockLabel": "Can reveal",
+                "items": [
+                  "Workplace",
+                  "Friend\u2019s house",
+                  "Safe locations",
+                  "In stalking cases, this becomes a serious safety threat"
+                ]
+              }
+            ],
+            "items": [
+              "Continuous monitoring of movements"
+            ]
+          },
+          {
+            "subTitle": "2. Behavior Pattern Analysis",
+            "blocks": [
+              {
+                "blockLabel": "Even without real-time tracking",
+                "items": []
+              },
+              {
+                "blockLabel": "Stored data shows",
+                "items": [
+                  "Daily routine",
+                  "Timings",
+                  "Frequently visited places"
+                ]
+              },
+              {
+                "blockLabel": "This can be used for",
+                "items": [
+                  "Surveillance",
+                  "Planning harassment"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Remote Manipulation",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Locking doors remotely while someone is inside",
+                  "Flashing lights at odd times",
+                  "Triggering alarms",
+                  "These actions create psychological pressure and fear"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Unauthorized Access after Separation",
+            "blocks": [
+              {
+                "blockLabel": "Common in India",
+                "items": [
+                  "Cars registered in one person\u2019s name",
+                  "Used by another family member"
+                ]
+              },
+              {
+                "blockLabel": "After disputes",
+                "items": [
+                  "Access is rarely revoked",
+                  "Passwords are not changed"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5. Hidden or External Tracking Devices",
+            "blocks": [
+              {
+                "blockLabel": "Apart from built-in systems",
+                "items": []
+              },
+              {
+                "blockLabel": "GPS trackers can be hidden",
+                "items": [
+                  "Under the car",
+                  "Inside dashboard",
+                  "Near battery",
+                  "These are cheap and easily available in India"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Legal Angle (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant Laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 354D"
+            ]
+          },
+          {
+            "blockLabel": "What can be illegal",
+            "items": [
+              "Tracking someone without consent",
+              "Unauthorized access to digital accounts",
+              "Monitoring movements for harassment"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Car behaving unusually (locking/unlocking automatically)",
+          "Unknown devices found in vehicle",
+          "Someone knowing your exact movements",
+          "Alerts from car apps you didn\u2019t trigger"
+        ]
+      },
+      {
+        "sectionTitle": "Prevention & Safety Measures (Practical \u2013 India)",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Account Security",
+          "Change car app passwords immediately",
+          "Log out from all devices",
+          "Update registered mobile number",
+          "Device Check",
+          "Remove all paired Bluetooth devices",
+          "Reset infotainment system",
+          "Physical Inspection",
+          "Check under seats, dashboard, bonnet",
+          "Look for unknown GPS devices",
+          "App Permissions",
+          "Review connected apps",
+          "Remove unnecessary integrations",
+          "Legal Help",
+          "Report to cyber cell if tracking is suspected",
+          "Keep evidence (screenshots, logs)"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "In India, cars are increasingly becoming digital surveillance tools if misused.",
+          "Awareness + control over access = main protection"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "smart-home",
+    "categoryTitle": "Smart Home Devices",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "In India, the adoption of smart devices has increased due to",
+            "items": [
+              "Affordable internet",
+              "Growth of IoT (Internet of Things)",
+              "Availability of budget smart devices",
+              "Common brands used in India include Xiaomi, Amazon (Alexa devices), and Google (Google Nest ecosystem).",
+              "\ud83d\udc49 These devices make homes convenient\u2014but also introduce serious privacy and surveillance risks if misused."
+            ]
+          }
+        ],
+        "items": [
+          "Smart home devices are internet-connected systems that allow users to monitor, automate, and control household functions remotely."
+        ]
+      },
+      {
+        "sectionTitle": "Types of Smart Home Devices",
+        "subSections": [
+          {
+            "subTitle": "1. Smart Security Cameras (CCTV / IP Cameras)",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Live video streaming",
+                  "Remote viewing via mobile apps",
+                  "Motion detection alerts",
+                  "Cloud storage recording"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Unauthorized remote access (hacking or shared login)",
+                  "Cameras placed in private spaces (illegal but still happens)",
+                  "Continuous surveillance without consent"
+                ]
+              },
+              {
+                "blockLabel": "In Real Concern",
+                "items": []
+              },
+              {
+                "blockLabel": "Cheap, unbranded CCTV cameras sold online often",
+                "items": [
+                  "Have weak security",
+                  "Use default passwords",
+                  "Are easily hackable"
+                ]
+              }
+            ],
+            "items": [
+              "Widely used in Indian homes, PGs, hostels, and apartments."
+            ]
+          },
+          {
+            "subTitle": "2. Smart Locks & Access Systems",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": []
+              },
+              {
+                "blockLabel": "Unlock doors using",
+                "items": [
+                  "Mobile apps",
+                  "Fingerprint",
+                  "OTP or PIN",
+                  "Remote access control"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": []
+              },
+              {
+                "blockLabel": "Someone with app access can",
+                "items": [
+                  "Lock/unlock doors remotely",
+                  "Control entry without permission"
+                ]
+              },
+              {
+                "blockLabel": "In Context",
+                "items": [
+                  "Common in urban apartments and Airbnb rentals",
+                  "Often installed by landlords \u2192 tenants may not have full control"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Voice Assistants & Smart Speakers",
+            "blocks": [
+              {
+                "blockLabel": "Examples include",
+                "items": [
+                  "Amazon Echo",
+                  "Google Nest Mini"
+                ]
+              },
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Voice commands",
+                  "Control other smart devices",
+                  "Answer queries, play music"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Always listening for \u201cwake word\u201d",
+                  "Can accidentally record conversations",
+                  "Linked accounts may expose personal data"
+                ]
+              },
+              {
+                "blockLabel": "If someone else controls the account, they may",
+                "items": [
+                  "Access voice history",
+                  "Control connected devices remotely"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Smart Lights, Fans & Appliances",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Controlled via mobile apps",
+                  "Scheduled automation",
+                  "Remote ON/OFF"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Sudden switching ON/OFF to disturb or intimidate",
+                  "Monitoring usage patterns (when lights are ON = when you are home)"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5. Smart TVs & Entertainment Systems",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Internet access",
+                  "Streaming apps",
+                  "Voice search",
+                  "Screen mirroring"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Data collection (watch history, preferences)",
+                  "Microphone/camera access in some models",
+                  "Account misuse (Netflix, YouTube, etc.)"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "6. Central Smart Home Hubs",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Connect all devices into one system",
+                  "Controlled through a single app"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "If one account is compromised \u2192 entire home is accessible"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Detailed Risk Analysis (Indian Reality)",
+        "subSections": [
+          {
+            "subTitle": "1. Remote Surveillance",
+            "blocks": [],
+            "items": [
+              "Cameras and microphones can be accessed remotely",
+              "Victims may be watched without their knowledge",
+              "In domestic conflict cases, this becomes covert monitoring"
+            ]
+          },
+          {
+            "subTitle": "2. Control & Intimidation",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Lights turning ON/OFF unexpectedly",
+                  "Doors locking/unlocking",
+                  "Devices behaving abnormally"
+                ]
+              },
+              {
+                "blockLabel": "This creates",
+                "items": [
+                  "Fear",
+                  "Psychological stress",
+                  "Feeling of being watched"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Unauthorized Shared Access",
+            "blocks": [
+              {
+                "blockLabel": "Very common in India",
+                "items": []
+              },
+              {
+                "blockLabel": "Devices set up by",
+                "items": [
+                  "Husband/partner",
+                  "Landlord",
+                  "Family member"
+                ]
+              },
+              {
+                "blockLabel": "Even after separation",
+                "items": [
+                  "Access is rarely removed",
+                  "Control continues silently"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Hidden Devices",
+            "blocks": [
+              {
+                "blockLabel": "Mini spy cameras can be hidden in",
+                "items": [
+                  "Chargers",
+                  "Clocks",
+                  "Smoke detectors"
+                ]
+              },
+              {
+                "blockLabel": "Increasing cases reported in",
+                "items": [
+                  "PGs",
+                  "Hostels",
+                  "Rental apartments"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5. Data Collection & Privacy Loss",
+            "blocks": [
+              {
+                "blockLabel": "Devices collect",
+                "items": [
+                  "Usage patterns",
+                  "Audio data",
+                  "Video recordings"
+                ]
+              },
+              {
+                "blockLabel": "This data can",
+                "items": [
+                  "Reveal routines",
+                  "Be misused if accessed"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Legal Perspective (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant Laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 354C",
+              "Indian Penal Code Section 354D"
+            ]
+          },
+          {
+            "blockLabel": "Illegal Activities Include",
+            "items": [
+              "Recording someone without consent",
+              "Installing hidden cameras",
+              "Unauthorized surveillance",
+              "Digital stalking"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs (Important for Awareness Section)",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Lights/devices behaving on their own",
+          "Unknown devices connected to Wi-Fi",
+          "Camera indicator lights turning ON unexpectedly",
+          "Strange sounds from smart speakers",
+          "Someone knowing your private activities"
+        ]
+      },
+      {
+        "sectionTitle": "Practical Safety Measures (India-Focused)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Factory reset when",
+            "items": [
+              "Moving to a new house",
+              "After relationship changes",
+              "Cover Cameras When Not in Use",
+              "Especially in private spaces",
+              "Buy Trusted Brands Only",
+              "Avoid cheap, unknown devices with poor security",
+              "Legal Action",
+              "Report hidden cameras or surveillance to police/cyber cell",
+              "Preserve evidence (photos, videos, logs)"
+            ]
+          }
+        ],
+        "items": [
+          "Secure Your Wi-Fi",
+          "Change default router password",
+          "Use WPA2/WPA3 security",
+          "Hide Wi-Fi network if needed",
+          "Change Device Credentials",
+          "Remove default usernames/passwords",
+          "Use strong, unique passwords",
+          "Check Connected Devices",
+          "Review all devices linked to your network",
+          "Remove unknown devices",
+          "Reset Devices"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Smart homes increase comfort\u2014but also increase points of control and surveillance.",
+          "In India, lack of awareness + shared living situations make misuse more common.",
+          "Control over devices = control over privacy"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "mobile-phones",
+    "categoryTitle": "Mobile Phones",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Mobile phones are the most personal and data-rich devices we use daily. In India, smartphones are used for",
+            "items": [
+              "Communication (calls, WhatsApp)",
+              "Banking & UPI payments",
+              "Social media",
+              "Location tracking",
+              "Work & personal storage",
+              "Popular devices include brands like Samsung, Xiaomi, and Apple.",
+              "Because of this, phones become the primary target for surveillance, stalking, and digital control."
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "What Makes Phones Highly Sensitive?",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Mobile phones store",
+            "items": [
+              "Personal Communication",
+              "Messages (SMS, WhatsApp, Telegram)",
+              "Emails",
+              "Call logs",
+              "Contacts & Social Circle",
+              "Saved contacts",
+              "Chat history",
+              "Group memberships",
+              "Location Data",
+              "Real-time GPS location",
+              "Location history (maps, apps)",
+              "Financial Information",
+              "UPI apps like Google Pay, PhonePe, Paytm",
+              "Banking apps",
+              "Transaction history",
+              "Personal Media",
+              "Photos & videos",
+              "Private documents",
+              "Screenshots",
+              "This makes phones a complete digital profile of a person\u2019s life."
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Major Threats & Risks",
+        "subSections": [
+          {
+            "subTitle": "1. Spyware & Stalking Apps",
+            "blocks": [
+              {
+                "blockLabel": "Software secretly installed on a phone to",
+                "items": [
+                  "Track activity",
+                  "Record calls",
+                  "Access messages",
+                  "Monitor location"
+                ]
+              },
+              {
+                "blockLabel": "How it is installed (India context)",
+                "items": [
+                  "Physical access to phone (very common)"
+                ]
+              },
+              {
+                "blockLabel": "Disguised as",
+                "items": [
+                  "Calculator apps",
+                  "Utility apps",
+                  "Installed by someone known (partner/family)"
+                ]
+              },
+              {
+                "blockLabel": "What spyware can do",
+                "items": [
+                  "Read WhatsApp messages",
+                  "Access photos/videos",
+                  "Track real-time location",
+                  "Record microphone audio",
+                  "Capture screen activity"
+                ]
+              },
+              {
+                "blockLabel": "In Real Concern",
+                "items": []
+              },
+              {
+                "blockLabel": "Many apps available online in India claim",
+                "items": [
+                  "\u201cTrack your partner\u201d",
+                  "\u201cMonitor spouse phone\u201d",
+                  "These are often illegal surveillance tools",
+                  "Warning Signs of Spyware",
+                  "Phone overheating without reason",
+                  "Battery draining quickly",
+                  "Unknown apps installed",
+                  "Data usage unusually high",
+                  "Phone behaving slowly or strangely"
+                ]
+              }
+            ],
+            "items": [
+              "What is Spyware?"
+            ]
+          },
+          {
+            "subTitle": "2. Unauthorized Access to Accounts",
+            "blocks": [
+              {
+                "blockLabel": "How it happens",
+                "items": [
+                  "Knowing your password",
+                  "Access to OTP (via SIM or phone)",
+                  "Saved passwords in browser/apps"
+                ]
+              },
+              {
+                "blockLabel": "What can be accessed",
+                "items": [
+                  "Email accounts",
+                  "Social media",
+                  "Cloud storage",
+                  "Banking apps"
+                ]
+              },
+              {
+                "blockLabel": "In Common Situation",
+                "items": [
+                  "Shared phones in families",
+                  "Passwords known to partners",
+                  "SIM cards registered in someone else\u2019s name",
+                  "This increases risk of misuse."
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Continuous Location Tracking",
+            "blocks": [
+              {
+                "blockLabel": "How tracking happens",
+                "items": []
+              },
+              {
+                "blockLabel": "Apps like",
+                "items": [
+                  "Google Maps",
+                  "WhatsApp (live location)",
+                  "\u201cFind My Device\u201d features",
+                  "Background location permissions"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "Someone can",
+                "items": [
+                  "Track movements in real time",
+                  "Know where you are at any moment",
+                  "Identify patterns (home, work, etc.)"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Call & Message Monitoring",
+            "blocks": [
+              {
+                "blockLabel": "Methods",
+                "items": [
+                  "Spy apps",
+                  "Call forwarding",
+                  "Linked devices (WhatsApp Web)"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "Private conversations accessed",
+                  "OTP interception",
+                  "Social manipulation"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5. App-Based Surveillance",
+            "blocks": [
+              {
+                "blockLabel": "Some apps misuse permissions like",
+                "items": [
+                  "Camera",
+                  "Microphone",
+                  "Contacts",
+                  "Storage",
+                  "Once granted, apps can collect sensitive data silently."
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "6. WhatsApp & Social Media Risks (Very Important in India)",
+            "blocks": [
+              {
+                "blockLabel": "Using WhatsApp",
+                "items": []
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "WhatsApp Web linked without knowledge",
+                  "Backup access via Google Drive/iCloud",
+                  "Reading chats remotely"
+                ]
+              },
+              {
+                "blockLabel": "Warning Sign",
+                "items": [
+                  "\u201cWhatsApp Web active\u201d without your knowledge"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Legal Perspective (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant Laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 354D",
+              "Indian Penal Code Section 66E"
+            ]
+          },
+          {
+            "blockLabel": "Illegal Activities",
+            "items": [
+              "Installing spyware without consent",
+              "Tracking someone digitally",
+              "Accessing private data/accounts"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs (For Website Section)",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Phone behaving abnormally",
+          "Unknown apps installed",
+          "Suspicious login alerts",
+          "Someone knowing private chats/info",
+          "WhatsApp showing active sessions"
+        ]
+      },
+      {
+        "sectionTitle": "Practical Safety Measures (India-Focused)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Turn off",
+            "items": [
+              "Location",
+              "Microphone",
+              "Camera access for unnecessary apps",
+              "Check Linked Devices",
+              "WhatsApp \u2192 Linked devices \u2192 log out all",
+              "Update SIM & OTP Security",
+              "Keep SIM in your control",
+              "Link number to your ID",
+              "Factory Reset (if needed)",
+              "If spyware suspected \u2192 reset device",
+              "Use Official App Stores Only",
+              "Avoid APK downloads from unknown websites"
+            ]
+          }
+        ],
+        "items": [
+          "Secure Your Phone",
+          "Use strong PIN/password (not pattern)",
+          "Enable biometric lock",
+          "Check Installed Apps",
+          "Remove unknown or suspicious apps",
+          "Review Permissions"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Whoever controls your phone or its accounts can",
+            "items": [
+              "Monitor you",
+              "Track you",
+              "Control your digital identity",
+              "Phone security = Personal safety"
+            ]
+          }
+        ],
+        "items": [
+          "In India, mobile phones are the central point of digital life."
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "computers",
+    "categoryTitle": "Computers & Online Accounts",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Computers (laptops/desktops) and online accounts act as the central hub of digital identity. In India, they are widely used for",
+            "items": [
+              "Education (assignments, research)",
+              "Work (emails, documents, portals)",
+              "Banking & financial management",
+              "Social media & communication",
+              "Devices from companies like HP, Dell, and Lenovo are commonly used.",
+              "Unlike phones, computers often store long-term, high-value data, making them a major target for misuse."
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "What Data Do Computers & Accounts Store?",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Examples",
+            "items": [
+              "Gmail",
+              "Outlook",
+              "Documents & Files",
+              "Academic records",
+              "Personal documents (Aadhaar, PAN, certificates)",
+              "Work files",
+              "Saved Passwords",
+              "Browsers store login credentials",
+              "Auto-login enabled for multiple websites",
+              "Browsing History",
+              "Websites visited",
+              "Search history",
+              "Downloaded files",
+              "Cloud Storage",
+              "Google Drive, OneDrive",
+              "Backups of personal data"
+            ]
+          }
+        ],
+        "items": [
+          "Email Accounts",
+          "Primary communication hub",
+          "Used for OTPs, password resets"
+        ]
+      },
+      {
+        "sectionTitle": "Major Threats & Risks",
+        "subSections": [
+          {
+            "subTitle": "1. Email Account Hacking",
+            "blocks": [
+              {
+                "blockLabel": "Why email is critical",
+                "items": []
+              },
+              {
+                "blockLabel": "It is linked to",
+                "items": [
+                  "Banking",
+                  "Social media",
+                  "Government portals",
+                  "If email is compromised \u2192 entire digital identity is at risk"
+                ]
+              },
+              {
+                "blockLabel": "How hacking happens",
+                "items": [
+                  "Weak passwords",
+                  "Phishing emails",
+                  "OTP access",
+                  "Password reuse"
+                ]
+              },
+              {
+                "blockLabel": "In Common Example",
+                "items": []
+              },
+              {
+                "blockLabel": "Fake emails pretending to be",
+                "items": [
+                  "Banks",
+                  "Government portals",
+                  "Job offers",
+                  "Trick users into entering login details"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "2. Misuse of Saved Passwords",
+            "blocks": [
+              {
+                "blockLabel": "How it works",
+                "items": [
+                  "Browsers like Chrome save passwords"
+                ]
+              },
+              {
+                "blockLabel": "Anyone with access to the computer can",
+                "items": [
+                  "View or export passwords"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "Access to",
+                "items": [
+                  "Social media",
+                  "Email",
+                  "Banking"
+                ]
+              },
+              {
+                "blockLabel": "In Common Situation",
+                "items": [
+                  "Shared laptops in families",
+                  "College or PG environments"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Monitoring Browsing Activity",
+            "blocks": [
+              {
+                "blockLabel": "Methods",
+                "items": [
+                  "Browser history",
+                  "Monitoring software",
+                  "Keyloggers"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "Tracking",
+                "items": [
+                  "Websites visited",
+                  "Searches made",
+                  "Online behavior"
+                ]
+              },
+              {
+                "blockLabel": "Can be used for",
+                "items": [
+                  "Surveillance",
+                  "Blackmail",
+                  "Control"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Keyloggers & Spy Software",
+            "blocks": [
+              {
+                "blockLabel": "Software/hardware that records",
+                "items": [
+                  "Every keystroke typed"
+                ]
+              },
+              {
+                "blockLabel": "What it captures",
+                "items": [
+                  "Passwords",
+                  "Emails",
+                  "Messages",
+                  "Banking details"
+                ]
+              },
+              {
+                "blockLabel": "In Risk Scenario",
+                "items": []
+              },
+              {
+                "blockLabel": "Installed in",
+                "items": [
+                  "Shared computers",
+                  "Cyber caf\u00e9s",
+                  "Office systems"
+                ]
+              }
+            ],
+            "items": [
+              "What is a keylogger?"
+            ]
+          },
+          {
+            "subTitle": "5. Public & Shared Computer Risks (Very Important in India)",
+            "blocks": [
+              {
+                "blockLabel": "Where",
+                "items": [
+                  "Cyber caf\u00e9s",
+                  "Libraries",
+                  "College labs"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Saved login sessions",
+                  "Screen recording software",
+                  "Malware infection"
+                ]
+              },
+              {
+                "blockLabel": "Example",
+                "items": [
+                  "Logging into email in a cyber caf\u00e9 \u2192 forgetting to log out",
+                  "Next user can access your account"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "6. Cloud Account Exploitation",
+            "blocks": [
+              {
+                "blockLabel": "What is stored",
+                "items": [
+                  "Photos",
+                  "Documents",
+                  "Backups"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": []
+              },
+              {
+                "blockLabel": "Unauthorized access reveals",
+                "items": [
+                  "Personal files",
+                  "Sensitive data"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Indian Cyber Threat Landscape",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "In Common Attacks",
+            "items": [
+              "Phishing emails (fake bank/KYC updates)",
+              "Job scams",
+              "Fake government portals",
+              "Remote access scams (\u201ctech support fraud\u201d)"
+            ]
+          },
+          {
+            "blockLabel": "Example",
+            "items": []
+          },
+          {
+            "blockLabel": "Fraudsters pretending to be from",
+            "items": [
+              "Bank",
+              "IT department",
+              "Customer care"
+            ]
+          },
+          {
+            "blockLabel": "Ask for",
+            "items": [
+              "OTP",
+              "Screen sharing access"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Legal Perspective (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant Laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 43",
+              "Indian Penal Code Section 66"
+            ]
+          },
+          {
+            "blockLabel": "Offences Include",
+            "items": [
+              "Unauthorized access",
+              "Data theft",
+              "Identity theft",
+              "Hacking"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Unknown login alerts",
+          "Passwords not working suddenly",
+          "Emails sent without your knowledge",
+          "Suspicious pop-ups or software",
+          "Slow system performance"
+        ]
+      },
+      {
+        "sectionTitle": "Practical Safety Measures (India-Focused)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "If necessary",
+            "items": [
+              "Use incognito mode",
+              "Log out completely",
+              "Check Login Activity",
+              "Gmail \u2192 \u201cLast account activity\u201d",
+              "Install Antivirus Software",
+              "Protect against malware & keyloggers",
+              "Be Alert to Phishing",
+              "Never click unknown links",
+              "Verify sender identity",
+              "Regular Backups",
+              "Keep data safe in case of attack"
+            ]
+          }
+        ],
+        "items": [
+          "Strong Password Practices",
+          "Use unique passwords for each account",
+          "Avoid saving passwords on shared systems",
+          "Enable 2-Factor Authentication (2FA)",
+          "Especially for email & banking",
+          "Avoid Public Computers"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Computers and online accounts are the gateway to your entire digital life.",
+          "In India, shared usage + phishing scams make them highly vulnerable.",
+          "Protecting your accounts = protecting your identity"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "tracking",
+    "categoryTitle": "Tracking Technologies",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "In India, these technologies are becoming more common due to",
+            "items": [
+              "Cheap GPS devices available online",
+              "Widespread smartphone usage",
+              "Growth of app-based tracking features",
+              "While designed for safety and convenience, these tools can be misused for stalking, surveillance, and control."
+            ]
+          }
+        ],
+        "items": [
+          "Tracking technologies are tools used to monitor a person\u2019s location, movement, and behaviour in real time or over a period."
+        ]
+      },
+      {
+        "sectionTitle": "Types of Tracking Technologies",
+        "subSections": [
+          {
+            "subTitle": "1. GPS Tracking Devices",
+            "blocks": [
+              {
+                "blockLabel": "Where they are hidden",
+                "items": [
+                  "Inside vehicles (under seats, dashboard)",
+                  "Bags or purses",
+                  "Clothing",
+                  "Personal belongings"
+                ]
+              },
+              {
+                "blockLabel": "How they work",
+                "items": [
+                  "Use GPS satellites to determine location",
+                  "Send data via SIM card or internet to a mobile app"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Real-time tracking without consent",
+                  "Monitoring daily routines",
+                  "Identifying safe/private locations"
+                ]
+              },
+              {
+                "blockLabel": "In Indian Reality",
+                "items": [
+                  "Easily available on e-commerce platforms",
+                  "Low-cost (\u20b91000\u2013\u20b93000 range)"
+                ]
+              },
+              {
+                "blockLabel": "Often marketed for",
+                "items": [
+                  "\u201cVehicle safety\u201d",
+                  "\u201cChild tracking\u201d",
+                  "But can be misused for stalking"
+                ]
+              }
+            ],
+            "items": [
+              "What are they?",
+              "Small electronic devices that use satellite signals to track location."
+            ]
+          },
+          {
+            "subTitle": "2. Bluetooth Trackers",
+            "blocks": [
+              {
+                "blockLabel": "Examples include",
+                "items": [
+                  "Apple AirTag",
+                  "Samsung SmartTag"
+                ]
+              },
+              {
+                "blockLabel": "How they work",
+                "items": [
+                  "Connect to nearby smartphones via Bluetooth",
+                  "Use crowdsourced networks to update location"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": []
+              },
+              {
+                "blockLabel": "Can be secretly placed in",
+                "items": [
+                  "Bags",
+                  "Cars",
+                  "Personal items",
+                  "Track movement without knowledge"
+                ]
+              },
+              {
+                "blockLabel": "Special Concern",
+                "items": []
+              },
+              {
+                "blockLabel": "Even though some alerts exist, they may",
+                "items": [
+                  "Be ignored",
+                  "Not work on all devices"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. App-Based Location Tracking",
+            "blocks": [
+              {
+                "blockLabel": "Apps like",
+                "items": [
+                  "Google Maps",
+                  "WhatsApp",
+                  "Life360"
+                ]
+              },
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Live location sharing",
+                  "Location history",
+                  "Movement tracking"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Forced sharing of location",
+                  "Continuous monitoring",
+                  "Lack of privacy"
+                ]
+              },
+              {
+                "blockLabel": "In Common Scenario",
+                "items": []
+              },
+              {
+                "blockLabel": "Partners/family demanding",
+                "items": [
+                  "\u201cShare your live location\u201d",
+                  "\u201cKeep location ON always\u201d",
+                  "This can become coercive control"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Vehicle-Based Tracking (Connected Cars)",
+            "blocks": [
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Real-time GPS",
+                  "Travel logs",
+                  "Remote tracking apps"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "Tracking movement through car apps",
+                  "Monitoring travel patterns"
+                ]
+              }
+            ],
+            "items": [
+              "(Linked with previous section)"
+            ]
+          },
+          {
+            "subTitle": "5. Hidden Surveillance Devices",
+            "blocks": [
+              {
+                "blockLabel": "Includes",
+                "items": [
+                  "Mini GPS trackers",
+                  "Spy cameras with tracking",
+                  "SIM-based tracking devices"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "Completely hidden tracking",
+                  "Hard to detect without checking"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Detailed Risk Analysis",
+        "subSections": [
+          {
+            "subTitle": "1. Real-Time Movement Monitoring",
+            "blocks": [
+              {
+                "blockLabel": "Someone can track",
+                "items": [
+                  "Where you are",
+                  "Where you go",
+                  "Who you meet",
+                  "This removes physical privacy"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "2. Pattern & Routine Analysis",
+            "blocks": [
+              {
+                "blockLabel": "Tracking data reveals",
+                "items": [
+                  "Daily schedule",
+                  "Frequent locations",
+                  "Behaviour patterns"
+                ]
+              },
+              {
+                "blockLabel": "Can be used for",
+                "items": [
+                  "Stalking",
+                  "Harassment",
+                  "Planning harm"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Safety Risk",
+            "blocks": [
+              {
+                "blockLabel": "If someone knows",
+                "items": [
+                  "When you are alone",
+                  "Your regular routes"
+                ]
+              },
+              {
+                "blockLabel": "It increases risk of",
+                "items": [
+                  "Physical harm",
+                  "Confrontation"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Psychological Impact",
+            "blocks": [
+              {
+                "blockLabel": "Victims may feel",
+                "items": [
+                  "Constantly watched",
+                  "Unsafe even in private spaces",
+                  "Loss of control"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [],
+        "items": []
+      },
+      {
+        "sectionTitle": "Detection Methods",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Inspect",
+            "items": [
+              "Bags",
+              "Vehicles",
+              "Personal items",
+              "Phone Alerts",
+              "Unknown tracking alerts",
+              "Bluetooth scanning apps",
+              "Signal Detection"
+            ]
+          },
+          {
+            "blockLabel": "Use apps to scan",
+            "items": [
+              "Unknown Bluetooth devices",
+              "Nearby trackers",
+              "Vehicle Inspection"
+            ]
+          },
+          {
+            "blockLabel": "Check under",
+            "items": [
+              "Dashboard",
+              "Seats",
+              "Wheel area"
+            ]
+          }
+        ],
+        "items": [
+          "Physical Check"
+        ]
+      },
+      {
+        "sectionTitle": "Legal Perspective (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant Laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 354D",
+              "Indian Penal Code Section 66E"
+            ]
+          },
+          {
+            "blockLabel": "Illegal Activities",
+            "items": [
+              "Tracking without consent",
+              "Installing hidden tracking devices",
+              "Monitoring movement for harassment"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Someone knows your location unexpectedly",
+          "Repeated sightings of the same person",
+          "Unknown devices found in belongings",
+          "Suspicious Bluetooth devices nearby",
+          "Being asked to constantly share location"
+        ]
+      },
+      {
+        "sectionTitle": "Practical Safety Measures",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Control Location Sharing",
+          "Turn OFF live location when not needed",
+          "Share only with trusted contacts",
+          "Check Phone Settings",
+          "Review apps with location access",
+          "Scan for Devices",
+          "Use Bluetooth scanner apps",
+          "Inspect Belongings Regularly",
+          "Especially bags and vehicles",
+          "Avoid Forced Sharing",
+          "Recognize coercion",
+          "Seek help if needed",
+          "Report Suspicious Activity",
+          "Cyber cell or local police",
+          "Keep evidence"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Tracking technologies can silently remove your freedom of movement and privacy.",
+          "In India, easy availability + low awareness makes misuse more common.",
+          "Awareness and regular checking = main protection"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "everyday-apps",
+    "categoryTitle": "Everyday Apps & Connected Services",
+    "sections": [
+      {
+        "sectionTitle": "Introduction",
+        "subSections": [
+          {
+            "subTitle": "2. Ride-Sharing Platforms",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Uber",
+                  "OLA"
+                ]
+              },
+              {
+                "blockLabel": "Data Stored",
+                "items": [
+                  "Pickup & drop locations",
+                  "Trip history",
+                  "Saved addresses"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Tracking movement patterns",
+                  "Misuse of travel history"
+                ]
+              },
+              {
+                "blockLabel": "Context",
+                "items": [
+                  "Accounts often shared among family members",
+                  "Devices reused by multiple users"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "3. Payment & Financial Apps (High Risk Area)",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Google Pay",
+                  "PhonePe",
+                  "Paytm"
+                ]
+              },
+              {
+                "blockLabel": "Data Stored",
+                "items": [
+                  "Bank account details",
+                  "Transaction history",
+                  "Linked contacts"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Unauthorized transactions",
+                  "Financial fraud",
+                  "Exposure of spending behaviour"
+                ]
+              },
+              {
+                "blockLabel": "In Common Threats",
+                "items": [
+                  "OTP scams",
+                  "Screen-sharing fraud",
+                  "Fake customer care calls"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "4. Wearables & Fitness Devices",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Apple Watch",
+                  "Mi Band",
+                  "Fitbit Charge"
+                ]
+              },
+              {
+                "blockLabel": "What They Track",
+                "items": [
+                  "Steps, activity levels",
+                  "Heart rate, sleep patterns",
+                  "Workout routes (GPS-enabled devices)",
+                  "Daily routine timing"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Location Exposure"
+                ]
+              },
+              {
+                "blockLabel": "Running/walking routes may reveal",
+                "items": [
+                  "Home location",
+                  "Frequently visited areas",
+                  "Behavioral Tracking",
+                  "Daily routine patterns (wake time, activity time)",
+                  "Predictable schedules",
+                  "Account Integration Risks",
+                  "Sync with mobile apps and cloud accounts",
+                  "If account is accessed \u2192 full activity data visible",
+                  "Data Privacy Issues",
+                  "Health data is sensitive",
+                  "Can be misused if leaked or accessed"
+                ]
+              },
+              {
+                "blockLabel": "In Context",
+                "items": [
+                  "Increasing use among youth and fitness users",
+                  "Often synced with shared family devices/accounts"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "5. Tap Cards & Contactless Payments",
+            "blocks": [
+              {
+                "blockLabel": "Includes",
+                "items": [
+                  "Debit/Credit cards (contactless)",
+                  "Metro cards",
+                  "NFC-enabled cards"
+                ]
+              },
+              {
+                "blockLabel": "How It Works",
+                "items": [
+                  "Uses NFC (Near Field Communication)",
+                  "Payment made by tapping card on machine"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Unauthorized Transactions",
+                  "Small payments can be made without PIN (within limit)",
+                  "Card Skimming / Cloning: Data can be captured using unauthorized devices",
+                  "Loss or Theft Misuse: Anyone can tap and pay until limit is reached",
+                  "Linked Financial Exposure: Connected to bank accounts \u2192 financial risk"
+                ]
+              },
+              {
+                "blockLabel": "In Context",
+                "items": [
+                  "Rapid adoption of contactless cards"
+                ]
+              },
+              {
+                "blockLabel": "Low awareness about",
+                "items": [
+                  "Tap limits",
+                  "Security features"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "6. Fitness & Health Apps",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Google Fit",
+                  "Fitbit"
+                ]
+              },
+              {
+                "blockLabel": "Data Collected",
+                "items": [
+                  "Health metrics",
+                  "Activity logs",
+                  "Location (if enabled)"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": [
+                  "Exposure of personal health data",
+                  "Routine tracking"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "7. \u201cFind My Device\u201d & Tracking Services",
+            "blocks": [
+              {
+                "blockLabel": "Examples",
+                "items": [
+                  "Find My Device",
+                  "Find My iPhone"
+                ]
+              },
+              {
+                "blockLabel": "Features",
+                "items": [
+                  "Track device location",
+                  "Lock or erase phone remotely"
+                ]
+              },
+              {
+                "blockLabel": "Risks",
+                "items": []
+              },
+              {
+                "blockLabel": "If account is compromised",
+                "items": [
+                  "Continuous tracking",
+                  "Device control"
+                ]
+              }
+            ],
+            "items": []
+          },
+          {
+            "subTitle": "8. Cloud & Connected Ecosystems",
+            "blocks": [
+              {
+                "blockLabel": "Includes",
+                "items": [
+                  "Google account",
+                  "Apple ID"
+                ]
+              },
+              {
+                "blockLabel": "What They Connect",
+                "items": [
+                  "Email",
+                  "Photos",
+                  "Apps",
+                  "Location history"
+                ]
+              },
+              {
+                "blockLabel": "Risk",
+                "items": [
+                  "One account compromised = entire digital life exposed"
+                ]
+              }
+            ],
+            "items": []
+          }
+        ],
+        "blocks": [
+          {
+            "blockLabel": "Everyday apps and connected services are deeply integrated into modern life in India. They are used for",
+            "items": [
+              "Navigation",
+              "Transportation",
+              "Financial transactions",
+              "Health monitoring",
+              "Device tracking",
+              "These systems continuously collect and process personal, behavioural, and location-based data.",
+              "While they improve convenience, they also create multiple points of data exposure and surveillance.",
+              "Navigation & Map Applications"
+            ]
+          },
+          {
+            "blockLabel": "Example",
+            "items": [
+              "Google Maps"
+            ]
+          },
+          {
+            "blockLabel": "Data Collected",
+            "items": [
+              "Real-time location",
+              "Search history",
+              "Frequently visited places",
+              "Travel routes"
+            ]
+          },
+          {
+            "blockLabel": "Risks",
+            "items": [
+              "Exposure of home/work locations",
+              "Identification of daily routines",
+              "Location history misuse"
+            ]
+          },
+          {
+            "blockLabel": "In Context",
+            "items": []
+          },
+          {
+            "blockLabel": "Many users",
+            "items": [
+              "Keep location history ON",
+              "Stay logged in on shared devices"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Overall Risk Analysis",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Routine & Behaviour Exposure",
+          "Daily habits become predictable",
+          "Location Privacy Loss",
+          "Continuous tracking across apps",
+          "Financial Risk",
+          "Direct access to money via apps/cards",
+          "Account-Based Surveillance",
+          "Monitoring through shared or compromised accounts",
+          "Data Profiling",
+          "Apps build detailed personal profiles"
+        ]
+      },
+      {
+        "sectionTitle": "Indian Cyber Crime Patterns",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "UPI fraud scams",
+          "Fake customer care numbers",
+          "Account takeover attacks",
+          "Location-based stalking"
+        ]
+      },
+      {
+        "sectionTitle": "Legal Perspective (India)",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "Relevant laws",
+            "items": [
+              "Information Technology Act 2000",
+              "Indian Penal Code Section 420",
+              "Indian Penal Code Section 66C"
+            ]
+          }
+        ],
+        "items": []
+      },
+      {
+        "sectionTitle": "Warning Signs",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Unknown transactions",
+          "Suspicious login alerts",
+          "Apps behaving unusually",
+          "Someone knowing your routine",
+          "OTP requests not initiated by you"
+        ]
+      },
+      {
+        "sectionTitle": "Practical Safety Measures",
+        "subSections": [],
+        "blocks": [],
+        "items": [
+          "Account Security",
+          "Strong passwords",
+          "Enable 2FA",
+          "Control Permissions",
+          "Limit location access",
+          "Review app permissions",
+          "Financial Safety",
+          "Never share OTP",
+          "Avoid screen sharing",
+          "Device Management",
+          "Logout from shared devices",
+          "Regularly review linked accounts",
+          "Awareness",
+          "Verify customer care",
+          "Avoid suspicious links"
+        ]
+      },
+      {
+        "sectionTitle": "Key Takeaway",
+        "subSections": [],
+        "blocks": [
+          {
+            "blockLabel": "In India, risks are amplified due to",
+            "items": [
+              "High digital adoption",
+              "Shared device usage",
+              "Low cybersecurity awareness",
+              "Managing app access and permissions is essential for privacy, safety, and financial security."
+            ]
+          }
+        ],
+        "items": [
+          "Everyday apps and connected services create a fully integrated digital ecosystem."
+        ]
+      }
+    ]
+  }
+]

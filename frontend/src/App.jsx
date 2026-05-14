@@ -20,7 +20,8 @@ import Resources from './pages/education/Resources';
 import Contact from './pages/Contact';
 import Games from './pages/Games';
 import UserNotFound from './pages/UserNotFound';
-
+// import TechTour from './pages/TechTour';
+import TechTourDetail from './pages/TechTourDetail';
 import WordSearchGame from './components/games/WordSearchGame';
 import MatchingGame from './components/games/MatchingGame';
 import JigsawGame from './components/games/JigsawGame';
@@ -40,6 +41,7 @@ function App() {
         <Route path="education/blogs" element={<Blogs />} />
         <Route path="education/quiz" element={<Quiz />} />
         <Route path="education/resources" element={<Resources />} />
+        <Route path="tech-tour/:slug" element={<TechTourDetail />} />
         <Route path="games" element={<Games />} />
         <Route path="games/word-search" element={<GameRoute component={WordSearchGame} />} />
         <Route path="games/matching" element={<GameRoute component={MatchingGame} />} />

@@ -7,6 +7,7 @@ import extractedData from '../data/extracted_docs.json';
 import { serviceDetails } from '../data/serviceDetails';
 import FAQAccordion from '../components/ui/FAQAccordion';
 import ServiceProcess from '../components/ui/ServiceProcess';
+import TechnoTourTeaser from '../components/ui/TechnoTourTeaser';
 
 // Utility to parse extracted Word text safely
 function parseContent(text) {
@@ -307,6 +308,7 @@ export default function ServiceDetail() {
 
       {/* Cyber Forensics Specific Custom Section */}
       {id === 'cyber' && (
+        <>
         <Container className="py-16 border-t border-slate-100">
           {/* Legal Validity & Digital Evidence Compliance Section */}
           <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-xl p-6 md:p-8 mb-12 shadow-sm flex flex-col md:flex-row items-start gap-6 transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md animate-fade-in-up">
@@ -419,8 +421,9 @@ export default function ServiceDetail() {
             </div>
           </div>
         </Container>
+        <TechnoTourTeaser />
+      </>
       )}
-
       {/* Fingerprint Specific Custom Section */}
       {id === 'fingerprint' && (
         <Container className="py-16 border-t border-slate-100">

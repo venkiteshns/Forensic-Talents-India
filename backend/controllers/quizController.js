@@ -5,6 +5,7 @@ export const getLatestQuiz = async (req, res, next) => {
   try {
     const state = await quizService.getQuizState();
     res.json({
+      _id: state._id,
       title: state.currentQuiz?.name || '',
       description: state.currentQuiz?.description || '',
       date: state.currentQuiz?.conductedDate || null,
@@ -13,6 +14,8 @@ export const getLatestQuiz = async (req, res, next) => {
       registrationEnabled: state.registration?.enabled || false,
       registrationLink: state.registration?.link || '',
       status: state.currentQuiz?.status || 'HIDDEN',
+      upcomingQuizName: state.upcomingQuiz?.name || '',
+      upcomingQuizVisible: state.upcomingQuiz?.visibility || false,
       upcomingQuizDate: state.upcomingQuiz?.scheduledDateTime || null
     });
   } catch (err) { next(err); }
