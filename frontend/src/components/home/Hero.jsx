@@ -7,17 +7,19 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Container } from '../ui/Container';
+import SeamlessVideoBackground from './SeamlessVideoBackground';
+
 
 // 3D Particle Background
 function ParticleField(props) {
   const ref = useRef();
-  
+
   // Generate a sphere of particles using an array size strictly divisible by 3
   const sphere = useMemo(() => {
     // 5000 particles * 3 dimensions (x, y, z) = 15000
     const positions = new Float32Array(15000);
     random.inSphere(positions, { radius: 1.5 });
-    
+
     // Fallback sanitation just in case maath fails
     for (let i = 0; i < positions.length; i++) {
       if (isNaN(positions[i])) positions[i] = 0;
@@ -54,6 +56,7 @@ export default function Hero() {
 
   return (
     <section className="relative h-screen min-h-[800px] bg-primary overflow-hidden flex items-center pt-20">
+      <SeamlessVideoBackground />
       {/* 3D Background Canvas */}
       <div className="absolute inset-0 z-0">
         <Canvas gl={{ antialias: true, alpha: true }} camera={{ position: [0, 0, 1] }}>
@@ -66,7 +69,7 @@ export default function Hero() {
       </div>
 
       <Container className="relative z-10 flex flex-col items-center justify-center text-center w-full">
-        <motion.div 
+        <motion.div
           style={{ y: y2, opacity }}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,7 +77,7 @@ export default function Hero() {
           className="flex flex-col items-center"
         >
           {/* Subtle Logo representation or badge */}
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -93,12 +96,12 @@ export default function Hero() {
               Legal Strength.
             </span>
           </h1>
-          
+
           <p className="text-lg md:text-2xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
             Delivering scientifically precise, ethically grounded, and legally admissible forensic solutions to strengthen the justice delivery system worldwide.
           </p>
 
-          <motion.div 
+          <motion.div
             style={{ y: y1 }}
             className="flex flex-col sm:flex-row gap-6 justify-center"
           >

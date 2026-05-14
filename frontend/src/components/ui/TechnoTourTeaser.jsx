@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Car, Home, Smartphone, Laptop, MapPin, Globe, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -62,64 +62,99 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
 };
 
-const InteractiveFlipCard = ({ data }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+const ExpandableCard = ({ data }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const Icon = data.icon;
 
   return (
-    <motion.div variants={itemVariants}>
-      <div 
-        className="relative w-full h-[400px] cursor-pointer group hover:-translate-y-1 transition-transform duration-300" 
-        style={{ perspective: "1000px" }}
-        onClick={() => setIsFlipped(!isFlipped)}
+    <motion.div variants={itemVariants} className="w-full h-full flex">
+      <motion.div 
+        layout 
+        onClick={() => setIsExpanded(!isExpanded)}
+        transition={{ layout: { type: "spring", stiffness: 60, damping: 14, mass: 1.2 } }}
+        className="w-full bg-white rounded-2xl p-6 flex flex-col cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
       >
-        <motion.div
-          className="w-full h-full relative"
-          style={{ transformStyle: "preserve-3d" }}
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ type: "spring", stiffness: 80, damping: 20, mass: 1.5 }}
-        >
-        {/* Front Face */}
-        <div 
-          className="absolute w-full h-full bg-white rounded-2xl p-6 flex flex-col justify-between overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:shadow-xl transition-shadow duration-300"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <div className="relative z-10 flex flex-col items-center text-center mt-8">
-            <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-6">
-              <Icon size={32} className="text-amber-500" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-4">{data.title}</h3>
-            <p className="text-slate-600 leading-relaxed text-sm">{data.introSnippet}</p>
-          </div>
-          
-          <div className="relative z-10 flex items-center justify-center text-amber-500 text-sm font-bold tracking-wider uppercase opacity-80 mt-auto">
-            <span>Tap to reveal</span>
-          </div>
-        </div>
+        <motion.div layout className="flex flex-col items-center text-center">
+          <motion.div layout className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-6 shrink-0">
+            <Icon size={32} className="text-amber-500" />
+          </motion.div>
+          <motion.h3 layout className="text-2xl font-bold text-slate-900 tracking-tight mb-4">
+            {data.title}
+          </motion.h3>
+        </motion.div>
 
-        {/* Back Face */}
-        <div 
-          className="absolute w-full h-full bg-white rounded-2xl p-6 flex flex-col shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:shadow-xl transition-shadow duration-300"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-        >
-          <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar">
-            <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-4 border-b border-slate-100 pb-3">{data.title}</h3>
-            <p className="text-slate-600 leading-relaxed text-sm mb-6">
-              {data.fullIntro}
-            </p>
-          </div>
-          <div className="mt-4 pt-4 border-t border-slate-100 flex-shrink-0">
-            <Link 
-              to={`/tech-tour/${data.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full flex items-center justify-center gap-2 bg-white text-amber-500 border border-amber-500 hover:bg-amber-500 hover:text-white font-bold py-3 px-4 rounded-xl transition-colors duration-200"
-            >
-              Explore Risk Analysis <ArrowRight size={18} />
-            </Link>
-          </div>
+        <motion.div layout className="relative w-full flex-grow">
+          <motion.div 
+            layout
+            className={`w-full overflow-hidden ${!isExpanded ? 'max-h-24' : ''}`}
+          >
+            {!isExpanded && (
+              <motion.p 
+                layout
+                className="text-slate-600 leading-relaxed text-sm text-center"
+              >
+                {data.fullIntro}
+              </motion.p>
+            )}
+            
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-slate-600 leading-relaxed text-sm text-center"
+                >
+                  {data.fullIntro}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Gradient Mask for collapsed state */}
+          {!isExpanded && (
+            <motion.div 
+              className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent pointer-events-none"
+            />
+          )}
+        </motion.div>
+
+        <div className="mt-auto">
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mt-6 pt-4 border-t border-slate-100 flex-shrink-0 w-full"
+              >
+                <Link 
+                  to={`/tech-tour/${data.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-amber-500 border border-amber-500 hover:bg-amber-500 hover:text-white font-bold py-3 px-4 rounded-xl transition-colors duration-200"
+                >
+                  Explore Risk Analysis <ArrowRight size={18} />
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {!isExpanded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="mt-4 flex items-center justify-center text-amber-500 text-sm font-bold tracking-wider uppercase opacity-80 w-full"
+              >
+                <span>Tap to reveal</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
-      </div>
     </motion.div>
   );
 };
@@ -145,7 +180,7 @@ export const TechnoTourTeaser = () => {
           viewport={{ once: true, margin: "-100px" }}
         >
           {technoTourData.map((data, index) => (
-            <InteractiveFlipCard key={index} data={data} />
+            <ExpandableCard key={index} data={data} />
           ))}
         </motion.div>
       </div>

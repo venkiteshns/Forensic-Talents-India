@@ -12,6 +12,8 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import api from '../utils/api';
 import ReviewsSection from '../components/education/ReviewsSection';
+import SeamlessVideoBackground from '../components/home/SeamlessVideoBackground';
+
 
 // ─── Motion System ────────────────────────────────────────────────
 // Single source of truth. Tuned for premium pacing.
@@ -517,6 +519,7 @@ export default function Home() {
 
       {/* ─── HERO ──────────────────────────────────────────────── */}
       <motion.section layout className="relative pt-24 pb-32 bg-primary overflow-hidden flex flex-col gap-6">
+        <SeamlessVideoBackground />
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
         <div className="absolute top-1/3 right-1/4 w-[480px] h-[480px] rounded-full bg-accent/5 blur-3xl pointer-events-none" />
 
