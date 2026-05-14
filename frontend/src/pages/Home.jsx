@@ -299,7 +299,7 @@ function QuizAlertBanner({ quiz }) {
           animate={{ opacity: 1, x: "-50%", y: 0, scale: 1 }}
           exit={{ opacity: 0, x: "-50%", y: -20, scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-          className="absolute top-full left-1/2 mt-4 w-[90%] max-w-4xl z-50"
+          className="absolute top-full left-1/2 mt-4 w-[90%] max-w-4xl z-40"
         >
           <motion.div layout className="relative overflow-hidden w-full rounded-2xl px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white shadow-2xl border border-white/10 bg-black/40 backdrop-blur-md">
 
