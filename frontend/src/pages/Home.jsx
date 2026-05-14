@@ -295,14 +295,13 @@ function QuizAlertBanner({ quiz }) {
       {shouldShow && (
         <motion.div
           key="banner"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
-          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-          className="w-full relative z-40 overflow-hidden"
-      >
-        <Container>
-          <motion.div layout className="relative overflow-hidden rounded-2xl px-5 py-4 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white shadow-2xl max-w-5xl mx-auto border border-white/10 bg-white/5 backdrop-blur-xl">
+          initial={{ opacity: 0, x: "-50%", y: -20, scale: 0.95 }}
+          animate={{ opacity: 1, x: "-50%", y: 0, scale: 1 }}
+          exit={{ opacity: 0, x: "-50%", y: -20, scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+          className="absolute top-full left-1/2 mt-4 w-[90%] max-w-4xl z-50"
+        >
+          <motion.div layout className="relative overflow-hidden w-full rounded-2xl px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-white shadow-2xl border border-white/10 bg-black/40 backdrop-blur-md">
 
             {/* Mobile Absolute Close Button */}
             <button
@@ -373,8 +372,7 @@ function QuizAlertBanner({ quiz }) {
               </button>
             </div>
           </motion.div>
-        </Container>
-      </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
@@ -523,11 +521,6 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
         <div className="absolute top-1/3 right-1/4 w-[480px] h-[480px] rounded-full bg-accent/5 blur-3xl pointer-events-none" />
 
-        {/* Banner slot — strict conditional rendering, no hardcoded heights */}
-        <AnimatePresence>
-          {activeQuiz && <QuizAlertBanner quiz={activeQuiz} />}
-        </AnimatePresence>
-
         {/* ────────────────────────────────────────────────────────────
              Hero Content — single orchestrating parent
              initial="hidden" propagates to ALL children synchronously
@@ -535,7 +528,7 @@ export default function Home() {
              animate="visible" then drives the stagger chain.
              No useAnimation. No useEffect. No setTimeout. No rAF.
         ──────────────────────────────────────────────────────────── */}
-        <Container className="relative z-10 flex flex-col items-center text-center">
+        <Container className="relative z-10 flex flex-col items-center text-center pb-20">
           <motion.div
             layout
             variants={heroContainer}
@@ -551,7 +544,7 @@ export default function Home() {
                 alt="Forensic Talents India"
                 className="h-28 md:h-36 mx-auto object-contain bg-white rounded-lg p-2"
                 draggable={false}
-                fetchpriority="high"
+                fetchPriority="high"
                 loading="eager"
               />
             </motion.div>
@@ -617,17 +610,22 @@ export default function Home() {
       </motion.section>
 
       {/* ─── TRUSTED INSTITUTIONS MARQUEE ──────────────────────── */}
-      <section className="py-10 bg-primary border-t border-white/10">
+      <section className="relative w-full py-10 bg-primary border-t border-white/10">
         <FadeInSection>
           <p className="text-center text-[11px] font-semibold tracking-widest text-slate-400 uppercase mb-6">
             Forensic Services &nbsp;·&nbsp; Certified Courses & Internship Programs &nbsp;·&nbsp; Investigation Specializations
           </p>
         </FadeInSection>
         <InfiniteMarquee />
+
+        {/* ─── FLOATING QUIZ ALERT NOTIFICATION ──────────────────── */}
+        <AnimatePresence>
+          {activeQuiz && <QuizAlertBanner quiz={activeQuiz} />}
+        </AnimatePresence>
       </section>
 
       {/* ─── ABOUT PREVIEW ─────────────────────────────────────── */}
-      <section className="py-20 bg-white">
+      <section className="pt-48 pb-24 md:pt-36 bg-white">
         <Container>
           <FadeInSection>
             <div className="max-w-4xl mx-auto text-center">
@@ -638,7 +636,7 @@ export default function Home() {
               <motion.div whileHover={{ x: 3 }} transition={SPRING.hover}>
                 <Button variant="ghost">
                   <Link to="/about" className="flex items-center gap-2 font-semibold">
-                    Read Our Story <ArrowRight size={18} />
+                    About Us <ArrowRight size={18} />
                   </Link>
                 </Button>
               </motion.div>
