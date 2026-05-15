@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '../../components/ui/Container';
 import { ArrowLeft, FileText, Image, Video, Download, Eye, Play, Loader2 } from 'lucide-react';
-import bgImage from '../../assets/forensic-lab-bg.png';
+import bgImage from '../../assets/forensic-lab-bg.webp';
 import { CardSkeleton } from '../../components/ui/Skeletons';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'https://forensic-talents-india.onrender.com/api';
@@ -69,7 +69,7 @@ function ResourceCard({ resource, index }) {
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
             {/* Background Image */}
             <img 
-              src={`/images/pdf-bgs/${(index % 7) + 1}.png`} 
+              src={`/images/pdf-bgs/${(index % 7) + 1}.webp`} 
               alt="PDF Background" 
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
               loading="lazy" 

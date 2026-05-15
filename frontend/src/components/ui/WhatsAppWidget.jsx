@@ -32,7 +32,7 @@ export default function WhatsAppWidget() {
             </div>
             <div className="relative z-10 flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                <img src="/assets/logo.png" alt="Forensic Talents" className="w-8 h-8 object-contain" onError={(e) => { e.target.style.display = 'none' }} />
+                <img src="/assets/logo.webp" alt="Forensic Talents" className="w-8 h-8 object-contain" onError={(e) => { e.target.style.display = 'none' }} />
               </div>
               <div>
                 <h4 className="font-bold text-sm">Need help?</h4>

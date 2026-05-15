@@ -18,7 +18,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand Col */}
           <div className="space-y-6">
-            <img src="/assets/logo.png" alt="Forensic Talents India" className="h-16 w-auto object-contain bg-white rounded-lg p-2" />
+            <img src="/assets/logo.webp" alt="Forensic Talents India" className="h-16 w-auto object-contain bg-white rounded-lg p-2" />
             <p className="text-sm leading-relaxed">
               Forensic Talents India offers premier medico-legal, cyber forensics, and psychological testing services.
             </p>

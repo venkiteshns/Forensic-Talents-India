@@ -23,7 +23,7 @@ export default function Blogs() {
           </Link>
         </div>
         <div className="absolute inset-0 z-0">
-          <img src="/images/banners/education_banner.png" alt="Blogs Background" className="w-full h-full object-cover" />
+          <img src="/images/banners/education_banner.webp" alt="Blogs Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
@@ -51,7 +51,7 @@ export default function Blogs() {
             {/* Blog Card 1 */}
             <a href="https://forensictalents.blogspot.com/2026/02/virtospy-digital-autopsy-that-lets-dead.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
               <div className="h-48 bg-slate-800 relative overflow-hidden">
-                <img src="/images/banners/services_banner.png" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                <img src="/images/banners/services_banner.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-accent text-primary font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wide">Technology</span>
@@ -69,7 +69,7 @@ export default function Blogs() {
             {/* Blog Card 2 */}
             <a href="https://forensictalents.blogspot.com/2026/02/the-silent-witness-comprehensive-guide.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
               <div className="h-48 bg-slate-800 relative overflow-hidden">
-                <img src="/images/services/crime-scene.png" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                <img src="/images/services/crime-scene.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-accent text-primary font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wide">Guide</span>
@@ -87,7 +87,7 @@ export default function Blogs() {
             {/* Blog Card 3 */}
             <a href="https://forensictalents.blogspot.com/2025/05/forensic-linguistics-where-language.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
               <div className="h-48 bg-slate-800 relative overflow-hidden">
-                <img src="/images/services/questioned-documents.png" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                <img src="/images/services/questioned-documents.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-accent text-primary font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wide">Linguistics</span>

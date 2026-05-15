@@ -158,7 +158,7 @@ export default function InteractiveForensicMap({ onSelectTopic }) {
           >
             {/* Background Image */}
             <img
-              src="/images/techTour/tech_tour.png"
+              src="/images/techTour/tech_tour.webp"
               alt="Forensic Ecosystem"
               className="absolute inset-0 w-full h-full object-contain"
             />

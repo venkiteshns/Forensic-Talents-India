@@ -55,7 +55,7 @@ export function NavBar() {
       <Container className="flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <img src="/assets/logo.png" alt="Forensic Talents India Logo" className="h-12 w-auto object-contain" />
+          <img src="/assets/logo.webp" alt="Forensic Talents India Logo" className="h-12 w-auto object-contain" />
         </Link>
 
         {/* Desktop Navigation */}

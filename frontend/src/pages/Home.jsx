@@ -540,7 +540,7 @@ export default function Home() {
             {/* 1 ─ Logo: scale-up + fade, first stagger child */}
             <motion.div layout variants={heroLogo} className="mb-8">
               <img
-                src="/assets/logo.png"
+                src="/assets/logo.webp"
                 alt="Forensic Talents India"
                 className="h-28 md:h-36 mx-auto object-contain bg-white rounded-lg p-2"
                 draggable={false}

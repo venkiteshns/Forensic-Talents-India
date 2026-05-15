@@ -91,7 +91,7 @@ export default function ServiceDetail() {
     <div className="bg-white min-h-[calc(100vh-88px)]">
       <div
         className="text-white py-12 md:py-24 relative bg-primary bg-cover bg-center border-b border-primary/20"
-        style={{ backgroundImage: `url('/images/services/${id}.png')` }}
+        style={{ backgroundImage: `url('/images/services/${id}.webp')` }}
       >
         <div className="absolute inset-0 bg-slate-900/85"></div>
         
@@ -861,7 +861,7 @@ export default function ServiceDetail() {
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
                 <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
                   <img
-                    src="/images/services/infographic-law.png"
+                    src="/images/services/infographic-law.webp"
                     alt="Law Enforcement Forensic Infographic"
                     className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
                   />
@@ -897,7 +897,7 @@ export default function ServiceDetail() {
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
                 <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
                   <img
-                    src="/images/services/infographic-banking.png"
+                    src="/images/services/infographic-banking.webp"
                     alt="Banking Forensic Infographic"
                     className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
                   />
@@ -933,7 +933,7 @@ export default function ServiceDetail() {
               <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-accent hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group overflow-hidden">
                 <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
                   <img
-                    src="/images/services/infographic-corporate.png"
+                    src="/images/services/infographic-corporate.webp"
                     alt="Corporate Forensic Infographic"
                     className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
                   />
@@ -970,7 +970,7 @@ export default function ServiceDetail() {
                 {/* Image Section */}
                 <div className="mb-6 rounded-lg overflow-hidden shadow-sm border border-slate-100 bg-slate-50 flex items-center justify-center p-4 animate-in fade-in duration-700">
                   <img
-                    src="/images/services/academic-infographic.png"
+                    src="/images/services/academic-infographic.webp"
                     alt="Academic Research Forensic Certification Outcome"
                     className="w-full max-w-[240px] min-[570px]:max-w-[380px] md:max-w-[280px] lg:max-w-[320px] h-auto max-h-[300px] object-contain rounded-md mx-auto transition-transform duration-500 hover:scale-[1.03]"
                   />

@@ -2,7 +2,7 @@ export const techTourData = {
   "vehicles-and-transport": {
     id: "vehicles-and-transport",
     title: "Vehicles and Transport Systems",
-    imageName: "Vehicles and Transport Systems.png",
+    imageName: "Vehicles and Transport Systems.webp",
     nodes: [
       {
         id: "loc-tracking",
@@ -38,7 +38,7 @@ export const techTourData = {
   "smart-home-devices": {
     id: "smart-home-devices",
     title: "Smart Home Devices",
-    imageName: "Smart Home Devices.png",
+    imageName: "Smart Home Devices.webp",
     nodes: [
       {
         id: "smart-cctv",
@@ -74,7 +74,7 @@ export const techTourData = {
   "mobile-phones": {
     id: "mobile-phones",
     title: "Mobile Phones",
-    imageName: "Mobile Phones.png",
+    imageName: "Mobile Phones.webp",
     nodes: [
       {
         id: "spyware",
@@ -111,7 +111,7 @@ export const techTourData = {
   "computers-online-accounts": {
     id: "computers-online-accounts",
     title: "Computers & Online Accounts",
-    imageName: "Computers & Online Accounts.png",
+    imageName: "Computers & Online Accounts.webp",
     nodes: [
       {
         id: "email-compromise",
@@ -147,7 +147,7 @@ export const techTourData = {
   "tracking-technologies": {
     id: "tracking-technologies",
     title: "Tracking Technologies",
-    imageName: "Tracking Technologies.png",
+    imageName: "Tracking Technologies.webp",
     nodes: [
       {
         id: "gps-trackers",
@@ -183,7 +183,7 @@ export const techTourData = {
   "everyday-apps": {
     id: "everyday-apps",
     title: "Everyday Apps & Connected Services",
-    imageName: "Everyday Apps & Connected Services.png",
+    imageName: "Everyday Apps & Connected Services.webp",
     nodes: [
       {
         id: "navigation-apps",

@@ -59,7 +59,7 @@ export default function HomeHeader() {
         <Link to="/" className="flex items-center gap-3">
           {/* Apply brightness/invert to make it white if necessary, but leaving object-contain as requested */}
           <img 
-            src="/assets/logo.png" 
+            src="/assets/logo.webp" 
             alt="Forensic Talents India Logo" 
             className="h-10 md:h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" 
           />

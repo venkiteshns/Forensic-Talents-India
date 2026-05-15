@@ -118,7 +118,7 @@ export default function Quiz() {
           </Link>
         </div>
         <div className="absolute inset-0 z-0">
-          <img src="/images/banners/education_banner.png" alt="Quiz Background" className="w-full h-full object-cover" />
+          <img src="/images/banners/education_banner.webp" alt="Quiz Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">

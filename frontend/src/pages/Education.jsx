@@ -53,7 +53,7 @@ export default function Education() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
         <div className="absolute inset-0 z-0">
-          <img src="/images/banners/education_banner.png" alt="Education Background" className="w-full h-full object-cover" />
+          <img src="/images/banners/education_banner.webp" alt="Education Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
