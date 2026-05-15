@@ -131,7 +131,7 @@ const ExpandableCard = ({ data }) => {
                 className="mt-6 pt-4 border-t border-slate-100 flex-shrink-0 w-full"
               >
                 <Link 
-                  to={`/tech-tour/${data.id}`}
+                  to={`/tech-tour?topic=${data.id}`}
                   onClick={(e) => e.stopPropagation()}
                   className="w-full flex items-center justify-center gap-2 bg-white text-amber-500 border border-amber-500 hover:bg-amber-500 hover:text-white font-bold py-3 px-4 rounded-xl transition-colors duration-200"
                 >

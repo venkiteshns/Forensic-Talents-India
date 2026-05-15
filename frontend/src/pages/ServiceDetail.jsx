@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link, Navigate, useSearchParams } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { ArrowLeft, ArrowRight, CheckCircle2, Globe, FileText, Fingerprint, Shield, Link as LinkIcon, BadgeCheck, Search, Database, MessageSquare, Mail, MapPin, Mic, HardDrive, Scale, History, Camera, GitCompare, ShieldAlert, Beaker, ClipboardList, Eye, Landmark, UserCheck, Scan, PenTool, FileSearch, FileEdit, FileQuestion, Droplet, Award, Activity, Users, Monitor, BrainCircuit, Lightbulb, Target, Briefcase, GraduationCap, BookOpen, LineChart } from 'lucide-react';
 import extractedData from '../data/extracted_docs.json';
@@ -7,7 +7,10 @@ import extractedData from '../data/extracted_docs.json';
 import { serviceDetails } from '../data/serviceDetails';
 import FAQAccordion from '../components/ui/FAQAccordion';
 import ServiceProcess from '../components/ui/ServiceProcess';
-import TechnoTourTeaser from '../components/ui/TechnoTourTeaser';
+import InteractiveForensicMap from '../components/ui/InteractiveForensicMap';
+import TopicForensicDashboard from '../components/ui/TopicForensicDashboard';
+import { techTourData } from '../data/techTourData';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Utility to parse extracted Word text safely
 function parseContent(text) {
@@ -50,6 +53,30 @@ function parseContent(text) {
 export default function ServiceDetail() {
   const { id } = useParams();
   const [showAcademicOutcome, setShowAcademicOutcome] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const activeTopicId = searchParams.get('topic');
+  const activeTopic = activeTopicId ? techTourData[activeTopicId] : null;
+
+  const handleSelectTopic = (topicId) => {
+    const mapToDataKeys = {
+      'vehicles': 'vehicles-and-transport',
+      'smart-home': 'smart-home-devices',
+      'mobile-phones': 'mobile-phones',
+      'computers': 'computers-online-accounts',
+      'tracking': 'tracking-technologies',
+      'everyday-apps': 'everyday-apps'
+    };
+    const targetId = mapToDataKeys[topicId] || topicId;
+    setSearchParams({ topic: targetId });
+  };
+
+  const handleCloseTechTour = () => {
+    setSearchParams({});
+    setTimeout(() => {
+      document.getElementById('tech-tour')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
 
   const serviceInfo = serviceDetails[id];
 
@@ -421,7 +448,27 @@ export default function ServiceDetail() {
             </div>
           </div>
         </Container>
-        <TechnoTourTeaser />
+        <InteractiveForensicMap onSelectTopic={handleSelectTopic} />
+        
+        <AnimatePresence>
+          {activeTopic && (
+            <motion.div
+              key="dashboard"
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed inset-0 z-50 flex bg-slate-50/95 backdrop-blur-xl"
+            >
+              <TopicForensicDashboard 
+                topic={activeTopic} 
+                onClose={handleCloseTechTour} 
+                onSwitchTopic={handleSelectTopic}
+                allTopics={techTourData}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
       )}
       {/* Fingerprint Specific Custom Section */}
