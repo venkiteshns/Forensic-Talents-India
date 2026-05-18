@@ -7,6 +7,8 @@ import CountryPhoneInput from '../components/ui/CountryPhoneInput';
 import SearchableCountrySelect from '../components/ui/SearchableCountrySelect';
 import { validatePhoneNumber } from '../utils/phoneValidation';
 import { getErrorMessage } from '../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants } from '../animations';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -160,31 +162,37 @@ export default function Contact() {
   return (
     <div className="bg-slate-50 min-h-[calc(100vh-88px)]">
       {/* Header */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}>
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}
+      >
         <div className="absolute inset-0 z-0">
           <img src="/images/banners/contact_banner.webp" alt="Contact Us" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Get in Touch</h1>
-          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
-            Reach out to our professional experts for highly confidential consultations, academic training inquiries, or precise investigative support. We operate with strict discretion and prompt communication globally.
-          </p>
+          <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Contact Us</motion.h1>
+          <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            Reach out for expert forensic consultations, partnership inquiries, or general questions. We are here to bring clarity and truth to your investigations.
+          </motion.p>
         </Container>
-      </section>
+      </motion.section>
 
-      <section className="py-20">
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="py-20"
+      >
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
             {/* Contact Form */}
-            <div className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100 relative">
+            <motion.div variants={cardVariants} className="lg:col-span-7 bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100 relative">
               <h2 className="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
 
               {serverError && (
-                <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                <motion.div variants={cardVariants} className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
                   {serverError}
-                </div>
+                </motion.div>
               )}
 
               <form noValidate onSubmit={handleSubmit} className="space-y-6">
@@ -322,14 +330,16 @@ export default function Contact() {
                   {touched.message && errors.message && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.message}</p>}
                 </div>
 
-                <Button type="submit" variant="primary" size="lg" className="w-full md:w-auto" disabled={status === 'loading'}>
-                  {status === 'loading' ? 'Sending...' : 'Submit Enquiry'}
-                </Button>
+                <motion.div variants={textVariants}>
+                  <Button type="submit" variant="primary" size="lg" className="w-full md:w-auto" disabled={status === 'loading'}>
+                    {status === 'loading' ? 'Sending...' : 'Submit Enquiry'}
+                  </Button>
+                </motion.div>
               </form>
-            </div>
+            </motion.div>
 
             {/* Contact Details & Map */}
-            <div className="lg:col-span-5 space-y-8">
+            <motion.div variants={cardVariants} className="lg:col-span-5 space-y-8">
 
               {/* Contact Info Card */}
               <div className="bg-primary text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
@@ -418,10 +428,10 @@ export default function Contact() {
                 ></iframe>
               </div>
 
-            </div>
+            </motion.div>
           </div>
         </Container>
-      </section>
+      </motion.section>
 
       <SuccessModal 
         isOpen={showSuccessModal} 

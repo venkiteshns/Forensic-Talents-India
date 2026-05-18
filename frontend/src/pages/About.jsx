@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '../components/ui/Container';
-import { Eye, ShieldCheck, CheckCircle2, Users, Calendar, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { Eye, ShieldCheck, CheckCircle2, Users, Calendar, X, ChevronLeft, ChevronRight, Image as ImageIcon, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover, vp } from '../animations';
 import api from '../utils/api';
 
 export default function About() {
   const [events, setEvents] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Auto-slide refs
   const autoSlideRef = useRef(null);
   const isPausedRef = useRef(false);
-
-  // Touch / swipe refs
   const touchStartXRef = useRef(null);
   const touchStartYRef = useRef(null);
 
@@ -21,15 +21,16 @@ export default function About() {
     const fetchEvents = async () => {
       try {
         const res = await api.get('/events');
-        setEvents(res.data);
+        setEvents(res.data || []);
       } catch (err) {
-        console.error("Failed to fetch events", err);
+        console.error('Failed to fetch events:', err);
+      } finally {
+        setEventsLoading(false);
       }
     };
     fetchEvents();
   }, []);
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
   const getImages = useCallback(() => {
     if (!selectedEvent) return [];
     return [selectedEvent.coverImage, ...(selectedEvent.images || [])].filter(Boolean);
@@ -56,7 +57,6 @@ export default function About() {
     goTo(currentImageIndex - 1);
   }, [currentImageIndex, getImages, goTo]);
 
-  // ─── Auto-slide ────────────────────────────────────────────────────────────
   const startAutoSlide = useCallback(() => {
     stopAutoSlide();
     autoSlideRef.current = setInterval(() => {
@@ -88,17 +88,9 @@ export default function About() {
     return () => stopAutoSlide();
   }, [selectedEvent]);
 
-  // ─── Modal open/close ─────────────────────────────────────────────────────
-  const openEventModal = (event) => {
-    setSelectedEvent(event);
-  };
+  const openEventModal = (event) => { setSelectedEvent(event); };
+  const closeEventModal = () => { stopAutoSlide(); setSelectedEvent(null); };
 
-  const closeEventModal = () => {
-    stopAutoSlide();
-    setSelectedEvent(null);
-  };
-
-  // ─── Touch / Swipe handlers ───────────────────────────────────────────────
   const handleTouchStart = (e) => {
     touchStartXRef.current = e.touches[0].clientX;
     touchStartYRef.current = e.touches[0].clientY;
@@ -106,7 +98,6 @@ export default function About() {
   };
 
   const handleTouchMove = (e) => {
-    // prevent vertical scroll hijack only when horizontal swipe is dominant
     if (touchStartXRef.current === null) return;
     const dx = Math.abs(e.touches[0].clientX - touchStartXRef.current);
     const dy = Math.abs(e.touches[0].clientY - touchStartYRef.current);
@@ -122,11 +113,9 @@ export default function About() {
     }
     touchStartXRef.current = null;
     touchStartYRef.current = null;
-    // Resume auto-slide after 2s
     setTimeout(() => { isPausedRef.current = false; }, 2000);
   };
 
-  // Pause on hover (desktop)
   const handleMouseEnter = () => { isPausedRef.current = true; };
   const handleMouseLeave = () => { isPausedRef.current = false; };
 
@@ -158,127 +147,155 @@ export default function About() {
 
   return (
     <div className="bg-white pb-20">
-      {/* Header */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}>
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent" style={{ minHeight: '340px' }}
+      >
         <div className="absolute inset-0 z-0">
           <img src="/images/banners/about_banner.webp" alt="About Forensic Talents" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">About Forensic Talents India</h1>
-          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+          <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">About Forensic Talents India</motion.h1>
+          <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
             A distinguished and forward-thinking organization dedicated to delivering scientifically precise, ethically grounded forensic solutions. We bridge the critical gap between complex forensic science and the steadfast pursuit of justice, bringing absolute clarity to every investigation.
-          </p>
+          </motion.p>
         </Container>
-      </section>
+      </motion.section>
 
-      {/* About & Welcome Details */}
-      <section className="py-20 bg-slate-50">
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="py-20 bg-slate-50"
+      >
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-7">
-              <h2 className="text-3xl font-heading font-bold text-primary mb-6">Welcome to Forensic Talents India</h2>
+            <motion.div variants={containerVariants} className="lg:col-span-7">
+              <motion.h2 variants={textVariants} className="text-3xl font-heading font-bold text-primary mb-6">Welcome to Forensic Talents India</motion.h2>
               <div className="space-y-4 text-slate-600 leading-relaxed">
-                <p>
+                <motion.p variants={textVariants}>
                   Forensic Talents India stands as a distinguished and forward-thinking organization in the domain of forensic science and investigation, dedicated to delivering scientifically precise, ethically grounded, and legally admissible forensic solutions. The organization was established with a clear and purposeful vision—to bridge the longstanding gap between scientific analysis and legal interpretation, thereby strengthening the justice delivery system.
-                </p>
-                <p>
+                </motion.p>
+                <motion.p variants={textVariants}>
                   In an era where the complexity of crimes and disputes is constantly evolving, the need for accurate forensic intervention has become more critical than ever. Recognizing this demand, Forensic Talents India operates at the intersection of science, law, and technology, offering multidisciplinary expertise that supports both investigative processes and judicial outcomes.
-                </p>
-                <div className="bg-white p-6 rounded-lg border-l-4 border-accent shadow-sm my-6">
+                </motion.p>
+                <motion.div variants={cardVariants} className="bg-white p-6 rounded-lg border-l-4 border-accent shadow-sm my-6">
                   <h3 className="font-bold text-primary flex items-center gap-2 mb-2">
                     <ShieldCheck className="text-accent" /> Evidentiary Legal Value
                   </h3>
                   <p className="text-sm text-slate-700">
                     The organization provides expert opinions under <strong>Section 39 of the Bharatiya Sakshya Adhiniyam, 2023</strong>, which corresponds to <strong>Section 45 of the Indian Evidence Act</strong>. These expert opinions hold significant evidentiary value in courts, assisting judges and legal professionals in understanding technical aspects of evidence.
                   </p>
-                </div>
-                <p>
+                </motion.div>
+                <motion.p variants={textVariants}>
                   Additionally, the organization specializes in examining critical legal and financial documents, such as wills, property deeds, agreements, cheques, affidavits, certificates, contracts, and other disputed materials. Each case is handled with methodical precision, scientific rigor, and legal awareness, ensuring dependable outcomes.
-                </p>
+                </motion.p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="lg:col-span-5 space-y-8">
-              <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+            <motion.div variants={containerVariants} className="lg:col-span-5 space-y-8">
+              <motion.div variants={cardVariants} className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
                 <h3 className="text-2xl font-bold text-primary mb-4">About Us</h3>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6 italic border-l-2 border-slate-200 pl-4">
                   Forensic science is fundamentally defined as “the application of scientific principles and techniques for the purpose of law.” It plays an indispensable role in modern justice systems by enabling the objective discovery of truth through evidence-based analysis.
                 </p>
                 <div className="space-y-4">
                   <p className="font-bold text-slate-800 text-sm">This principle is translated into practice through the integration of:</p>
-                  <ul className="space-y-2 text-sm text-slate-600">
-                    <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Advanced analytical techniques</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Modern forensic instruments</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Standardized methodologies</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Continuous research and innovation</li>
-                  </ul>
+                  <motion.ul variants={containerVariants} className="space-y-2 text-sm text-slate-600">
+                    <motion.li variants={textVariants} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Advanced analytical techniques</motion.li>
+                    <motion.li variants={textVariants} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Modern forensic instruments</motion.li>
+                    <motion.li variants={textVariants} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Standardized methodologies</motion.li>
+                    <motion.li variants={textVariants} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-accent flex-shrink-0" /> Continuous research and innovation</motion.li>
+                  </motion.ul>
                 </div>
-                <div className="mt-6 pt-6 border-t border-slate-100">
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    The organization is driven by a team of highly qualified, experienced, and specialized forensic professionals. Their work is guided by accuracy, impartiality, and adherence to legal standards, ensuring that every conclusion is scientifically valid and fully admissible during legal scrutiny and cross-examinations.
-                  </p>
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </Container>
-      </section>
+      </motion.section>
 
-      {/* What We Do & Why Choose Us */}
-      <section className="py-16 bg-secondary-light">
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="py-16 bg-secondary-light"
+      >
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Offerings */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-              <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+            <motion.div variants={containerVariants} className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+              <motion.h3 variants={textVariants} className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
                 <ShieldCheck className="text-accent" /> What We Do
-              </h3>
+              </motion.h3>
               <ul className="space-y-4">
                 {offerings.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-slate-700">
-                    <CheckCircle2 size={20} className="text-primary mt-1 flex-shrink-0" />
+                  <motion.li variants={textVariants} key={idx} className="flex items-start gap-3 text-slate-700">
+                    <CheckCircle2 size={16} className="text-primary mt-1 flex-shrink-0" />
                     <span className="text-sm leading-relaxed"><strong className="text-slate-800">{item.title}:</strong> {item.desc}</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
-            {/* Why Choose Us */}
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
-              <h3 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+            <motion.div variants={containerVariants} className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+              <motion.h3 variants={textVariants} className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
                 <Users className="text-accent" /> Why Choose Us
-              </h3>
+              </motion.h3>
               <ul className="space-y-4">
                 {whyChooseUs.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-slate-700">
-                    <CheckCircle2 size={20} className="text-accent mt-0.5 flex-shrink-0" />
+                  <motion.li variants={textVariants} key={idx} className="flex items-start gap-3 text-slate-700">
+                    <CheckCircle2 size={16} className="text-accent mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
         </Container>
-      </section>
+      </motion.section>
 
-      {/* Events & Activities */}
-      <section className="py-16 bg-white">
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="py-16 bg-white"
+      >
         <Container>
-          <div className="flex items-center gap-3 mb-10 border-b border-slate-100 pb-4">
+          <motion.div variants={textVariants} className="flex items-center gap-3 mb-10 border-b border-slate-100 pb-4">
             <Calendar className="text-accent h-8 w-8" />
-            <h2 className="text-3xl font-heading font-bold text-primary">Events & Activities</h2>
-          </div>
+            <h2 className="text-3xl font-heading font-bold text-primary">Events &amp; Activities</h2>
+          </motion.div>
 
-          {events.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50 rounded-xl border border-slate-100">
+          {eventsLoading ? (
+            <div className="flex justify-center py-16">
+              <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : events.length === 0 ? (
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
+              variants={cardVariants}
+              className="text-center py-10 bg-slate-50 rounded-xl border border-slate-100"
+            >
               <Calendar className="h-12 w-12 text-slate-300 mx-auto mb-3" />
               <p className="text-slate-500">No events found at the moment. Please check back later.</p>
-            </div>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map((event) => (
-                <div key={event._id} className="bg-slate-50 rounded-xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-shadow group cursor-pointer" onClick={() => openEventModal(event)}>
+              {events.map((event, idx) => (
+                <motion.div
+                  key={event._id}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.15 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 36, scale: 0.97 },
+                    visible: {
+                      opacity: 1, y: 0, scale: 1,
+                      transition: {
+                        duration: 0.75,
+                        ease: [0.16, 1, 0.3, 1],
+                        delay: (idx % 3) * 0.12
+                      }
+                    }
+                  }}
+                  whileHover={{ y: -5, scale: 1.01, transition: { type: 'spring', stiffness: 90, damping: 18 } }}
+                  className="bg-slate-50 rounded-xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+                  onClick={() => openEventModal(event)}
+                >
                   <div className="h-48 relative overflow-hidden bg-slate-200">
                     {event.coverImage ? (
                       <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -300,27 +317,38 @@ export default function About() {
                       <span className="text-accent group-hover:text-primary transition-colors flex items-center gap-1">View Details <Eye size={14} /></span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
         </Container>
-      </section>
+      </motion.section>
 
 
       {/* Clients */}
-      <section className="py-16">
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="py-16"
+      >
         <Container>
-          <h2 className="text-3xl font-heading font-bold text-primary mb-10 text-center">Who We Serve</h2>
+          <motion.h2 variants={textVariants} className="text-3xl font-heading font-bold text-primary mb-10 text-center">Who We Serve</motion.h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {clients.map((client, idx) => (
-              <div key={idx} className="bg-slate-50 border border-slate-100 p-6 rounded-lg text-center hover:bg-primary hover:text-white transition-colors duration-300">
+              <motion.div
+                key={idx}
+                initial="hidden"
+                whileInView="visible"
+                viewport={vp}
+                variants={cardVariants}
+                transition={{ delay: (idx % 3) * 0.12 }}
+                className="bg-slate-50 border border-slate-100 p-6 rounded-lg text-center hover:bg-primary hover:text-white transition-colors duration-300"
+              >
                 <p className="font-medium">{client}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Event Modal */}
       {selectedEvent && (

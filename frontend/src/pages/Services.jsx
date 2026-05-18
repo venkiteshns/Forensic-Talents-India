@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { ArrowRight, Shield, Search, FileText, Fingerprint, Monitor, Scale, Activity, Users, GraduationCap, Leaf, Landmark } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, scaleHover } from '../animations';
 import api from '../utils/api';
 import ReviewsSection from '../components/education/ReviewsSection';
 
@@ -13,6 +15,39 @@ function getInitials(name) {
   if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   return parts[0]?.[0]?.toUpperCase() || '?';
 }
+
+// ─── Individual Viewport-Bound Card Variants ────────────────────────────────
+//
+// ARCHITECTURE: Decentralized — each card owns its own IntersectionObserver.
+// WHY: The parent-stagger pattern fires ALL cards the moment the grid top-edge
+// enters the screen. Cards deep below the fold animate while invisible.
+// Per-card observers fix this: each card waits until IT personally crosses
+// the viewport threshold before animating.
+//
+// margin: "0px 0px -100px 0px"  →  card must be 100px inside the bottom
+//                                   of the viewport before triggering.
+//                                   Prevents any below-fold pre-animation.
+//
+// delay: (i % 3) * 0.25  →  column-position stagger within each row.
+//   col 0 = 0ms | col 1 = 250ms | col 2 = 500ms
+//   On 1-col mobile, every card is col-0 so delay is always 0 — natural
+//   scroll order provides the stagger automatically.
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+  },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: (i % 3) * 0.25,   // 250ms gap between each column in a row
+      duration: 1.2,            // cinematic, deliberately slow lift
+      ease: [0.16, 1, 0.3, 1], // Apple quiet-luxury deceleration curve
+    },
+  }),
+};
+// ────────────────────────────────────────────────────────────────────────────
 
 export default function Services() {
   useEffect(() => {
@@ -91,23 +126,49 @@ export default function Services() {
   return (
     <div className="bg-secondary-light min-h-[calc(100vh-88px)]">
       {/* Header */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute inset-0 z-0">
-          <img src="/images/banners/services_banner.webp" alt="Forensic Services" className="w-full h-full object-cover" />
+          <img src="/images/banners/services_banner.webp" alt="Our Forensic Services" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Our Forensic Services</h1>
-          <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
-            We provide specialized, legally sound scientific assistance across fundamentally critical domains. Explore our comprehensive portfolio below to view detailed breakdowns of our methodologies and forensic analysis processes.
-          </p>
+          <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">Our Expertise & Solutions</motion.h1>
+          <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            Delivering scientifically rigorous and legally defensible forensic analysis across a wide spectrum of specialized domains.
+          </motion.p>
         </Container>
-      </section>
+      </motion.section>
 
-      <Container className="pb-20">
+      <Container className="pb-24">
+        {/*
+          ── DECENTRALIZED VIEWPORT-BOUND GRID ─────────────────────────────────
+          Each card is its own viewport observer (no parent orchestrator).
+          margin: "0px 0px -100px 0px" → card must physically enter 100px
+          inside the bottom edge before its animation fires. Cards below
+          the fold remain completely invisible until the user scrolls there.
+
+          Column-stagger delay: (i % 3) * 0.25
+            col 0 → 0ms   col 1 → 250ms   col 2 → 500ms
+          On mobile (1-col), modulo always yields 0 — natural scroll order
+          provides the stagger without empty timing gaps.
+          ────────────────────────────────────────────────────────────────────
+        */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {servicesList.map((srv) => (
-            <div key={srv.id} className="bg-white rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-primary overflow-hidden flex flex-col hover:-translate-y-2 hover:shadow-xl transition-transform duration-300 ease-out group">
+          {servicesList.map((srv, i) => (
+            <motion.div
+              key={srv.id}
+              variants={cardVariants}
+              custom={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15, margin: "0px 0px -100px 0px" }}
+              whileHover={scaleHover.hover}
+              style={{ willChange: 'transform' }}
+              className="bg-white rounded-xl shadow-sm border border-slate-100 border-l-4 border-l-primary overflow-hidden flex flex-col group"
+            >
               <div className="p-8 flex-grow">
                 <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-6 shadow-md">
                   {srv.icon}
@@ -123,7 +184,7 @@ export default function Services() {
                   </Link>
                 </Button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </Container>

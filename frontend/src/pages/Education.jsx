@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
-import { BookOpen, Award, PenTool, BrainCircuit, ArrowRight, FileDown } from 'lucide-react';
+import { BookOpen, Award, PenTool, BrainCircuit, ArrowRight, FileDown, GraduationCap } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../components/education/SharedSections';
 import ReviewsSection from '../components/education/ReviewsSection';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover, vp } from '../animations';
 
 export default function Education() {
   useEffect(() => {
@@ -45,28 +47,38 @@ export default function Education() {
       icon: <FileDown size={40} className="text-white" />,
       link: "/education/resources",
       bgClass: "from-blue-800 to-slate-800"
+    },
+    {
+      title: "Institutional Directory",
+      description: "Access a meticulously compiled registry of authorized universities, national campuses, and specialized institutions offering recognized forensic qualifications across India.",
+      icon: <GraduationCap size={40} className="text-white" />,
+      link: "/education/academic-directory",
+      bgClass: "from-indigo-900 to-slate-900"
     }
   ];
 
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute inset-0 z-0">
           <img src="/images/banners/education_banner.webp" alt="Education Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants} className="max-w-4xl mx-auto">
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Master the Science of Investigation
-            </h1>
-            <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
               A premier gateway to high-end forensic education. Enhance your expertise through specialized training, immersive internships, and continuous learning.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Intro Section */}
       <PageIntro 
@@ -77,35 +89,45 @@ export default function Education() {
       {/* Hub Grid Section */}
       <section className="py-8 relative z-10">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {sections.map((section, idx) => (
-              <Link
+              <motion.div
                 key={idx}
-                to={section.link}
-                className="group relative bg-white rounded-3xl p-1 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden flex flex-col h-full"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.15, margin: "0px 0px -80px 0px" }}
+                variants={cardVariants}
+                custom={idx}
+                whileHover={scaleHover.hover}
+                transition={{ delay: (idx % 3) * 0.25 }}
+                className="h-full"
               >
-                <div className="bg-white rounded-3xl p-8 md:p-10 h-full flex flex-col relative z-10 border border-slate-100">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${section.bgClass} flex items-center justify-center mb-8 shadow-inner group-hover:scale-105 transition-transform duration-300`}>
-                    {section.icon}
+                <Link
+                  to={section.link}
+                  className="group relative bg-white rounded-3xl p-1 shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col h-full"
+                >
+                  <div className="bg-white rounded-3xl p-8 md:p-10 h-full flex flex-col relative z-10 border border-slate-100">
+                    <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${section.bgClass} flex items-center justify-center mb-8 shadow-inner group-hover:scale-105 transition-transform duration-300`}>
+                      {section.icon}
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-primary transition-colors">
+                      {section.title}
+                    </h3>
+
+                    <p className="text-slate-600 leading-relaxed mb-8 flex-grow">
+                      {section.description}
+                    </p>
+
+                    <div className="flex items-center text-primary font-bold mt-auto group-hover:gap-3 gap-2 transition-all">
+                      Explore Module <ArrowRight size={20} className="text-accent" />
+                    </div>
                   </div>
 
-                  <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-primary transition-colors">
-                    {section.title}
-                  </h3>
-
-                  <p className="text-slate-600 leading-relaxed mb-8 flex-grow">
-                    {section.description}
-                  </p>
-
-                  <div className="flex items-center text-accent font-bold uppercase tracking-wider text-sm mt-auto">
-                    Explore Program
-                    <ArrowRight size={18} className="ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-                  </div>
-                </div>
-
-                {/* Subtle Hover Background Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${section.bgClass} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none`}></div>
-              </Link>
+                  {/* Subtle Hover Background Effect */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${section.bgClass} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none`}></div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </Container>

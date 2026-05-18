@@ -4,6 +4,8 @@ import { Container } from '../../components/ui/Container';
 import { Button } from '../../components/ui/Button';
 import { ExternalLink, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageIntro, WhyChooseUs } from '../../components/education/SharedSections';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover } from '../../animations';
 
 export default function Blogs() {
   useEffect(() => {
@@ -13,7 +15,10 @@ export default function Blogs() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Header Section */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute top-8 left-4 md:left-8 z-20">
           <Link 
             to="/education"
@@ -27,16 +32,16 @@ export default function Blogs() {
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants}>
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Forensic Insights
-            </h1>
-            <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
               Stay updated with our latest case studies, research articles, and field notes from industry experts.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Intro */}
       <PageIntro
@@ -49,7 +54,15 @@ export default function Blogs() {
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {/* Blog Card 1 */}
-            <a href="https://forensictalents.blogspot.com/2026/02/virtospy-digital-autopsy-that-lets-dead.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
+            <motion.a
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              whileHover={scaleHover.hover}
+              style={{ willChange: 'transform' }}
+              href="https://forensictalents.blogspot.com/2026/02/virtospy-digital-autopsy-that-lets-dead.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full block"
+            >
               <div className="h-48 bg-slate-800 relative overflow-hidden">
                 <img src="/images/banners/services_banner.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
@@ -64,10 +77,18 @@ export default function Blogs() {
                   Read Article <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-            </a>
+            </motion.a>
 
             {/* Blog Card 2 */}
-            <a href="https://forensictalents.blogspot.com/2026/02/the-silent-witness-comprehensive-guide.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
+            <motion.a
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              whileHover={scaleHover.hover}
+              style={{ willChange: 'transform' }}
+              href="https://forensictalents.blogspot.com/2026/02/the-silent-witness-comprehensive-guide.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full block"
+            >
               <div className="h-48 bg-slate-800 relative overflow-hidden">
                 <img src="/images/services/crime-scene.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
@@ -82,10 +103,18 @@ export default function Blogs() {
                   Read Article <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-            </a>
+            </motion.a>
 
             {/* Blog Card 3 */}
-            <a href="https://forensictalents.blogspot.com/2025/05/forensic-linguistics-where-language.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full">
+            <motion.a
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              whileHover={scaleHover.hover}
+              style={{ willChange: 'transform' }}
+              href="https://forensictalents.blogspot.com/2025/05/forensic-linguistics-where-language.html?m=1" target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group transition-all duration-300 flex flex-col h-full block"
+            >
               <div className="h-48 bg-slate-800 relative overflow-hidden">
                 <img src="/images/services/questioned-documents.webp" alt="Blog Post" className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
@@ -100,16 +129,16 @@ export default function Blogs() {
                   Read Article <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
-            </a>
+            </motion.a>
           </div>
 
-          <div className="text-center">
-            <a href="https://forensictalents.blogspot.com/?m=1" target="_blank" rel="noopener noreferrer">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="text-center">
+            <motion.a variants={textVariants} href="https://forensictalents.blogspot.com/?m=1" target="_blank" rel="noopener noreferrer" className="inline-block">
               <Button variant="outline" size="lg" className="group border-slate-300 hover:border-primary hover:bg-slate-100 text-slate-800 font-bold px-8">
                 View All Blogs <ExternalLink size={18} className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </Button>
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </Container>
       </section>
     </div>

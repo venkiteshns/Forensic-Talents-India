@@ -8,6 +8,8 @@ import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/educati
 import { QuizSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants } from '../../animations';
 
 export default function Quiz() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
@@ -108,7 +110,10 @@ export default function Quiz() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Header */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute top-8 left-4 md:left-8 z-20">
           <Link
             to="/education"
@@ -122,16 +127,16 @@ export default function Quiz() {
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants}>
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Test Your Knowledge
-            </h1>
-            <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
               Engage deeply with real-world case studies and enhance your investigative understanding.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Intro & Advantages */}
       <PageIntro
@@ -149,29 +154,37 @@ export default function Quiz() {
       />
 
       {/* Certification Info */}
-      <section className="py-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={containerVariants}
+        className="py-8"
+      >
         <Container>
-          <div className="max-w-4xl mx-auto text-center">
-            <Award className="mx-auto text-accent mb-4" size={48} />
-            <h2 className="text-3xl font-heading font-bold text-primary mb-4">Certification</h2>
-            <p className="text-slate-600 text-lg leading-relaxed">
+          <motion.div variants={containerVariants} className="max-w-4xl mx-auto text-center">
+            <motion.div variants={cardVariants}>
+              <Award className="mx-auto text-accent mb-4" size={48} />
+            </motion.div>
+            <motion.h2 variants={textVariants} className="text-3xl font-heading font-bold text-primary mb-4">Certification</motion.h2>
+            <motion.p variants={textVariants} className="text-slate-600 text-lg leading-relaxed">
               Participants who participate in the quiz and accomplishes are awarded certificates, which serve as recognition of their knowledge, critical thinking ability, and commitment to learning in the field of forensic science.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Quiz Details */}
       <section id="quiz_box_section" className="py-8 relative z-10">
         <Container>
-          <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={containerVariants}
+            className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-12"
+          >
 
             {/* Background Texture */}
             <div className="absolute right-0 top-0 w-1/2 h-full opacity-5 pointer-events-none">
               <BrainCircuit className="w-full h-full text-primary scale-150 translate-x-1/4 -translate-y-1/4" />
             </div>
 
-            <div className="md:w-1/2 relative z-10">
+            <motion.div variants={textVariants} className="md:w-1/2 relative z-10">
               <span className="text-accent font-bold tracking-wider uppercase text-sm mb-3 block">Monthly Initiative</span>
 
               {loading ? (
@@ -234,9 +247,9 @@ export default function Quiz() {
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
 
-            <div className="md:w-1/2 relative z-10">
+            <motion.div variants={cardVariants} className="md:w-1/2 relative z-10">
               <div className="bg-slate-50 p-6 md:p-8 rounded-2xl shadow-inner border border-slate-100">
                 <div className="border-b border-slate-200 pb-4 mb-6">
                   <h4 className="font-bold text-slate-800 text-xl">📝 Sample Quiz Format</h4>
@@ -268,22 +281,25 @@ export default function Quiz() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-          </div>
+          </motion.div>
         </Container>
       </section>
 
       {/* Certificate Verification Section */}
-      <section className="py-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={containerVariants}
+        className="py-12"
+      >
         <Container>
-          <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden group">
+          <motion.div variants={cardVariants} className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden group">
             {/* Decorative Background Element */}
             <div className="absolute -right-16 -top-16 w-64 h-64 bg-accent/5 rounded-full blur-3xl group-hover:bg-accent/10 transition-colors duration-700"></div>
             <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-700"></div>
 
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-              <div className="lg:w-1/2 text-center lg:text-left">
+              <motion.div variants={textVariants} className="lg:w-1/2 text-center lg:text-left">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 text-accent mb-6 shadow-sm border border-accent/10">
                   <ShieldCheck size={32} />
                 </div>
@@ -301,9 +317,9 @@ export default function Quiz() {
                     <span>Instant Result</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="lg:w-1/2 w-full lg:flex lg:justify-end">
+              <motion.div variants={cardVariants} className="lg:w-1/2 w-full lg:flex lg:justify-end">
                 <div className="w-full grid grid-cols-1 lg:max-w-[420px] bg-[#FFFFFF] rounded-2xl p-[20px] md:p-[24px] shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
                   <div className="flex flex-col">
                     <div className="flex flex-col gap-[12px]">
@@ -426,11 +442,11 @@ export default function Quiz() {
                     </p>
                   )}
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
 
       <EnrollModal

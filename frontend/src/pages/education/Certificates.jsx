@@ -7,6 +7,8 @@ import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { CardSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover } from '../../animations';
 
 export default function Certificates() {
   const [expandedProgram, setExpandedProgram] = useState(null);
@@ -78,7 +80,10 @@ export default function Certificates() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Header */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute top-8 left-4 md:left-8 z-20">
           <Link 
             to="/education"
@@ -92,16 +97,16 @@ export default function Certificates() {
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants}>
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Certificate Courses
-            </h1>
-            <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
               Specialized programs crafted by industry experts to advance your forensic career with practical, hands-on knowledge.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Intro & Advantages */}
       <PageIntro
@@ -133,7 +138,16 @@ export default function Certificates() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {groupedCourses.map((cat, idx) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200 overflow-hidden group hover:border-accent/50 transition-colors duration-300">
+              <motion.div
+                key={idx}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.35 }}
+                whileHover={scaleHover.hover}
+                style={{ willChange: 'transform' }}
+                className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200 overflow-hidden group hover:border-accent/50 transition-colors duration-300"
+              >
                 <div className="bg-slate-900 p-8 border-b border-slate-800 flex items-center gap-5 relative overflow-hidden">
                   <div className="absolute right-0 top-0 opacity-5 -translate-y-1/4 translate-x-1/4">
                     {cat.icon}
@@ -230,9 +244,9 @@ export default function Certificates() {
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+            </div>
           )}
         </Container>
       </section>

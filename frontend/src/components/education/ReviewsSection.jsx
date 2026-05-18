@@ -5,6 +5,8 @@ import ReviewCard from '../ui/ReviewCard';
 import TestimonialCarousel from '../ui/TestimonialCarousel';
 import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants } from '../../animations';
 
 // Helper: get initials from name (e.g. "John Ken" → "JK", "John" → "J")
 function getInitials(name) {
@@ -146,12 +148,12 @@ export default function ReviewsSection({ type }) {
         
         {/* Client Testimonials (Service) */}
         {(!type || type === 'service') && (
-          <div className="mb-20">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</h2>
-              <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
-              <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</p>
-            </div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="mb-20">
+            <motion.div variants={containerVariants} className="text-center mb-12">
+              <motion.h2 variants={textVariants} className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</motion.h2>
+              <motion.div variants={textVariants} className="h-1 w-20 bg-accent mx-auto rounded-full"></motion.div>
+              <motion.p variants={textVariants} className="text-slate-600 mt-4 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</motion.p>
+            </motion.div>
             
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -164,17 +166,17 @@ export default function ReviewsSection({ type }) {
             ) : (
               <TestimonialCarousel testimonials={serviceReviews} speed={28} />
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Student Testimonials (Education) */}
         {(!type || type === 'education') && (
-          <div className="mb-24">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Student Testimonials</h2>
-              <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
-              <p className="text-slate-600 mt-4 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</p>
-            </div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="mb-24">
+            <motion.div variants={containerVariants} className="text-center mb-12">
+              <motion.h2 variants={textVariants} className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Student Testimonials</motion.h2>
+              <motion.div variants={textVariants} className="h-1 w-20 bg-accent mx-auto rounded-full"></motion.div>
+              <motion.p variants={textVariants} className="text-slate-600 mt-4 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</motion.p>
+            </motion.div>
             
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -187,18 +189,18 @@ export default function ReviewsSection({ type }) {
             ) : (
               <TestimonialCarousel testimonials={educationReviews} speed={32} />
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Submission Form */}
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="max-w-4xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-bl-full -z-0"></div>
           
           <div className="relative z-10">
-            <div className="text-center mb-10">
+            <motion.div variants={textVariants} className="text-center mb-10">
               <h3 className="text-2xl sm:text-3xl font-heading font-bold text-primary mb-3">Share Your Experience</h3>
               <p className="text-slate-600 max-w-lg mx-auto">Your feedback helps us maintain the highest standards of scientific excellence and education.</p>
-            </div>
+            </motion.div>
 
             {successMode ? (
               <div className="bg-green-50 text-green-800 p-8 rounded-2xl text-center border border-green-100 flex flex-col items-center animate-in zoom-in-95 duration-500">
@@ -352,7 +354,7 @@ export default function ReviewsSection({ type }) {
               </form>
             )}
           </div>
-        </div>
+        </motion.div>
 
       </Container>
     </section>

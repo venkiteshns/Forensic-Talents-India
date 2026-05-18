@@ -46,7 +46,7 @@ const Hotspot = ({ topic, index, setHasInteracted, onSelectTopic }) => {
     <motion.div
       initial={{ scale: 0, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, amount: 0.15 }}
       transition={{ type: 'spring', delay: index * 0.1, stiffness: 300, damping: 20 }}
       className="absolute z-10"
       style={{ top: topic.top, left: topic.left, transform: 'translate(-50%, -50%)' }}
@@ -104,7 +104,7 @@ export default function InteractiveForensicMap({ onSelectTopic }) {
             <motion.h2
               initial={{ y: '100%', opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.15 }}
               transition={{ ease: [0.16, 1, 0.3, 1], duration: 1.2 }}
               className="text-2xl sm:text-4xl lg:text-6xl font-heading font-bold text-primary leading-tight"
             >
@@ -128,7 +128,7 @@ export default function InteractiveForensicMap({ onSelectTopic }) {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, amount: 0.15 }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                   className="flex items-center gap-3"
                 >

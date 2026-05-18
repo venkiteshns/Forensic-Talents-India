@@ -90,24 +90,21 @@ export default function Expertise() {
           </motion.div>
         </div>
 
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[250px]"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[250px]">
           {services.map((srv) => (
             <motion.div
               key={srv.id}
               variants={itemVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              style={{ willChange: 'transform', transformPerspective: 1000 }}
               whileHover={{ 
                 scale: 1.02, 
                 rotateX: 2, 
                 rotateY: -2,
                 boxShadow: "none"
               }}
-              style={{ transformPerspective: 1000 }}
               className={`group relative rounded-3xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl transition-colors hover:border-white/20 ${srv.colSpan} ${srv.rowSpan}`}
             >
               <Link to={`/services/${srv.id}`} className="absolute inset-0 z-20 flex flex-col justify-end p-8">
@@ -134,6 +131,10 @@ export default function Expertise() {
           {/* Quick link card to complete the grid */}
           <motion.div
             variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.35 }}
+            style={{ willChange: 'transform' }}
             whileHover={{ scale: 1.02 }}
             className="group relative rounded-3xl overflow-hidden border border-accent/20 bg-accent/5 backdrop-blur-xl flex items-center justify-center col-span-1 md:col-span-1 lg:col-span-1 auto-rows-[250px]"
           >
@@ -144,7 +145,7 @@ export default function Expertise() {
                 <span className="text-white font-semibold">Explore All<br/>Forensic Services</span>
              </Link>
           </motion.div>
-        </motion.div>
+        </div>
         
         <div className="mt-8 text-center md:hidden">
           <Link to="/services" className="inline-flex items-center gap-2 text-accent font-semibold hover:text-white transition-colors">

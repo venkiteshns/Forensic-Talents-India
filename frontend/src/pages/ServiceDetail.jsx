@@ -11,7 +11,7 @@ import InteractiveForensicMap from '../components/ui/InteractiveForensicMap';
 import TopicForensicDashboard from '../components/ui/TopicForensicDashboard';
 import { techTourData } from '../data/techTourData';
 import { AnimatePresence, motion } from 'framer-motion';
-
+import { containerVariants, textVariants, cardVariants } from '../animations';
 // Utility to parse extracted Word text safely
 function parseContent(text) {
   if (!text) return { intro: '', features: [], process: [] };
@@ -105,8 +105,10 @@ export default function ServiceDetail() {
         </div>
 
         <Container className="relative z-10 pt-10">
-          <h1 className="text-3xl md:text-5xl font-heading font-bold mb-6 text-white drop-shadow-md">{serviceInfo.title}</h1>
-          <p className="text-slate-200 text-xl max-w-3xl leading-relaxed drop-shadow">{serviceInfo.catchyIntro}</p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}>
+            <motion.h1 variants={textVariants} className="text-3xl md:text-5xl font-heading font-bold mb-6 text-white drop-shadow-md">{serviceInfo.title}</motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-xl max-w-3xl leading-relaxed drop-shadow">{serviceInfo.catchyIntro}</motion.p>
+          </motion.div>
         </Container>
       </div>
 
@@ -114,74 +116,74 @@ export default function ServiceDetail() {
         <ServiceProcess serviceId={id} />
       ) : (
         <Container className="py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
             {/* LEFT SIDE (Key Offerings) */}
-            <div className="col-span-1 lg:col-span-2 order-2 lg:order-1 max-w-full">
+            <motion.div variants={containerVariants} className="col-span-1 lg:col-span-2 order-2 lg:order-1 max-w-full">
               {id === 'fingerprint' && (
-                <div className="mb-12 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-primary">
+                <motion.div variants={cardVariants} className="mb-12 bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-primary">
                   <h3 className="text-xl font-bold text-primary mb-3">Expert Legal Validity</h3>
                   <p className="text-slate-700 leading-relaxed text-lg">
                     We provide complete solutions in fingerprint examination matters, and our expert opinion is acceptable under <span className="font-semibold text-primary">Section 39 of the Bharatiya Sakshya Adhiniyam, 2023</span> (formerly Section 45 of the Indian Evidence Act) by all the Courts of India and abroad. We are pleased to support you, whenever you need our services.
                   </p>
-                </div>
+                </motion.div>
               )}
 
-              <h2 className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Key Offerings</h2>
+              <motion.h2 variants={textVariants} className="text-3xl font-heading font-bold text-primary mb-8 border-b pb-4">Key Offerings</motion.h2>
               {parsed.features.length > 0 ? (
-                <div className="space-y-6">
+                <motion.div variants={containerVariants} className="space-y-6">
                   {parsed.features.map((feat, idx) => (
-                    <div key={idx} className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
-                      <h3 className="text-xl font-bold text-primary mb-3 flex items-start gap-2">
+                    <motion.div variants={cardVariants} key={idx} className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
+                      <motion.h3 variants={textVariants} className="text-xl font-bold text-primary mb-3 flex items-start gap-2">
                         <CheckCircle2 className="text-accent flex-shrink-0 mt-1" size={20} />
                         {feat.title.replace('Our Services Include', '')}
-                      </h3>
+                      </motion.h3>
                       {feat.details && feat.details.length > 0 && (
                         <ul className="text-slate-600 leading-relaxed ml-8 list-disc space-y-2">
                           {feat.details.map((point, pIdx) => (
-                            <li key={pIdx}>{point}</li>
+                            <motion.li variants={textVariants} key={pIdx}>{point}</motion.li>
                           ))}
                         </ul>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               ) : (
-                <p className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</p>
+                <motion.p variants={textVariants} className="text-slate-600 italic">Detailed service breakdown allows us to provide scientifically accurate testing and expert opinions verified under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023.</motion.p>
               )}
 
               {/* Countries Covered Section - PCC Only */}
               {id === 'pcc' && (
-                <div className="py-10">
-                  <h2 className="text-3xl font-heading font-bold text-primary mb-6 border-b pb-4">Countries Covered</h2>
-                  <p className="text-slate-600 mb-8 leading-relaxed">
+                <motion.div variants={containerVariants} className="py-10">
+                  <motion.h2 variants={textVariants} className="text-3xl font-heading font-bold text-primary mb-6 border-b pb-4">Countries Covered</motion.h2>
+                  <motion.p variants={textVariants} className="text-slate-600 mb-8 leading-relaxed">
                     Our services are available across multiple countries, ensuring compliance with each region’s legal and procedural standards.
-                  </p>
+                  </motion.p>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                  <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     {[
                       'USA', 'Canada', 'UK', 'UAE', 'Australia', 'Singapore', 'New Zealand', 'Saudi Arabia'
                     ].map((country, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-200">
+                      <motion.div variants={cardVariants} key={idx} className="flex items-center gap-3 p-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all duration-200">
                         <Globe className="text-accent flex-shrink-0" size={20} />
                         <span className="font-semibold text-slate-800">{country}</span>
-                      </div>
+                      </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                   
-                  <p className="text-slate-600 italic">
+                  <motion.p variants={textVariants} className="text-slate-600 italic">
                     And many more. We stay updated with the latest requirements of each country to ensure compliance and smooth processing.
-                  </p>
-                </div>
+                  </motion.p>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
 
             {/* RIGHT SIDE (Process Flow) */}
-            <div className="col-span-1 order-1 lg:order-2">
+            <motion.div variants={containerVariants} className="col-span-1 order-1 lg:order-2">
               <div className="sticky top-24 bg-white lg:border-l lg:border-slate-100 lg:pl-8">
                 <ServiceProcess serviceId={id} compact={true} />
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </Container>
       )}
 

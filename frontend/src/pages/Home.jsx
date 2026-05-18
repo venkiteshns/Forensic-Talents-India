@@ -125,7 +125,7 @@ const heroFadeUp = {
 
 function AnimatedCounter({ from, to, suffix }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const isInView = useInView(ref, { once: true, amount: 0.35 });
   const count = useMotionValue(from);
   const rounded = useTransform(count, (latest) => Math.round(latest));
 
@@ -145,7 +145,7 @@ function AnimatedCounter({ from, to, suffix }) {
 
 function FadeInSection({ children, className = '', delay = 0.3 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-12% 0px' });
+  const inView = useInView(ref, { once: true, amount: 0.35 });
 
   return (
     <motion.div
@@ -193,7 +193,8 @@ function Card({ children, className = '', index = 0, divide = 3 }) {
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, amount: 0.35 }}
+      style={{ willChange: 'transform' }}
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: {

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { Search, Image as ImageIcon, CheckSquare, PenTool, Play, Info } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover, vp } from '../animations';
 
 const GAMES = [
   {
@@ -45,26 +47,29 @@ export default function Games() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12" style={{ minHeight: '340px' }}>
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-32 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-12" style={{ minHeight: '340px' }}
+      >
         <div className="absolute inset-0 z-0 bg-slate-900 overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants} className="max-w-4xl mx-auto">
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Forensic Games Hub
-            </h1>
-            <p className="text-slate-300 text-lg max-w-2xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-300 text-lg max-w-2xl mx-auto leading-relaxed">
               Test your investigative skills and forensic knowledge with our interactive training exercises. Select a module below to begin.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Disclaimer Section */}
       <Container className="mb-10 relative z-10 -mt-20">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg shadow-slate-200/50">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="max-w-5xl mx-auto">
+          <motion.div variants={cardVariants} className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg shadow-slate-200/50">
             <div className="bg-blue-50 p-2.5 rounded-lg border border-blue-100 flex-shrink-0">
               <Info className="w-5 h-5 text-blue-600" />
             </div>
@@ -74,8 +79,8 @@ export default function Games() {
                 These interactive modules are designed strictly for educational engagement and entertainment purposes. Participation in these exercises does not confer any formal certifications, academic credits, or professional rewards.
               </p>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
 
       {/* Game Selection Grid */}
@@ -84,33 +89,35 @@ export default function Games() {
           {GAMES.map((game, idx) => {
             const Icon = game.icon;
             return (
-              <div
+              <motion.div
                 key={game.id}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer"
+                initial="hidden"
+                whileInView="visible"
+                viewport={vp}
+                variants={cardVariants}
+                whileHover={scaleHover.hover}
+                transition={{ delay: (idx % 2) * 0.15 }}
+                className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col group cursor-pointer"
                 onClick={() => navigate(`/games/${game.id}`)}
-                style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="p-8 flex-grow">
                   <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner", game.lightColor)}>
                     <Icon className={cn("w-8 h-8", game.color.replace('bg-', 'text-'))} />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-primary transition-colors">
                     {game.title}
                   </h3>
-                  <p className="text-slate-600 leading-relaxed">
+                  <p className="text-slate-600 leading-relaxed mb-6">
                     {game.description}
                   </p>
                 </div>
-
-                <div className="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between group-hover:bg-primary/5 transition-colors">
-                  <span className="font-bold text-slate-700 group-hover:text-primary transition-colors">
-                    Play Now
-                  </span>
-                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                    <Play className="w-4 h-4 ml-0.5" />
+                <div className="bg-slate-50 border-t border-slate-100 p-5 flex items-center justify-between group-hover:bg-primary/5 transition-colors">
+                  <span className="font-semibold text-primary">Play Now</span>
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <Play className="w-4 h-4 ml-1" />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

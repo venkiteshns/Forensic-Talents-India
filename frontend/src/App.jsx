@@ -17,6 +17,7 @@ import Internships from './pages/education/Internships';
 import Blogs from './pages/education/Blogs';
 import Quiz from './pages/education/Quiz';
 import Resources from './pages/education/Resources';
+import AcademicDirectory from './pages/education/AcademicDirectory';
 import Contact from './pages/Contact';
 import Games from './pages/Games';
 import UserNotFound from './pages/UserNotFound';
@@ -41,6 +42,7 @@ function App() {
         <Route path="education/blogs" element={<Blogs />} />
         <Route path="education/quiz" element={<Quiz />} />
         <Route path="education/resources" element={<Resources />} />
+        <Route path="education/academic-directory" element={<AcademicDirectory />} />
         <Route path="games" element={<Games />} />
         <Route path="games/word-search" element={<GameRoute component={WordSearchGame} />} />
         <Route path="games/matching" element={<GameRoute component={MatchingGame} />} />

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants } from '../animations';
 import { ArrowLeft } from 'lucide-react';
 import techData from '../data/techData.json';
 
@@ -29,21 +30,6 @@ const TechTourDetail = () => {
     );
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,11 +47,10 @@ const TechTourDetail = () => {
 
         <motion.div
           variants={containerVariants}
-          initial="hidden"
-          animate="show"
+          initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}
         >
           {/* Header */}
-          <motion.div variants={itemVariants} className="mb-12">
+          <motion.div variants={textVariants} className="mb-12">
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
               {categoryData.categoryTitle}
             </h1>
@@ -75,7 +60,7 @@ const TechTourDetail = () => {
             {categoryData.sections.map((section, index) => (
               <motion.div
                 key={index}
-                variants={itemVariants}
+                variants={containerVariants}
                 className="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100"
               >
                 <h2 className="text-2xl font-bold text-slate-800 border-b border-slate-200 pb-2 mt-2 mb-6 flex items-center">

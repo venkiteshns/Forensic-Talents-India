@@ -7,6 +7,8 @@ import { EnrollModal } from '../../components/education/EnrollModal';
 import { PageIntro, AdvantagesList, WhyChooseUs } from '../../components/education/SharedSections';
 import { CardSkeleton } from '../../components/ui/Skeletons';
 import api from '../../utils/api';
+import { motion } from 'framer-motion';
+import { containerVariants, textVariants, cardVariants, scaleHover } from '../../animations';
 
 export default function Internships() {
   const [enrollModal, setEnrollModal] = useState({ isOpen: false, course: null });
@@ -55,7 +57,10 @@ export default function Internships() {
   return (
     <div className="bg-slate-50 min-h-screen pb-20 font-sans">
       {/* Header Section */}
-      <section className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}>
+      <motion.section
+        initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants}
+        className="relative pt-24 pb-20 text-center flex items-center justify-center border-b-[8px] border-accent mb-16" style={{ minHeight: '340px' }}
+      >
         <div className="absolute top-8 left-4 md:left-8 z-20">
           <Link 
             to="/education"
@@ -69,16 +74,16 @@ export default function Internships() {
           <div className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"></div>
         </div>
         <Container className="relative z-10">
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+          <motion.div variants={containerVariants}>
+            <motion.h1 variants={textVariants} className="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
               Internship Program
-            </h1>
-            <p className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
+            </motion.h1>
+            <motion.p variants={textVariants} className="text-slate-200 text-lg max-w-3xl mx-auto leading-relaxed">
               Jumpstart your career and acquire practical, real-world experience in a professional forensic environment.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </Container>
-      </section>
+      </motion.section>
 
       {/* Intro & Advantages */}
       <PageIntro
@@ -97,7 +102,14 @@ export default function Internships() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Areas to Explore */}
-            <div className="bg-white rounded-2xl p-8 border border-slate-200 hover:border-accent/50 transition-colors shadow-lg h-full flex flex-col">
+            <motion.div
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.35 }}
+              style={{ willChange: 'transform' }}
+              className="bg-white rounded-2xl p-8 border border-slate-200 hover:border-accent/50 transition-colors shadow-lg h-full flex flex-col"
+            >
               <h3 className="text-xl font-bold text-primary mb-6 flex items-center gap-3">
                 <Search size={24} className="text-accent" /> Areas You Will Explore
               </h3>
@@ -112,7 +124,7 @@ export default function Internships() {
                   <p className="text-slate-400 text-sm italic">Areas will be updated soon.</p>
                 )}
               </ul>
-            </div>
+            </motion.div>
 
             {/* Dynamic Internships */}
             {loading ? (
@@ -129,7 +141,16 @@ export default function Internships() {
                 const isOffline = internship.type.toLowerCase() === 'offline';
                 
                 return (
-                  <div key={internship._id} className={`${isOffline ? 'bg-gradient-to-b from-primary to-primary-dark shadow-2xl border-2 border-accent text-white' : 'bg-white shadow-lg border border-slate-200 text-slate-900'} rounded-2xl p-8 transform hover:-translate-y-2 transition-transform duration-300 relative flex flex-col`}>
+                <motion.div
+                  key={internship._id}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.35 }}
+                  whileHover={scaleHover.hover}
+                  style={{ willChange: 'transform' }}
+                  className={`${isOffline ? 'bg-gradient-to-b from-primary to-primary-dark shadow-2xl border-2 border-accent text-white' : 'bg-white shadow-lg border border-slate-200 text-slate-900'} rounded-2xl p-8 relative flex flex-col`}
+                >
                     {isOffline && (
                       <div className="absolute top-0 right-0 bg-accent text-primary font-bold text-xs px-3 py-1.5 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">
                         Best Value / Recommended
@@ -176,7 +197,7 @@ export default function Internships() {
                         Apply Now <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </div>
-                  </div>
+                </motion.div>
                 );
               })
             )}
