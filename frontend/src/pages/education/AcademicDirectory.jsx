@@ -83,45 +83,37 @@ function InstitutionRow({ institution, index }) {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3, margin: '0px 0px -60px 0px' }}
-      className="group flex flex-col items-start gap-2 py-4 border-b border-slate-100 last:border-0 md:flex-row md:items-center md:justify-between md:gap-4"
+      className="group flex flex-col items-start gap-1.5 py-4 border-b border-slate-100 last:border-0 md:flex-row md:items-center md:justify-between md:gap-4"
     >
-      {/* Col 1 – Icon + Institution Name */}
-      <div className="flex items-start gap-3 pr-4 w-full md:w-auto md:min-w-0">
+      {/* Col 1 – Icon + Institution Name (stacks on mobile) */}
+      <div className="flex items-start gap-3 pr-4 md:pr-0 min-w-0">
         <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-primary/10 transition-colors flex items-center justify-center flex-shrink-0 mt-0.5">
           <Building2 size={13} className="text-slate-500 group-hover:text-primary transition-colors" />
         </div>
-        <div className="min-w-0 flex-1">
-          <a
-            href={institution.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group/link inline-flex items-start gap-1.5"
-          >
-            {/* No truncate — name wraps freely on mobile */}
-            <span className="font-semibold text-slate-800 hover:text-primary transition-colors text-sm leading-snug break-words">
-              {institution.name}
-            </span>
-            <ExternalLink
-              size={11}
-              className="opacity-0 group-hover/link:opacity-50 transition-opacity mt-0.5 flex-shrink-0"
-            />
-          </a>
-          {/* City badge: stacks below name on mobile only */}
-          <div className="flex items-center gap-1 mt-1 md:hidden">
-            <MapPin size={11} className="text-slate-400 flex-shrink-0" />
-            <span className="text-xs text-slate-500 font-medium">{institution.city}</span>
-          </div>
-        </div>
+        <a
+          href={institution.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-slate-800 hover:text-primary transition-colors text-sm md:text-sm leading-snug group/link flex items-start gap-1.5"
+        >
+          {/* Name: wraps freely on all sizes — no truncation */}
+          <span className="break-words">{institution.name}</span>
+          <ExternalLink
+            size={11}
+            className="opacity-0 group-hover/link:opacity-50 transition-opacity mt-0.5 flex-shrink-0"
+          />
+        </a>
       </div>
 
-      {/* Col 2 – City: right-aligned on desktop, hidden on mobile (shown above) */}
-      <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
-        <MapPin size={12} className="text-slate-400" />
-        <span className="text-sm text-slate-500 font-medium">{institution.city}</span>
+      {/* Col 2 – City: left-aligned below name on mobile, right-aligned on desktop */}
+      <div className="flex items-center gap-1.5 pl-10 md:pl-0 md:flex-shrink-0">
+        <MapPin size={12} className="text-slate-400 flex-shrink-0" />
+        <span className="text-xs md:text-sm text-slate-500 font-medium">{institution.city}</span>
       </div>
     </motion.div>
   );
 }
+
 
 function StateSection({ stateName, institutions }) {
   return (

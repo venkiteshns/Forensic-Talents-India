@@ -1,52 +1,74 @@
-import { useState, useRef } from 'react';
-import { Plus, Minus } from 'lucide-react';
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
-export default function FAQAccordion({ faqs }) {
-  const [openIndex, setOpenIndex] = useState(null);
-
-  if (!faqs || faqs.length === 0) return null;
-
-  const toggleAccordion = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+function FAQBox({ faq, index }) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-4">
-      {faqs.map((faq, index) => {
-        const isOpen = openIndex === index;
-        return (
-          <div 
-            key={index} 
-            className={`border rounded-xl transition-all duration-300 overflow-hidden ${
-              isOpen ? 'border-primary/30 shadow-md bg-white' : 'border-slate-200 bg-slate-50 hover:shadow-sm'
-            }`}
+    <motion.div
+      custom={index}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4, borderColor: '#94a3b8' }}
+      viewport={{ once: true, margin: '0px 0px -60px 0px', amount: 0.15 }}
+      transition={{
+        type: 'spring',
+        stiffness: 110,
+        damping: 22,
+        delay: (index % 2) * 0.1,
+      }}
+      className="bg-white border border-slate-200 rounded-xl overflow-hidden"
+    >
+      {/* Header trigger */}
+      <button
+        onClick={() => setIsOpen((p) => !p)}
+        className="w-full flex items-start gap-4 px-5 py-5 text-left group focus:outline-none"
+        aria-expanded={isOpen}
+      >
+        <span className="flex-1 text-sm md:text-base font-semibold text-slate-900 leading-snug group-hover:text-primary transition-colors duration-200">
+          {faq.question}
+        </span>
+
+        <motion.span
+          animate={{ rotate: isOpen ? 45 : 0 }}
+          transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+          className="flex-shrink-0 w-7 h-7 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 group-hover:border-slate-400 group-hover:text-slate-700 transition-colors duration-200 text-lg leading-none select-none"
+          aria-hidden
+        >
+          +
+        </motion.span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="answer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 140, damping: 24 }}
+            className="overflow-hidden"
           >
-            <button
-              onClick={() => toggleAccordion(index)}
-              className="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none"
-              aria-expanded={isOpen}
-            >
-              <span className={`font-bold pr-8 ${isOpen ? 'text-primary' : 'text-slate-800'}`}>
-                {faq.question}
-              </span>
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                isOpen ? 'bg-primary text-white' : 'bg-slate-200 text-slate-600'
-              }`}>
-                {isOpen ? <Minus size={18} /> : <Plus size={18} />}
-              </div>
-            </button>
-            <div 
-              className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
-            >
-              <div className="overflow-hidden">
-                <div className="px-6 pb-6 text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
-                  {faq.answer}
-                </div>
-              </div>
+            <div className="px-5 pb-5 border-t border-slate-100 pt-4">
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {faq.answer}
+              </p>
             </div>
-          </div>
-        );
-      })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+export default function FAQAccordion({ faqs }) {
+  if (!faqs || faqs.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      {faqs.map((faq, index) => (
+        <FAQBox key={index} faq={faq} index={index} />
+      ))}
     </div>
   );
 }
