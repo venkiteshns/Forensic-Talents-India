@@ -1,5 +1,5 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
-import { motion, useMotionValue, animate, useMotionValueEvent } from 'framer-motion';
+import { useRef, useEffect, useCallback } from 'react';
+import { motion, useMotionValue, animate } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 
 // ─── Motion & Timing Tokens ───────────────────────────────────────────────────
@@ -37,12 +37,6 @@ const SNAP_SPRING = {
   mass: 0.8,
 };
 
-// Dot morphing spring: fast width stretch, no overshoot
-const DOT_SPRING = {
-  type: 'spring',
-  stiffness: 300,
-  damping: 25,
-};
 
 // ─── Inline Card ──────────────────────────────────────────────────────────────
 function getInitials(name) {
@@ -56,7 +50,17 @@ function CarouselCard({ review }) {
   return (
     <div
       className="w-[300px] sm:w-[360px] flex-shrink-0 bg-white border border-slate-200 rounded-xl p-6 flex flex-col justify-between shadow-none whitespace-normal select-none"
-      style={{ height: '220px' }}
+      style={{
+        height: '220px',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        transform: 'translate3d(0,0,0)',
+        WebkitTransform: 'translate3d(0,0,0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        filter: 'blur(0px)',
+        contain: 'paint layout',
+      }}
     >
       <p className="text-sm text-slate-600 leading-relaxed italic line-clamp-3 mb-4">
         &ldquo;{review.review}&rdquo;
@@ -95,46 +99,9 @@ function CarouselCard({ review }) {
   );
 }
 
-// ─── Momentum-Bound Dot ───────────────────────────────────────────────────────
-// Each dot is a motion.span that reads its own `isActive` prop and morphs
-// width + color via a DOT_SPRING. The spring is independent from the track
-// spring so the dot can settle faster/slower than the card without coupling.
-function Dot({ isActive, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-full"
-      aria-label="Go to slide"
-    >
-      <motion.span
-        className="block h-2 rounded-full"
-        animate={{
-          width: isActive ? 20 : 8,
-          backgroundColor: isActive ? '#0F172A' : '#E2E8F0',
-        }}
-        transition={DOT_SPRING}
-      />
-    </button>
-  );
-}
 
 // ─── Testimonial Carousel ─────────────────────────────────────────────────────
-//
-// Motion architecture:
-//
-//   x (MotionValue) ← animate(x, target, spring)
-//     ↓
-//   useMotionValueEvent('change') fires synchronously inside Framer's rAF loop
-//     ↓
-//   Math.round(|x| / step) % N  →  localDotIndex (React state, set only on
-//     index change — not every frame — so re-renders are O(N transitions))
-//     ↓
-//   <Dot isActive={i === localDotIndex} />  →  width/color morphs via DOT_SPRING
-//
-// The seamless loop reset uses animate(x, clone_target).then(() => x.set(0))
-// — the Promise from animate() resolves when the spring settles, then x.set()
-// is an instant set (no spring) so the snap is invisible to the user.
-//
+// Dots removed. Navigation via arrow buttons and swipe only.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function TestimonialCarousel({
@@ -146,17 +113,10 @@ export default function TestimonialCarousel({
   // ── All hooks unconditionally at the top ──────────────────────────────────
 
   // x MotionValue: the single source of truth for track position.
-  // animate() drives it. useMotionValueEvent reads it.
   const x = useMotionValue(0);
 
   // stepRef: always-fresh card+gap width for the event handler closure.
-  // Must be a ref (not state) inside useMotionValueEvent to avoid stale reads.
-  const stepRef = useRef(384); // default; updated from DOM after mount
-
-  // localDotIndex: derived from x in real-time; drives the dot indicators.
-  // Updated only when the index boundary is crossed (not every rAF frame).
-  const [localDotIndex, setLocalDotIndex] = useState(0);
-  const localDotRef = useRef(0); // ref mirror to avoid stale closure in event
+  const stepRef = useRef(384);
 
   // currentIndexRef: the logical step index for interval/button logic.
   const currentIndexRef = useRef(0);
@@ -172,32 +132,15 @@ export default function TestimonialCarousel({
   const N = testimonials?.length || 0;
   const items = hasData ? [...testimonials, ...testimonials] : [];
 
-  // ── Real-time dot tracker ─────────────────────────────────────────────────
-  // Fires synchronously inside Framer's animation loop on every x change.
-  // Math.round gives us the midpoint crossover: dot flips at exactly 50%
-  // of the inter-card distance, matching the physical card displacement.
-  useMotionValueEvent(x, 'change', (latest) => {
-    if (stepRef.current <= 0 || N === 0) return;
-    const rawIdx = Math.round(Math.abs(latest) / stepRef.current);
-    const wrappedIdx = rawIdx % N; // keep within original card range
-    if (wrappedIdx !== localDotRef.current) {
-      localDotRef.current = wrappedIdx;
-      setLocalDotIndex(wrappedIdx);
-    }
-  });
 
   // ── Measure step from DOM ─────────────────────────────────────────────────
-  // A ref is updated immediately so stepRef is always fresh for the event
-  // handler. State `step` drives the interval/button calculations (needs
-  // React renders). Both are updated together.
-  const [step, setStep] = useState(384);
+  // stepRef is the single source of truth — all navigation reads it directly.
+  // No React state needed; ref updates are synchronous and don't trigger renders.
   useEffect(() => {
     if (!hasData) return;
     const measure = () => {
       if (firstCardRef.current) {
-        const measured = firstCardRef.current.offsetWidth + GAP;
-        stepRef.current = measured; // instant ref update for event handler
-        setStep(measured);          // state update for interval/button math
+        stepRef.current = firstCardRef.current.offsetWidth + GAP;
       }
     };
     const t = setTimeout(measure, 50); // delay so CSS breakpoints resolve
@@ -217,22 +160,19 @@ export default function TestimonialCarousel({
     isAnimatingRef.current = true;
 
     if (nextIdx >= N) {
-      // Seamless loop: animate into clone, then snap back to origin
-      await animate(x, -nextIdx * stepRef.current, spring);
-      x.set(0);                      // instant, invisible snap
-      localDotRef.current = 0;
-      setLocalDotIndex(0);
+      await animate(x, Math.round(-nextIdx * stepRef.current), spring);
+      x.set(0);
       currentIndexRef.current = 0;
     } else if (nextIdx < 0) {
       await animate(x, 0, spring);
       currentIndexRef.current = 0;
     } else {
-      await animate(x, -nextIdx * stepRef.current, spring);
+      await animate(x, Math.round(-nextIdx * stepRef.current), spring);
       currentIndexRef.current = nextIdx;
     }
 
     isAnimatingRef.current = false;
-  }, [x, N]); // stepRef.current is accessed via ref — not a dep
+  }, [x, N]);
 
   // ── Auto-advance interval ─────────────────────────────────────────────────
   const startInterval = useCallback(() => {
@@ -331,21 +271,17 @@ export default function TestimonialCarousel({
         </div>
       )}
 
-      {/* Scroll viewport ────────────────────────────────────────────────────── */}
-      <div className="relative w-full overflow-hidden">
-
+      {/* Scroll viewport: perspective forces 3D compositing context ─────────── */}
+      <div className="relative w-full overflow-hidden" style={{ perspective: '1000px' }}>
 
         {/* ── Track: GPU-composited layer, x MotionValue, pointer swipe ────── */}
-        {/* transform-gpu → forces browser to promote this element to its own   */}
-        {/* GPU compositing layer BEFORE animation starts. will-change-transform */}
-        {/* signals the intent ahead of time. backfaceVisibility:hidden prevents */}
-        {/* the compositing layer flip/flicker on spring direction changes.      */}
         <motion.div
-          className="flex py-2 cursor-grab active:cursor-grabbing transform-gpu will-change-transform"
+          className="flex py-2 cursor-grab active:cursor-grabbing will-change-transform"
           style={{
             x,
             gap: `${GAP}px`,
             touchAction: 'pan-y',
+            transformStyle: 'preserve-3d',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
           }}
@@ -360,21 +296,6 @@ export default function TestimonialCarousel({
           ))}
         </motion.div>
       </div>
-
-      {/* ── Momentum-bound progress dots ──────────────────────────────────── */}
-      {/* localDotIndex updates mid-spring — dots morph at the exact frame    */}
-      {/* the card crosses the 50% displacement threshold. No async lag.      */}
-      {N > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {Array.from({ length: N }).map((_, i) => (
-            <Dot
-              key={i}
-              isActive={i === localDotIndex}
-              onClick={() => { goToIndex(i, SNAP_SPRING); startInterval(); }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

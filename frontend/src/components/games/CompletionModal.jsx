@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ChevronRight, RefreshCw, GraduationCap } from 'lucide-react';
+import { CheckCircle2, ChevronRight, RefreshCw, GraduationCap, Gamepad2 } from 'lucide-react';
 
 export default function CompletionModal({ 
   level, 
@@ -51,8 +51,12 @@ export default function CompletionModal({
     }
   };
 
+  const isFinalLevel = currentLevelNum >= displayTotal;
+
   const handleSecondaryAction = () => {
-    if (onNextLevel && currentLevelNum < displayTotal) {
+    if (isFinalLevel) {
+      navigate('/games');
+    } else if (onNextLevel) {
       onNextLevel();
     } else {
       onPlayAgain();
@@ -138,8 +142,11 @@ export default function CompletionModal({
               onClick={handleSecondaryAction} 
               className="secondary-cta"
             >
-              Continue Playing
-              <ChevronRight className="w-4 h-4" />
+              {isFinalLevel ? (
+                <><Gamepad2 className="w-4 h-4" /> Explore More Games</>
+              ) : (
+                <>Continue Playing <ChevronRight className="w-4 h-4" /></>
+              )}
             </button>
 
             <button 

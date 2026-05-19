@@ -159,15 +159,38 @@ export default function MatchingGame({ onQuit }) {
     return () => window.removeEventListener("resize", calculateLayout);
   }, [currentGame?.deck?.length, gameState]);
 
+  // Maps named difficulty → integer for odd/even asset routing
+  // odd  (easy=1, hard=3) → local forensic icon deck (zero network cost)
+  // even (medium=2, pro=4) → backend image fetch with icon fallback on failure
+  const LEVEL_INDEX = { easy: 1, medium: 2, hard: 3, pro: 4 };
+
   const loadLevel = async (lvl) => {
     setIsLoading(true);
-    const cacheKey = `matching-${lvl}`;
+    const levelNum   = LEVEL_INDEX[lvl] ?? 1;
+    const isIconLevel = levelNum % 2 !== 0;          // 1,3 → icons; 2,4 → images
+    const cacheKey   = `matching-${lvl}`;
     const MIN_LOADING_TIME = 300;
-    const startTime = Date.now();
+    const startTime  = Date.now();
 
+    if (isIconLevel) {
+      // ── ODD LEVEL: local forensic icon deck, no network call ─────────────────
+      console.log(`[MatchingGame] Level ${levelNum} (${lvl}): Building Local Forensic Icon Matrix.`);
+      setGameConfig({ isIconFallback: true });
+      setIsFallbackUsed(false); // icons are intentional here, not a fallback
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_LOADING_TIME) {
+        await new Promise(r => setTimeout(r, MIN_LOADING_TIME - elapsed));
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    // ── EVEN LEVEL: query backend for image assets ────────────────────────────
+    console.log(`[MatchingGame] Level ${levelNum} (${lvl}): Querying Forensic Laboratory Database for Images.`);
     try {
       const res = await api.get(`/game/matching?level=${lvl}`);
-      
+
       if (!res.data || !res.data.images || res.data.images.length === 0) {
         throw new Error("Empty dataset");
       }
@@ -178,11 +201,11 @@ export default function MatchingGame({ onQuit }) {
 
     } catch (err) {
       console.warn(
-        "Backend connectivity issue detected. Initiating Forensic Fallback Asset Deck.",
+        `[MatchingGame] Database connection issue on image level (${lvl}). Swapping to Local Forensic Icon Deck safely.`,
         err.message
       );
 
-      // Tier 1: previously cached image set from a successful fetch
+      // Tier 1: previously cached images from a successful session
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         setGameConfig({ images: JSON.parse(cached), isIconFallback: false });
@@ -200,24 +223,31 @@ export default function MatchingGame({ onQuit }) {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     loadLevel(level);
   }, [level]);
 
+  // Preload the next level's images only when that next level is an even (image) level
   useEffect(() => {
     const levels = ["easy", "medium", "hard", "pro"];
     const idx = levels.indexOf(level);
     if (idx >= 0 && idx < levels.length - 1) {
-       const nextLvl = levels[idx+1];
-       const preloadNextLevel = async (nextLevel) => {
-         try {
-           const res = await api.get(`/game/matching?level=${nextLevel}`);
-           if (res.data && res.data.images) {
-             localStorage.setItem(`matching-${nextLevel}`, JSON.stringify(res.data.images));
-           }
-         } catch {}
-       };
-       preloadNextLevel(nextLvl);
+      const nextLvl    = levels[idx + 1];
+      const nextNum    = LEVEL_INDEX[nextLvl] ?? 1;
+      const nextIsIcon = nextNum % 2 !== 0;
+
+      if (nextIsIcon) return; // icon levels need no network preload
+
+      const preloadNextLevel = async (nl) => {
+        try {
+          const res = await api.get(`/game/matching?level=${nl}`);
+          if (res.data && res.data.images) {
+            localStorage.setItem(`matching-${nl}`, JSON.stringify(res.data.images));
+          }
+        } catch {}
+      };
+      preloadNextLevel(nextLvl);
     }
   }, [level]);
 
