@@ -34,14 +34,22 @@ export default function Contact() {
 
   const validate = (data = formData) => {
     let newErrors = {};
-    if (!data.name.trim()) newErrors.name = "Full Name is required.";
+    // ── Name: required → min length → strict alpha + single-space regex ──
+    const nameRegex = /^[A-Za-z]+( [A-Za-z]+)*$/;
+    if (!data.name.trim()) {
+      newErrors.name = "Full Name is required.";
+    } else if (data.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters long.";
+    } else if (!nameRegex.test(data.name)) {
+      newErrors.name = "Name may only contain letters. Use a single space between words (e.g. \"John Michael Doe\").";
+    }
     const phoneValidation = validatePhoneNumber(data.phone, data.nationality || 'India');
     if (!phoneValidation.isValid) {
       newErrors.phone = phoneValidation.error;
     }
 
     if (!data.email.trim()) newErrors.email = "Email Address is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
+    else if (!/^(?!.*\.\.)(?!\.)(?!.*\.$)[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z]{2,})+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
     
     if (!data.enquiryCategory) newErrors.enquiryCategory = "Type of Enquiry is required.";
     
@@ -98,22 +106,31 @@ export default function Contact() {
     }
   };
 
+  // ─── Scroll-to-first-error utility ────────────────────────────────
+  // Waits 100ms so React has fully flushed the new error state and
+  // rendered aria-invalid="true" on the invalid fields before we query.
+  const scrollToFirstError = () => {
+    setTimeout(() => {
+      const firstErrorEl = document.querySelector('[aria-invalid="true"]');
+      if (firstErrorEl) {
+        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorEl.focus({ preventScroll: true });
+      }
+    }, 100);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      const allTouched = Object.keys(newErrors).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+      // Mark every invalid field as touched so error UI renders immediately
+      const allTouched = Object.keys(newErrors).reduce(
+        (acc, key) => ({ ...acc, [key]: true }), {}
+      );
       setTouched(prev => ({ ...prev, ...allTouched }));
-      
-      setTimeout(() => {
-        const firstErrorField = document.querySelector(`[name="${Object.keys(newErrors)[0]}"]`);
-        if (firstErrorField) {
-          firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          firstErrorField.focus({ preventScroll: true });
-        }
-      }, 50);
+      scrollToFirstError();
       return;
     }
 
@@ -198,9 +215,26 @@ export default function Contact() {
               <form noValidate onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.name && errors.name ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="John Doe" />
-                    {touched.name && errors.name && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.name}</p>}
+                    <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      aria-invalid={!!(touched.name && errors.name)}
+                      aria-describedby={touched.name && errors.name ? 'name-error' : undefined}
+                      className={`w-full px-4 py-3 rounded-lg border ${
+                        touched.name && errors.name
+                          ? 'border-red-400 focus:ring-red-500'
+                          : 'border-slate-200 focus:ring-primary'
+                      } focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                      placeholder="John Doe"
+                    />
+                    {touched.name && errors.name && (
+                      <p id="name-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Company Name (Optional)</label>
@@ -222,9 +256,26 @@ export default function Contact() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.email && errors.email ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all`} placeholder="john@example.com" />
-                    {touched.email && errors.email && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.email}</p>}
+                    <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      aria-invalid={!!(touched.email && errors.email)}
+                      aria-describedby={touched.email && errors.email ? 'email-error' : undefined}
+                      className={`w-full px-4 py-3 rounded-lg border ${
+                        touched.email && errors.email
+                          ? 'border-red-400 focus:ring-red-500'
+                          : 'border-slate-200 focus:ring-primary'
+                      } focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                      placeholder="john@example.com"
+                    />
+                    {touched.email && errors.email && (
+                      <p id="email-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.email}</p>
+                    )}
                   </div>
                 </div>
 
@@ -247,11 +298,31 @@ export default function Contact() {
                   <label className="block text-sm font-medium text-slate-700">Type of Enquiry *</label>
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="enquiryCategory" value="Educational" checked={formData.enquiryCategory === 'Educational'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input
+                        type="radio"
+                        id="enquiryCategory-educational"
+                        name="enquiryCategory"
+                        value="Educational"
+                        checked={formData.enquiryCategory === 'Educational'}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.enquiryCategory && errors.enquiryCategory)}
+                        className="w-4 h-4 text-primary focus:ring-primary border-slate-300"
+                      />
                       <span className="text-slate-700">Educational</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="enquiryCategory" value="Professional" checked={formData.enquiryCategory === 'Professional'} onChange={handleChange} onBlur={handleBlur} className="w-4 h-4 text-primary focus:ring-primary border-slate-300" />
+                      <input
+                        type="radio"
+                        id="enquiryCategory-professional"
+                        name="enquiryCategory"
+                        value="Professional"
+                        checked={formData.enquiryCategory === 'Professional'}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.enquiryCategory && errors.enquiryCategory)}
+                        className="w-4 h-4 text-primary focus:ring-primary border-slate-300"
+                      />
                       <span className="text-slate-700">Professional</span>
                     </label>
                   </div>
@@ -263,7 +334,20 @@ export default function Contact() {
                   <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Educational Enquiry Type *</label>
-                      <select name="educationType" value={formData.educationType} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.educationType && errors.educationType ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
+                      <select
+                        id="educationType"
+                        name="educationType"
+                        value={formData.educationType}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.educationType && errors.educationType)}
+                        aria-describedby={touched.educationType && errors.educationType ? 'educationType-error' : undefined}
+                        className={`w-full px-4 py-3 rounded-lg border ${
+                          touched.educationType && errors.educationType
+                            ? 'border-red-400 focus:ring-red-500'
+                            : 'border-slate-200 focus:ring-primary'
+                        } focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}
+                      >
                         <option value="">Select an Option</option>
                         <option value="Courses">Courses</option>
                         <option value="Internships">Internships</option>
@@ -271,14 +355,33 @@ export default function Contact() {
                         <option value="Workshop">Workshop</option>
                         <option value="Other">Other</option>
                       </select>
-                      {touched.educationType && errors.educationType && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.educationType}</p>}
+                      {touched.educationType && errors.educationType && (
+                        <p id="educationType-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.educationType}</p>
+                      )}
                     </div>
 
                     {formData.educationType === 'Other' && (
                       <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Please describe your requirement *</label>
-                        <textarea name="customRequirement" value={formData.customRequirement} onChange={handleChange} onBlur={handleBlur} rows="3" className={`w-full px-4 py-3 rounded-lg border ${touched.customRequirement && errors.customRequirement ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`} placeholder="Describe your educational needs..."></textarea>
-                        {touched.customRequirement && errors.customRequirement && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.customRequirement}</p>}
+                        <label htmlFor="customRequirement" className="block text-sm font-medium text-slate-700 mb-2">Please describe your requirement *</label>
+                        <textarea
+                          id="customRequirement"
+                          name="customRequirement"
+                          value={formData.customRequirement}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          rows="3"
+                          aria-invalid={!!(touched.customRequirement && errors.customRequirement)}
+                          aria-describedby={touched.customRequirement && errors.customRequirement ? 'customRequirement-error' : undefined}
+                          className={`w-full px-4 py-3 rounded-lg border ${
+                            touched.customRequirement && errors.customRequirement
+                              ? 'border-red-400 focus:ring-red-500'
+                              : 'border-slate-200 focus:ring-primary'
+                          } focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`}
+                          placeholder="Describe your educational needs..."
+                        />
+                        {touched.customRequirement && errors.customRequirement && (
+                          <p id="customRequirement-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.customRequirement}</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -288,8 +391,21 @@ export default function Contact() {
                 {formData.enquiryCategory === 'Professional' && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Select Professional Service *</label>
-                      <select name="professionalService" value={formData.professionalService} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.professionalService && errors.professionalService ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
+                      <label htmlFor="professionalService" className="block text-sm font-medium text-slate-700 mb-2">Select Professional Service *</label>
+                      <select
+                        id="professionalService"
+                        name="professionalService"
+                        value={formData.professionalService}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.professionalService && errors.professionalService)}
+                        aria-describedby={touched.professionalService && errors.professionalService ? 'professionalService-error' : undefined}
+                        className={`w-full px-4 py-3 rounded-lg border ${
+                          touched.professionalService && errors.professionalService
+                            ? 'border-red-400 focus:ring-red-500'
+                            : 'border-slate-200 focus:ring-primary'
+                        } focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}
+                      >
                         <option value="">Select a Service</option>
                         <option value="Fingerprint Verification">Fingerprint Verification</option>
                         <option value="Signature Verification">Signature Verification</option>
@@ -301,13 +417,28 @@ export default function Contact() {
                         <option value="Biological Analysis">Biological Analysis</option>
                         <option value="Toxicology Analysis">Toxicology Analysis</option>
                       </select>
-                      {touched.professionalService && errors.professionalService && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.professionalService}</p>}
+                      {touched.professionalService && errors.professionalService && (
+                        <p id="professionalService-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.professionalService}</p>
+                      )}
                     </div>
 
                     {formData.professionalService === 'Cyber Forensic' && (
                       <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Select Cyber Forensic Service *</label>
-                        <select name="cyberSubService" value={formData.cyberSubService} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-lg border ${touched.cyberSubService && errors.cyberSubService ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}>
+                        <label htmlFor="cyberSubService" className="block text-sm font-medium text-slate-700 mb-2">Select Cyber Forensic Service *</label>
+                        <select
+                          id="cyberSubService"
+                          name="cyberSubService"
+                          value={formData.cyberSubService}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          aria-invalid={!!(touched.cyberSubService && errors.cyberSubService)}
+                          aria-describedby={touched.cyberSubService && errors.cyberSubService ? 'cyberSubService-error' : undefined}
+                          className={`w-full px-4 py-3 rounded-lg border ${
+                            touched.cyberSubService && errors.cyberSubService
+                              ? 'border-red-400 focus:ring-red-500'
+                              : 'border-slate-200 focus:ring-primary'
+                          } focus:outline-none focus:ring-2 focus:border-transparent transition-all bg-white`}
+                        >
                           <option value="">Select a Cyber Service</option>
                           <option value="63(4)(c) Certificate BSA">63(4)(c) Certificate BSA</option>
                           <option value="65B Certificate">65B Certificate</option>
@@ -318,16 +449,35 @@ export default function Contact() {
                           <option value="Social Media Analysis">Social Media Analysis</option>
                           <option value="Other">Other</option>
                         </select>
-                        {touched.cyberSubService && errors.cyberSubService && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.cyberSubService}</p>}
+                        {touched.cyberSubService && errors.cyberSubService && (
+                          <p id="cyberSubService-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.cyberSubService}</p>
+                        )}
                       </div>
                     )}
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Message *</label>
-                  <textarea name="message" value={formData.message} onChange={handleChange} onBlur={handleBlur} rows="5" className={`w-full px-4 py-3 rounded-lg border ${touched.message && errors.message ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`} placeholder="How can we help you?"></textarea>
-                  {touched.message && errors.message && <p className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.message}</p>}
+                  <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">Message *</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    rows="5"
+                    aria-invalid={!!(touched.message && errors.message)}
+                    aria-describedby={touched.message && errors.message ? 'message-error' : undefined}
+                    className={`w-full px-4 py-3 rounded-lg border ${
+                      touched.message && errors.message
+                        ? 'border-red-400 focus:ring-red-500'
+                        : 'border-slate-200 focus:ring-primary'
+                    } focus:outline-none focus:ring-2 focus:border-transparent transition-all resize-none`}
+                    placeholder="How can we help you?"
+                  />
+                  {touched.message && errors.message && (
+                    <p id="message-error" className="text-red-500 text-sm mt-1 animate-in fade-in duration-300">{errors.message}</p>
+                  )}
                 </div>
 
                 <motion.div variants={textVariants}>

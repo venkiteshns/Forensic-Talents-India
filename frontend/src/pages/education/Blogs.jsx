@@ -133,11 +133,19 @@ export default function Blogs() {
           </div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="text-center">
-            <motion.a variants={textVariants} href="https://forensictalents.blogspot.com/?m=1" target="_blank" rel="noopener noreferrer" className="inline-block">
-              <Button variant="outline" size="lg" className="group border-slate-300 hover:border-primary hover:bg-slate-100 text-slate-800 font-bold px-8">
+            <motion.div variants={textVariants} className="inline-block">
+              <Button
+                as="a"
+                href="https://forensictalents.blogspot.com/?m=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outline"
+                size="lg"
+                className="group border-slate-300 hover:border-primary hover:bg-slate-100 text-slate-800 font-bold px-8 inline-flex items-center"
+              >
                 View All Blogs <ExternalLink size={18} className="ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </Button>
-            </motion.a>
+            </motion.div>
           </motion.div>
         </Container>
       </section>

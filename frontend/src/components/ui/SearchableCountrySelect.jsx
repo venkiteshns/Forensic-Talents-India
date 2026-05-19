@@ -9,7 +9,8 @@ export default function SearchableCountrySelect({
   error, 
   touched, 
   label = "Country", 
-  required = false 
+  required = false,
+  name = "nationality"
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,6 +70,20 @@ export default function SearchableCountrySelect({
 
   return (
     <div className="relative" style={{ zIndex: 1 }}>
+      {/* Hidden sentinel: gives scroll-to-error a real focusable DOM node to target
+          when this custom dropdown widget is in an error state.              */}
+      <input
+        type="text"
+        id={name}
+        name={name}
+        aria-invalid={!!(touched && error)}
+        aria-describedby={touched && error ? `${name}-error` : undefined}
+        tabIndex={-1}
+        readOnly
+        aria-hidden="true"
+        className="sr-only"
+        style={{ position: 'absolute', pointerEvents: 'none' }}
+      />
       {label && (
         <label className="block text-sm font-bold text-slate-700 mb-1.5 relative z-1">
           {label} {required && <span className="text-red-500">*</span>}

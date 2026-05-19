@@ -589,10 +589,9 @@ export default function Home() {
                 whileTap={{ scale: 0.98 }}
                 transition={SPRING.hover}
               >
-                <Button variant="accent" size="lg" className="group">
-                  <Link to="/contact" className="flex items-center gap-2">
-                    Book Consultation <ArrowRight size={20} />
-                  </Link>
+                {/* as={Link} renders a single <a> — no invalid <a> inside <button> */}
+                <Button as={Link} to="/contact" variant="accent" size="lg" className="group flex items-center gap-2">
+                  Book Consultation <ArrowRight size={20} />
                 </Button>
               </motion.div>
               <motion.div
@@ -600,8 +599,8 @@ export default function Home() {
                 whileTap={{ scale: 0.98 }}
                 transition={SPRING.hover}
               >
-                <Button variant="secondary" size="lg">
-                  <Link to="/services">Explore Services</Link>
+                <Button as={Link} to="/services" variant="secondary" size="lg">
+                  Explore Services
                 </Button>
               </motion.div>
             </motion.div>
@@ -637,10 +636,8 @@ export default function Home() {
                 We operate at the intersection of science, law, and technology. Our deeply qualified experts provide multidisciplinary forensic solutions ranging from questioned documents to cyber forensics. Reports and expert opinions provided are valid under Section 39 of the Bharatiya Sakshya Adhiniyam, 2023 (Section 45 of the Indian Evidence Act), highly respected across Indian and International courts.
               </p>
               <motion.div whileHover={{ x: 3 }} transition={SPRING.hover}>
-                <Button variant="ghost">
-                  <Link to="/about" className="flex items-center gap-2 font-semibold">
-                    About Us <ArrowRight size={18} />
-                  </Link>
+                <Button as={Link} to="/about" variant="ghost" className="flex items-center gap-2 font-semibold">
+                  About Us <ArrowRight size={18} />
                 </Button>
               </motion.div>
             </div>
@@ -783,8 +780,8 @@ export default function Home() {
                 transition={SPRING.hover}
                 className="inline-block"
               >
-                <Button variant="primary" size="lg">
-                  <Link to="/contact">Request a Callback</Link>
+                <Button as={Link} to="/contact" variant="primary" size="lg">
+                  Request a Callback
                 </Button>
               </motion.div>
             </div>

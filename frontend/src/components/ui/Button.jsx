@@ -6,6 +6,7 @@ export const Button = forwardRef(({
   variant = 'primary',
   size = 'md',
   className,
+  as: Component = 'button',   // ← polymorphic: pass as={Link} to avoid <a> inside <button>
   ...props
 }, ref) => {
   const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-300 rounded";
@@ -24,13 +25,13 @@ export const Button = forwardRef(({
   };
 
   return (
-    <button
+    <Component
       ref={ref}
       className={cn(baseStyles, variants[variant], sizes[size], className)}
       {...props}
     >
       {children}
-    </button>
+    </Component>
   );
 });
 
