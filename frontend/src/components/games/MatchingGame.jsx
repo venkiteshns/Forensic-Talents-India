@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
-import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Fingerprint, Dna, Microscope, BadgeAlert, Camera, Search, Pipette, Briefcase, FileSignature, Gavel, Shield, FlaskConical } from 'lucide-react';
+import { RefreshCw, Play, CheckCircle2, Clock, ArrowLeft, Fingerprint, Dna, Microscope, BadgeAlert, Camera, Search, Pipette, Briefcase, FileSignature, Gavel, Shield, FlaskConical, Crosshair, Scale, Skull, Eye, FileText } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import api from '../../utils/api';
 import { getErrorMessage } from '../../utils/errorHandler';
@@ -21,27 +21,23 @@ const MEMORY_LEVELS = {
   pro:     { pairs: 12, maxMoves: 35 }
 };
 
-const ICON_SET = [
-  "/icons/fingerprint.svg",
-  "/icons/dna.svg",
-  "/icons/microscope.svg",
-  "/icons/evidence.svg",
-  "/icons/lab.svg",
-  "/icons/camera.svg",
-  "/icons/badge.svg",
-  "/icons/search.svg",
-  "/icons/pipette.svg",
-  "/icons/briefcase.svg",
-  "/icons/file-signature.svg",
-  "/icons/gavel.svg"
+// ─── Lucide-React Forensic Fallback Icon Deck ────────────────────────────────
+// Used whenever the backend API is unreachable (network outage, DB drop, etc.).
+// 12 unique icons → duplicated + shuffled → up to 24-card game matrix (Pro level).
+const FORENSIC_FALLBACK_ICONS = [
+  { id: 'f-1',  type: 'fingerprint',   bg: '#EFF6FF', icon: <Fingerprint className="w-8 h-8" style={{ color: '#2563EB' }} /> },  // blue
+  { id: 'f-2',  type: 'ballistics',    bg: '#FEF2F2', icon: <Crosshair   className="w-8 h-8" style={{ color: '#DC2626' }} /> },  // red
+  { id: 'f-3',  type: 'cyber',         bg: '#F0FDF4', icon: <Shield      className="w-8 h-8" style={{ color: '#16A34A' }} /> },  // green
+  { id: 'f-4',  type: 'analysis',      bg: '#FFF7ED', icon: <Search      className="w-8 h-8" style={{ color: '#EA580C' }} /> },  // orange
+  { id: 'f-5',  type: 'legal',         bg: '#FAF5FF', icon: <Scale       className="w-8 h-8" style={{ color: '#7C3AED' }} /> },  // purple
+  { id: 'f-6',  type: 'pathology',     bg: '#FFF1F2', icon: <Skull       className="w-8 h-8" style={{ color: '#BE123C' }} /> },  // rose
+  { id: 'f-7',  type: 'surveillance',  bg: '#F0F9FF', icon: <Eye         className="w-8 h-8" style={{ color: '#0284C7' }} /> },  // sky
+  { id: 'f-8',  type: 'documentation', bg: '#FEFCE8', icon: <FileText    className="w-8 h-8" style={{ color: '#CA8A04' }} /> },  // amber
+  { id: 'f-9',  type: 'forensic-lab',  bg: '#F0FDF4', icon: <Microscope  className="w-8 h-8" style={{ color: '#059669' }} /> },  // emerald
+  { id: 'f-10', type: 'judiciary',     bg: '#FFF7ED', icon: <Gavel       className="w-8 h-8" style={{ color: '#B45309' }} /> },  // brown
+  { id: 'f-11', type: 'crime-scene',   bg: '#F5F3FF', icon: <Camera      className="w-8 h-8" style={{ color: '#6D28D9' }} /> },  // violet
+  { id: 'f-12', type: 'investigation', bg: '#FFF1F2', icon: <Briefcase   className="w-8 h-8" style={{ color: '#9F1239' }} /> },  // crimson
 ];
-
-const fallbackMatchingData = {
-  easy: ICON_SET,
-  medium: ICON_SET,
-  hard: ICON_SET,
-  pro: ICON_SET
-};
 
 const preloadImages = (images) => {
   images.forEach((src) => {
@@ -74,6 +70,20 @@ const generateDeck = (customImages, numPairs) => {
   }
   return deck;
 };
+
+// Builds a paired + shuffled icon deck from FORENSIC_FALLBACK_ICONS.
+// numPairs is capped at 8 (the array length) — pro mode will use 8 pairs.
+const generateIconDeck = (numPairs) => {
+  const icons = FORENSIC_FALLBACK_ICONS.slice(0, Math.min(numPairs, FORENSIC_FALLBACK_ICONS.length));
+  return [...icons, ...icons]
+    .map((card, index) => ({
+      ...card,
+      uniqueId: `${card.id}-${index}`,
+      isIcon: true,
+    }))
+    .sort(() => Math.random() - 0.5);
+};
+
 
 export default function MatchingGame({ onQuit }) {
   const { isUnlocked, unlockNextLevel } = useGameProgress('matching');
@@ -162,19 +172,23 @@ export default function MatchingGame({ onQuit }) {
         throw new Error("Empty dataset");
       }
 
-      setGameConfig({ images: res.data.images });
+      setGameConfig({ images: res.data.images, isIconFallback: false });
       localStorage.setItem(cacheKey, JSON.stringify(res.data.images));
       setIsFallbackUsed(false);
 
     } catch (err) {
-      console.warn("Using fallback data:", err.message);
+      console.warn(
+        "Backend connectivity issue detected. Initiating Forensic Fallback Asset Deck.",
+        err.message
+      );
 
+      // Tier 1: previously cached image set from a successful fetch
       const cached = localStorage.getItem(cacheKey);
-
       if (cached) {
-        setGameConfig({ images: JSON.parse(cached) });
+        setGameConfig({ images: JSON.parse(cached), isIconFallback: false });
       } else {
-        setGameConfig({ images: fallbackMatchingData[lvl] });
+        // Tier 2: zero-network Lucide-icon deck — works fully offline
+        setGameConfig({ isIconFallback: true });
       }
       setIsFallbackUsed(true);
 
@@ -208,9 +222,23 @@ export default function MatchingGame({ onQuit }) {
   }, [level]);
 
   const generateGameData = useCallback((config, lvl) => {
-    if (!config || !config.images || config.images.length < MEMORY_LEVELS[lvl].pairs) return null;
-    const deck = generateDeck(config.images, MEMORY_LEVELS[lvl].pairs);
-    return { deck, config: MEMORY_LEVELS[lvl] };
+    if (!config) return null;
+    const pairs = MEMORY_LEVELS[lvl].pairs;
+
+    if (config.isIconFallback) {
+      // Offline path: icon deck capped at available unique icons
+      const actualPairs = Math.min(pairs, FORENSIC_FALLBACK_ICONS.length);
+      const deck = generateIconDeck(actualPairs);
+      // CRITICAL: config.pairs must equal actualPairs so the completion
+      // check (matchedIds.size === config.pairs) fires at the right moment
+      return { deck, config: { ...MEMORY_LEVELS[lvl], pairs: actualPairs } };
+    }
+
+    if (!config.images || config.images.length < 2) return null;
+    // Use however many images the API returned; don't hard-fail on pair count
+    const availablePairs = Math.min(pairs, config.images.length);
+    const deck = generateDeck(config.images, availablePairs);
+    return { deck, config: { ...MEMORY_LEVELS[lvl], pairs: availablePairs } };
   }, []);
 
   const nextGame = useMemo(() => {
@@ -370,7 +398,7 @@ export default function MatchingGame({ onQuit }) {
               <button 
                 ref={startRef}
                 onClick={handleStartGameClick} 
-                disabled={isLoading || !nextGame}
+                disabled={isLoading || (!nextGame && level !== 'pro')}
                 className="start-game-btn w-full max-w-[260px] mx-auto flex items-center justify-center gap-2 text-[13px] min-[320px]:text-sm sm:text-base font-bold px-[12px] py-[10px] min-[320px]:px-4 min-[320px]:py-3 sm:px-6 sm:py-4 rounded-[10px] min-[320px]:rounded-xl bg-accent hover:bg-accent-light text-slate-900 transition-all duration-200 shadow-lg hover:shadow-accent/30 hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isLoading ? (
@@ -488,7 +516,10 @@ export default function MatchingGame({ onQuit }) {
                               <Fingerprint className="absolute text-slate-300 w-1/3 h-1/3" />
                             </div>
                             <div className={cn("absolute inset-0 bg-white border-2 rounded-xl flex items-center justify-center overflow-hidden p-1.5", isMatched ? "border-green-400 bg-green-50" : "border-primary")} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                              <img src={card.imageUrl} alt="Card Match" className="w-full h-full object-cover opacity-90 rounded-md" />
+                              {card.isIcon
+                                ? <div className="w-full h-full flex items-center justify-center rounded-xl border border-slate-100" style={{ backgroundColor: isMatched ? '#F0FDF4' : (card.bg || '#F8FAFC') }}>{card.icon}</div>
+                                : <img src={card.imageUrl} alt="Evidence" className="w-full h-full object-cover opacity-90 rounded-md" />
+                              }
                             </div>
                           </div>
                           </div>
