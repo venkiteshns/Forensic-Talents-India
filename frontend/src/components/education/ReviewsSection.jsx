@@ -148,64 +148,72 @@ export default function ReviewsSection({ type }) {
         
         {/* Client Testimonials (Service) */}
         {(!type || type === 'service') && (
-          <div className="mb-12">
-            {/* Header Block */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1, margin: "0px 0px -40px 0px" }}
-              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
-              className="text-center mb-12"
-            >
-              <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">CLIENT VOICES</p>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4">Client Testimonials</h2>
-              <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</p>
-            </motion.div>
-
-            {/* Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1, margin: '0px 0px -40px 0px' }}
+            transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+            className="mb-14"
+          >
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
-                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl"></div>)}
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl" />)}
               </div>
             ) : serviceReviews.length === 0 ? (
-              <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
-                No reviews currently registered.
-              </div>
+              <>
+                <div className="mb-8">
+                  <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">CLIENT VOICES</p>
+                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-1">Client Testimonials</h2>
+                  <p className="text-sm text-slate-500">Feedback from our forensic investigation and legal consultancy clients.</p>
+                </div>
+                <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
+                  No reviews currently registered.
+                </div>
+              </>
             ) : (
-              <TestimonialCarousel testimonials={serviceReviews} />
+              <TestimonialCarousel
+                testimonials={serviceReviews}
+                supertag="CLIENT VOICES"
+                title="Client Testimonials"
+                description="Feedback from our forensic investigation and legal consultancy clients."
+              />
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Student Testimonials (Education) */}
         {(!type || type === 'education') && (
-          <div className="mb-12">
-            {/* Header Block */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1, margin: "0px 0px -40px 0px" }}
-              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
-              className="text-center mb-12"
-            >
-              <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">STUDENT VOICES</p>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4">Student Testimonials</h2>
-              <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</p>
-            </motion.div>
-
-            {/* Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1, margin: '0px 0px -40px 0px' }}
+            transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+            className="mb-14"
+          >
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
-                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl"></div>)}
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl" />)}
               </div>
             ) : educationReviews.length === 0 ? (
-              <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
-                No reviews currently registered.
-              </div>
+              <>
+                <div className="mb-8">
+                  <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">STUDENT VOICES</p>
+                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-1">Student Testimonials</h2>
+                  <p className="text-sm text-slate-500">Hear from participants of our professional forensic training and internship programs.</p>
+                </div>
+                <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
+                  No reviews currently registered.
+                </div>
+              </>
             ) : (
-              <TestimonialCarousel testimonials={educationReviews} />
+              <TestimonialCarousel
+                testimonials={educationReviews}
+                supertag="STUDENT VOICES"
+                title="Student Testimonials"
+                description="Hear from participants of our professional forensic training and internship programs."
+              />
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Submission Form */}
