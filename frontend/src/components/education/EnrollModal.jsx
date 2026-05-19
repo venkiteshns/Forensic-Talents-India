@@ -79,9 +79,21 @@ export function EnrollModal({ isOpen, course, onClose }) {
 
   const validate = (data = formData) => {
     let newErrors = {};
-    if (!data.name.trim())  newErrors.name  = "Full Name is required.";
-    if (!data.email.trim()) newErrors.email = "Email Address is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = "Please enter a valid email address.";
+    // ── Name: required → min-length → strict alpha + single-space regex ──
+    const nameRegex = /^[A-Za-z]+( [A-Za-z]+)*$/;
+    if (!data.name.trim()) {
+      newErrors.name = "Full Name is required.";
+    } else if (data.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters long.";
+    } else if (!nameRegex.test(data.name)) {
+      newErrors.name = "Name may only contain letters. Use a single space between words (e.g. \"Rahul Sharma\").";
+    }
+    // ── Email: strict pattern — no consecutive dots, leading dot, or trailing dot ──
+    if (!data.email.trim()) {
+      newErrors.email = "Email Address is required.";
+    } else if (!/^(?!.*\.\.)(?!\.)(?!.*\.$)[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z]{2,})+$/.test(data.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
 
     const phoneValidation = validatePhoneNumber(data.phone, data.nationality || 'India');
     if (!phoneValidation.isValid) newErrors.phone = phoneValidation.error;
@@ -274,14 +286,40 @@ export function EnrollModal({ isOpen, course, onClose }) {
                   <h4 className="text-sm font-bold text-primary uppercase tracking-wider border-b border-slate-100 pb-2">Personal Information</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1 mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Full Name <span className="text-red-500">*</span></label>
-                      <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.name && errors.name ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="e.g. Rahul Sharma" />
-                      {touched.name && errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                      <label htmlFor="enroll-name" className="block text-sm font-bold text-slate-700 mb-1">Full Name <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        id="enroll-name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.name && errors.name)}
+                        aria-describedby={touched.name && errors.name ? 'enroll-name-error' : undefined}
+                        className={`w-full px-4 py-3 rounded-xl border ${touched.name && errors.name ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`}
+                        placeholder="e.g. Rahul Sharma"
+                      />
+                      {touched.name && errors.name && (
+                        <p id="enroll-name-error" className="text-red-500 text-sm mt-1">{errors.name}</p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-1 mb-4">
-                      <label className="block text-sm font-bold text-slate-700 mb-1">Email <span className="text-red-500">*</span></label>
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} className={`w-full px-4 py-3 rounded-xl border ${touched.email && errors.email ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`} placeholder="rahul@example.com" />
-                      {touched.email && errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                      <label htmlFor="enroll-email" className="block text-sm font-bold text-slate-700 mb-1">Email <span className="text-red-500">*</span></label>
+                      <input
+                        type="email"
+                        id="enroll-email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        aria-invalid={!!(touched.email && errors.email)}
+                        aria-describedby={touched.email && errors.email ? 'enroll-email-error' : undefined}
+                        className={`w-full px-4 py-3 rounded-xl border ${touched.email && errors.email ? 'border-red-400 focus:ring-red-500' : 'border-slate-200 focus:ring-accent'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`}
+                        placeholder="rahul@example.com"
+                      />
+                      {touched.email && errors.email && (
+                        <p id="enroll-email-error" className="text-red-500 text-sm mt-1">{errors.email}</p>
+                      )}
                     </div>
                   </div>
 
