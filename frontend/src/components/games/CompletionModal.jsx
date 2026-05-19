@@ -175,20 +175,32 @@ export default function CompletionModal({
           border-radius: 20px;
           max-width: 420px;
           width: 100%;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+          box-shadow: none;
           position: relative;
-          border: 1px solid rgba(0, 0, 0, 0.05);
+          border: 1px solid #E2E8F0;
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          max-height: 85vh;
+        }
+
+        @media (min-width: 768px) {
+          .completion-modal {
+            max-height: none;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+          }
         }
 
         .completion-modal-content {
-          padding: 32px 24px;
+          padding: 16px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          max-height: 90vh;
           overflow-y: auto;
+          flex: 1 1 auto;
+          min-height: 0;
           scrollbar-width: none; /* Firefox */
         }
 
@@ -196,19 +208,26 @@ export default function CompletionModal({
           display: none; /* Chrome/Safari */
         }
 
+        @media (min-width: 640px) {
+          .completion-modal-content {
+            padding: 24px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .completion-modal-content {
+            padding: 32px 24px;
+          }
+        }
+
         @media (max-width: 510px) {
           .completion-modal {
             width: 92%;
-            max-height: 85vh;
-            margin: 16px;
-            margin-top: calc(16px + env(safe-area-inset-top));
-            margin-bottom: calc(16px + env(safe-area-inset-bottom));
             border-radius: 16px;
           }
 
-          .completion-modal-content {
-            padding: 24px 20px;
-            max-height: calc(85vh - 20px);
+          .modal-overlay {
+            padding: calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 12px);
           }
         }
 
@@ -217,12 +236,19 @@ export default function CompletionModal({
         }
 
         .success-icon-container {
-          margin-bottom: 20px;
+          margin-bottom: 12px;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+          .success-icon-container {
+            margin-bottom: 20px;
+          }
         }
 
         .success-icon-bg {
-          width: 64px;
-          height: 64px;
+          width: 48px;
+          height: 48px;
           background: #ECFDF5;
           border-radius: 50%;
           display: flex;
@@ -231,17 +257,37 @@ export default function CompletionModal({
           border: 1px solid #D1FAE5;
         }
 
+        @media (min-width: 768px) {
+          .success-icon-bg {
+            width: 64px;
+            height: 64px;
+          }
+        }
+
         .modal-title {
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 600;
           color: #0F172A;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
+        }
+
+        @media (min-width: 768px) {
+          .modal-title {
+            font-size: 20px;
+            margin-bottom: 12px;
+          }
         }
 
         .progress-section {
           width: 100%;
-          margin-bottom: 24px;
+          margin-bottom: 12px;
           max-width: 280px;
+        }
+
+        @media (min-width: 768px) {
+          .progress-section {
+            margin-bottom: 24px;
+          }
         }
 
         .progress-text {
@@ -271,13 +317,21 @@ export default function CompletionModal({
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-          gap: 16px;
+          gap: 12px;
           width: 100%;
-          margin-bottom: 24px;
-          padding: 16px;
+          margin-bottom: 12px;
+          padding: 12px;
           background: #F8FAFC;
           border-radius: 12px;
           border: 1px solid #F1F5F9;
+        }
+
+        @media (min-width: 768px) {
+          .stats-grid {
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+          }
         }
 
         .stat-item {
@@ -300,26 +354,43 @@ export default function CompletionModal({
         }
 
         .reinforcement-message {
-          font-size: 14px;
+          font-size: 13px;
           color: #475569;
-          line-height: 1.6;
-          margin-bottom: 32px;
-          padding: 0 8px;
+          line-height: 1.55;
+          margin-bottom: 16px;
+          padding: 0 4px;
+        }
+
+        @media (min-width: 768px) {
+          .reinforcement-message {
+            font-size: 14px;
+            margin-bottom: 32px;
+            padding: 0 8px;
+          }
         }
 
         .cta-group {
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 640px) {
+          .cta-group {
+            gap: 12px;
+          }
         }
 
         .primary-cta {
           background: #2563EB;
           color: white;
-          height: 48px;
+          height: 44px;
           border-radius: 12px;
-          font-weight: 600;
+          font-weight: 700;
+          font-size: 14px;
+          letter-spacing: -0.01em;
           width: 100%;
           display: flex;
           align-items: center;
@@ -328,7 +399,17 @@ export default function CompletionModal({
           transition: all 200ms ease;
           border: none;
           cursor: pointer;
-          font-size: 15px;
+        }
+
+        .primary-cta:active {
+          transform: scale(0.98);
+        }
+
+        @media (min-width: 768px) {
+          .primary-cta {
+            height: 48px;
+            font-size: 15px;
+          }
         }
 
         .primary-cta:hover {
@@ -340,9 +421,11 @@ export default function CompletionModal({
         .secondary-cta {
           background: transparent;
           color: #475569;
-          height: 48px;
+          height: 44px;
           border-radius: 12px;
-          font-weight: 600;
+          font-weight: 700;
+          font-size: 13px;
+          letter-spacing: -0.01em;
           width: 100%;
           display: flex;
           align-items: center;
@@ -351,7 +434,17 @@ export default function CompletionModal({
           transition: all 200ms ease;
           border: 1px solid #E2E8F0;
           cursor: pointer;
-          font-size: 14px;
+        }
+
+        .secondary-cta:active {
+          transform: scale(0.98);
+        }
+
+        @media (min-width: 768px) {
+          .secondary-cta {
+            height: 48px;
+            font-size: 14px;
+          }
         }
 
         .secondary-cta:hover {
