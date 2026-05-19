@@ -143,53 +143,69 @@ export default function ReviewsSection({ type }) {
   };
 
   return (
-    <section className="py-20 bg-slate-50 relative overflow-hidden">
+    <section className="w-full h-auto bg-white py-16 md:py-24 px-4 border-t border-slate-100 relative">
       <Container>
         
         {/* Client Testimonials (Service) */}
         {(!type || type === 'service') && (
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="mb-20">
-            <motion.div variants={containerVariants} className="text-center mb-12">
-              <motion.h2 variants={textVariants} className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Client Testimonials</motion.h2>
-              <motion.div variants={textVariants} className="h-1 w-20 bg-accent mx-auto rounded-full"></motion.div>
-              <motion.p variants={textVariants} className="text-slate-600 mt-4 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</motion.p>
+          <div className="mb-12">
+            {/* Header Block */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1, margin: "0px 0px -40px 0px" }}
+              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+              className="text-center mb-12"
+            >
+              <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">CLIENT VOICES</p>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4">Client Testimonials</h2>
+              <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">Feedback from our forensic investigation and legal consultancy clients.</p>
             </motion.div>
-            
+
+            {/* Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl"></div>)}
               </div>
             ) : serviceReviews.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-slate-500 italic">No client reviews yet.</p>
+              <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
+                No reviews currently registered.
               </div>
             ) : (
-              <TestimonialCarousel testimonials={serviceReviews} speed={28} />
+              <TestimonialCarousel testimonials={serviceReviews} />
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Student Testimonials (Education) */}
         {(!type || type === 'education') && (
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={containerVariants} className="mb-24">
-            <motion.div variants={containerVariants} className="text-center mb-12">
-              <motion.h2 variants={textVariants} className="text-3xl md:text-4xl font-heading font-bold text-primary mb-4">Student Testimonials</motion.h2>
-              <motion.div variants={textVariants} className="h-1 w-20 bg-accent mx-auto rounded-full"></motion.div>
-              <motion.p variants={textVariants} className="text-slate-600 mt-4 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</motion.p>
+          <div className="mb-12">
+            {/* Header Block */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1, margin: "0px 0px -40px 0px" }}
+              transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+              className="text-center mb-12"
+            >
+              <p className="text-xs font-bold tracking-widest uppercase text-slate-400 mb-2">STUDENT VOICES</p>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 mb-4">Student Testimonials</h2>
+              <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto">Hear from participants of our professional forensic training and internship programs.</p>
             </motion.div>
-            
+
+            {/* Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-200 animate-pulse rounded-2xl"></div>)}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
+                {[1, 2, 3].map(i => <div key={i} className="h-48 bg-slate-100 animate-pulse rounded-xl"></div>)}
               </div>
             ) : educationReviews.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-slate-500 italic">No student reviews yet.</p>
+              <div className="w-full max-w-md mx-auto py-6 border border-dashed border-slate-200 rounded-xl text-center text-sm text-slate-400">
+                No reviews currently registered.
               </div>
             ) : (
-              <TestimonialCarousel testimonials={educationReviews} speed={32} />
+              <TestimonialCarousel testimonials={educationReviews} />
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Submission Form */}

@@ -760,9 +760,11 @@ export default function Home() {
       </section>
 
       {/* ─── REVIEWS ───────────────────────────────────────────── */}
-      <FadeInSection>
-        <ReviewsSection />
-      </FadeInSection>
+      {/* NOTE: ReviewsSection owns its own per-element whileInView observers.
+           Do NOT wrap in FadeInSection — that applies opacity:0 to the entire
+           tall block and requires amount:0.35 of the full section to enter the
+           viewport before anything reveals. On mobile this causes a dead gap. */}
+      <ReviewsSection />
 
       {/* ─── CTA ───────────────────────────────────────────────── */}
       <section className="py-24 bg-white text-center">
